@@ -1,0 +1,246 @@
+// dd stock
+
+.dd-select {
+  border-radius: 2px;
+  border: solid 1px #ccc;
+  position: relative;
+  cursor: pointer;
+}
+
+.dd-desc {
+  color: #aaa;
+  display: block;
+  overflow: hidden;
+  font-weight: normal;
+  line-height: 1.4em;
+}
+
+.dd-selected {
+  overflow: hidden;
+  display: block;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.dd-pointer {
+  width: 0;
+  height: 0;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  margin-top: -3px;
+}
+
+.dd-pointer-down {
+  border: solid 5px transparent;
+  border-top: solid 5px #000;
+}
+
+.dd-pointer-up {
+  border: solid 5px transparent !important;
+  border-bottom: solid 5px #000 !important;
+  margin-top: -8px;
+}
+
+.dd-options {
+  border: solid 1px #ccc;
+  border-top: none;
+  list-style: none;
+  box-shadow: 0px 1px 5px #ddd;
+  //display: none;
+  position: absolute;
+  z-index: 2000;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  overflow: auto;
+}
+
+.dd-option {
+  padding: 10px;
+  display: block;
+  border-bottom: solid 1px #ddd;
+  overflow: hidden;
+  text-decoration: none;
+  color: #333;
+  cursor: pointer;
+  -webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  -ms-transition: all 0.25s ease-in-out;
+}
+
+.dd-options > li:last-child > .dd-option {
+  border-bottom: none;
+}
+
+.dd-option:hover {
+  background: #f3f3f3;
+  color: #000;
+}
+
+.dd-selected-description-truncated {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dd-option-selected {
+  background: #f6f6f6;
+}
+
+.dd-option-image, .dd-selected-image {
+  vertical-align: middle;
+  float: left;
+  margin-right: 5px;
+  max-width: 64px;
+}
+
+.dd-image-right {
+  float: right;
+  margin-right: 15px;
+  margin-left: 5px;
+}
+
+.dd-container {
+  position: relative;
+}
+
+.dd-selected-text {
+  font-weight: bold
+}
+
+// custom
+
+.select-wrap {
+  width: 100%;
+  @media (min-width: 520px) {
+    max-width: 32.4rem;
+  }
+}
+
+.select {
+  display: none !important;
+}
+
+.dd-select,
+.dd-options,
+.dd-container {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.dd-options,
+.dd-container {
+  background-color: transparent !important;
+  border: none !important;
+  transition-duration: .3s !important;
+}
+
+.dd-option {
+  position: relative;
+  padding: 10px 14px !important;
+}
+
+.dd-options {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  top: 75px;
+
+  li {
+    margin-bottom: 5px;
+    height: fit-content !important;
+  }
+}
+
+.dd-selected {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0 !important;
+  height: 100%;
+
+  &:before {
+    z-index: 0 !important;
+  }
+}
+
+.dd-select {
+  height: 52px !important;
+  overflow: hidden;
+  border-radius: 0 !important;
+  transition: $base-transition;
+  cursor: pointer !important;
+  background: #292F36 !important;
+  border: 2px solid #6D7E8A !important;
+  box-shadow: inset 4px 4px 15px rgba(0, 0, 0, 0.25) !important;
+  padding: 1rem !important;
+  @media (min-width: 768px) {
+    padding: 2rem;
+    height: 68px !important;
+  }
+
+  label {
+    cursor: pointer !important
+  }
+}
+
+.dd-selected,
+.dd-option {
+  display: flex !important;
+  align-items: center !important;
+  position: relative;
+  color: $white !important;
+}
+
+.dd-option {
+  border: 2px solid #6D7E8A !important;
+  box-shadow: inset 4px 4px 15px rgba(0, 0, 0, 0.25) !important;
+  background-color: $bg-footer !important;
+  border-radius: 0;
+
+  &:hover {
+    background-color: $bg-body !important;
+  }
+}
+
+.dd-pointer {
+  display: block;
+  width: 19px !important;
+  height: 10px !important;
+  margin-top: -4px !important;
+  right: 10px !important;
+  transition: $base-transition;
+  border: none !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='17' height='8' viewBox='0 0 17 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.5 8L0.272759 0.5L16.7272 0.500001L8.5 8Z' fill='%236D7E8A'/%3E%3C/svg%3E%0A");
+  @media (min-width: 768px) {
+    right: 20px !important;
+  }
+
+  &.dd-pointer-up {
+    border: none !important;
+    transform: rotate(-180deg);
+    margin-top: -6px !important;
+  }
+}
+
+.dd-option-selected {
+  background-color: $bg-video !important;
+
+  .dd-selected-text,
+  .dd-option-selected,
+  .dd-selected-description {
+    color: $white !important;
+  }
+}
+
+.dd-option-text,
+.dd-selected-text {
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  cursor: pointer;
+}
+

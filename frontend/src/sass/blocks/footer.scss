@@ -1,0 +1,83 @@
+.footer {
+  padding: 3.2rem 0;
+  background-color: $bg-footer;
+
+  .container {
+    max-width: 100rem;
+  }
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -2rem;
+  }
+
+  &__col {
+    display: flex;
+    flex-direction: column;
+    padding: 0 2rem;
+    width: 100%;
+    margin-bottom: 4rem;
+
+    @media (min-width: 600px) {
+      width: 50%;
+    }
+
+    @media (min-width: 1024px) {
+      width: 25%;
+      margin-bottom: 0;
+    }
+  }
+
+  &__logo {
+    width: 94px;
+    margin-bottom: 8px;
+
+    img {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  &__copyright {
+    font-family: $title-font;
+    font-size: 1.6rem;
+    color: $white;
+    @media (min-width: 1024px) {
+      font-size: 1.8rem;
+    }
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    margin-bottom: 1.6rem;
+    line-height: 1.2;
+    color: $white;
+    opacity: 0.5;
+    font-weight: 400;
+  }
+}
+
+.footer-list {
+  li {
+    margin-bottom: 1.6rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: $white;
+    white-space: nowrap;
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1.2;
+    @media (min-width: 1024px) {
+      font-size: 1.8rem;
+    }
+
+    &:hover {
+      opacity: 0.5;
+    }
+  }
+}

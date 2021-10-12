@@ -1,0 +1,428 @@
+.cards-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 -0.6rem;
+
+  @media (min-width: 768px) {
+    margin: 0 -1.2rem;
+  }
+}
+
+.card {
+  position: relative;
+  width: 50%;
+  padding: 0 0.6rem;
+  margin-bottom: 1.2rem;
+
+  @media (min-width: 768px) {
+    width: 33.33%;
+    padding: 0 1.2rem;
+    margin-bottom: 2.4rem;
+  }
+
+  @media (min-width: 1024px) {
+    width: 25%;
+  }
+
+  &_craft {
+    width: 75% !important;
+
+    @media (min-width: 1024px) {
+      width: 33.33% !important;
+      max-width: 39.9rem;
+      //margin: 0 -0.6rem 5rem !important;
+      padding: 0 !important;
+    }
+
+    &:hover {
+      .card-menu {
+        opacity: 1;
+      }
+    }
+
+    &:nth-child(2) {
+      @media (min-width: 1024px) {
+        margin-top: -1.9rem;
+        z-index: 3;
+      }
+    }
+
+    .card__wrapper {
+      padding: 2rem;
+      height: 100%;
+      @media (min-width: 1024px) {
+        padding: 3.2rem;
+      }
+
+      .card__wrap {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        .card__label {
+          color: white;
+          font-size: 32px;
+          text-align: center;
+        }
+
+        .card__image ~ .card__label {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: -30px;
+          font-size: 24px;
+        }
+      }
+    }
+  }
+
+  &_claim {
+    width: 50%;
+    margin-bottom: 5rem !important;
+
+    @media (min-width: 768px) {
+      width: 33.33% !important;
+      //margin-bottom: 0 !important;
+    }
+  }
+
+  &_market {
+    &:hover{
+      .card__wrapper {
+        border: 2px solid $menu-link-active;
+      }
+    }
+
+    .card__wrapper {
+      padding: 0.5rem 0.5rem 1rem;
+
+      @media (min-width: 1024px) {
+        padding: 0.8rem 0.8rem 1.5rem;
+      }
+    }
+
+    .card__text {
+      margin-bottom: 1rem;
+    }
+  }
+
+  &__wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-position: 100% 25%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1;
+  }
+
+  &__wrapper {
+    position: relative;
+    background-color: $bg-video;
+    border: 2px solid $search-border;
+    box-shadow: inset 4px 4px 15px rgba(0, 0, 0, 0.25);
+    padding: 0.5rem 0.5rem 3rem;
+    transition: $base-transition;
+
+    @media (min-width: 1024px) {
+      padding: 2rem 2.4rem 5rem;
+    }
+
+    @media (min-width: 1024px) {
+      padding: 3.2rem 3.8rem 6.3rem;
+    }
+  }
+
+  &__image {
+    width: 100%;
+    position: relative;
+    background-position: center;
+    background-size: cover;
+    z-index: 2;
+    img {
+      width: 100%;
+    }
+  }
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__img {
+    position: relative;
+    width: 75%;
+    margin-bottom: 3rem;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+
+    @media (min-width: 768px) {
+      max-width: 37.5rem;
+      width: 100%;
+    }
+
+    @media (min-width: 1024px) {
+      margin-right: 4rem;
+    }
+
+    img {
+      width: 100% !important;
+      height: auto !important;
+    }
+  }
+
+  &__stone {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 25%;
+    transform: translate(-50%, -50%);
+    max-width: 8.7rem;
+    max-height: 8.7rem;
+
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  &__text {
+    font-size: 1.7rem;
+    color: $white;
+    line-height: 1.2;
+    @media (min-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  &__btn {
+    position: absolute;
+    bottom: -3rem;
+    left: 50%;
+    transform: translateX(-50%);
+
+    .btn {
+      @media (max-width: 768px) {
+        min-height: auto;
+        min-width: auto;
+        padding: 1.2rem 2rem;
+        font-size: 1.4rem;
+      }
+    }
+  }
+
+  &__body {
+    text-align: center;
+    padding-top: 1.5rem;
+  }
+
+  &__descr {
+    font-size: 1.6rem;
+    color: $white;
+    @media (min-width: 768px) {
+      font-size: 1.8rem;
+    }
+
+    span {
+      opacity: 0.5;
+      margin-right: 0.5rem;
+    }
+  }
+
+  &__name {
+    opacity: 0.5;
+    font-size: 1.8rem;
+    color: $white;
+    @media (min-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+}
+
+.card-menu {
+  position: absolute;
+  width: 28.6rem;
+  top: 15rem;
+  left: 1rem;
+  background-color: #292f36;
+  border: 2px solid #99763e;
+  box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.5),
+    inset 4px 4px 15px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  z-index: 4;
+  transition: $base-transition;
+
+  @media (min-width: 1200px) {
+    top: 17rem;
+    left: 12.6rem;
+  }
+
+  &__item {
+    padding: 2.4rem;
+    border-bottom: 2px solid #1f2429;
+    display: flex;
+    align-items: center;
+    transition: $base-transition;
+    cursor: pointer;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover,
+    &.active {
+      background-color: rgba(255, 255, 255, 0.03);
+      padding-left: 3.8rem;
+      .card-menu__link {
+        color: #f8b32d;
+      }
+      svg {
+        path {
+          stroke: #f8b32d;
+        }
+      }
+    }
+
+    svg {
+      margin-right: 1rem;
+      path {
+        transition: $base-transition;
+      }
+    }
+  }
+
+  &__link {
+    font-size: 2rem;
+    color: #98753d;
+    transition: $base-transition;
+  }
+}
+
+.note {
+  width: 100%;
+  max-width: 29.15rem;
+  margin: 4rem auto 0;
+  padding: 0.5rem;
+  position: relative;
+  display: none;
+
+  @media (min-width: 1024px) {
+    margin: 6.6rem auto 0;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -6px;
+    transform: translateY(-50%) rotate(45deg);
+    width: 13px;
+    height: 13px;
+  }
+
+  &_succcess {
+    background-color: $success-bg;
+    &::before {
+      background-color: $success-bg;
+    }
+    .note__wrap {
+      background-color: $success-bg;
+      border: 2px solid $success-border;
+      &::before {
+        background-color: $success-bg;
+        border-left: 2px solid $success-border;
+        border-bottom: 2px solid $success-border;
+      }
+    }
+
+    .note__img {
+      border-color: rgba(31, 36, 41, 0.24);
+    }
+  }
+
+  &_error {
+    background-color: $error-bg;
+    &::before {
+      background-color: $error-bg;
+    }
+    .note__wrap {
+      background-color: $error-bg;
+      border: 2px solid $error-border;
+      &::before {
+        background-color: $error-bg;
+        border-left: 2px solid $error-border;
+        border-bottom: 2px solid $error-border;
+      }
+    }
+
+    .note__img {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &.active {
+    display: block;
+  }
+
+  &__wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: -6.5px;
+      transform: translateY(-50%) rotate(45deg);
+      width: 8px;
+      height: 8px;
+    }
+  }
+
+  &__img {
+    width: 3rem;
+    height: 3rem;
+    padding: 0.5rem;
+    border-right: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @media (min-width: 768px) {
+      width: 5rem;
+      height: 5.4rem;
+      padding: 1rem;
+    }
+
+    img {
+      height: 100%;
+      width: 100%;
+      display: block;
+      object-fit: contain;
+    }
+  }
+
+  &__text {
+    font-size: 1.4rem;
+    line-height: 1.2;
+    color: $white;
+    text-align: center;
+    padding-left: 1rem;
+    width: calc(100% - 3rem);
+    @media (min-width: 768px) {
+      font-size: 2rem;
+      width: calc(100% - 5rem);
+    }
+    span {
+      opacity: 0.5;
+      font-size: 1.4rem;
+      margin-right: 0.5rem;
+    }
+  }
+}

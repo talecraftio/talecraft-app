@@ -1,0 +1,27 @@
+$breakpoints: (
+	'xl': 1920px,
+	'lg': 1280px,
+	'md': 768px,
+	'sm': 480px,
+	'xs': 460px,
+);
+
+$black: #000000;
+$white: #FFFFFF;
+$title: #98753D;
+$border-color:#6A4829;
+$menu-link-active: #F8B32D;
+$bg-body: #191C1F;
+$bg-footer: #22272E;
+$bg-header: #A8171B;
+$bg-video: #292F36;
+$placeholder: #6D7E8A;
+$search-border: #99763E;
+$success-bg: #404836;
+$success-border: #66753E;
+$error-bg: #321B1E;
+$error-border: #94171A;
+$base-font: 'Enchanted Land';
+$title-font: 'Enchanted Land';
+
+$base-transition: all 0.3s ease;

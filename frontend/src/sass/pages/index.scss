@@ -1,0 +1,11 @@
+.section-padding {
+  padding: 0 0 4rem 0;
+
+  @media (min-width: 768px) {
+    padding: 0 0 8rem 0;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0 0 16rem 0;
+  }
+}

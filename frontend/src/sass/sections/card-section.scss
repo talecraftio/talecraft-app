@@ -1,0 +1,97 @@
+.card-section {
+    padding: 12rem 0 4rem;
+    @media (min-width: 1024px) {
+        padding: 11.8rem 0 8rem;
+    }
+
+    .section-title {
+        margin-bottom: 1.6rem;
+    }
+}
+
+.card-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    @media (min-width: 1200px) {
+     padding-left: 14rem;
+    }
+  
+    .card {
+      width: 70%;
+      margin-bottom: 2rem;
+      @media (min-width: 768px) {
+        width: 100%;
+        margin-bottom: 0;
+        padding-right: 3.1rem;
+        max-width: 38.3rem;
+      }
+  
+      .card__wrapper {
+        padding: 2rem 2rem 2.2rem;
+        @media (min-width: 768px) {
+          padding: 2.8rem 2.8rem 2.2rem;
+        }
+      }
+    }
+}
+
+.card-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    @media (min-width: 768px) {
+        width: calc(100% - 38.3rem);
+        align-items: flex-start;
+    }
+}
+
+.card-head {
+    margin-bottom: 2.2rem;
+    span {
+        display: block;
+    }
+}
+
+.card-table {
+    margin-bottom: 2.7rem;
+}
+
+.card-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.4rem;
+    @media (min-width: 1024px) {
+        margin-bottom: 2rem;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+    span {
+        display: block;
+        font-size: 1.6rem;
+        color: $white;
+        &:first-child {
+            min-width: 12rem;
+            @media (min-width: 1024px) {
+                min-width: 22rem;
+            }
+        }
+    }
+}
+
+.card-footer {
+    display: flex;
+    flex-wrap: wrap;
+    .btn {
+        width: 100%;
+        margin-bottom: 1.5rem;
+        @media (min-width: 1024px) {
+            width: auto;
+            margin: 0 2.4rem 0 0;
+        }
+    }
+}

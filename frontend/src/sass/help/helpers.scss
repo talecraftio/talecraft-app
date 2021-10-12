@@ -1,0 +1,30 @@
+.desctop {
+  display: none !important;
+
+  @media (min-width: 768px) {
+    display: block !important;
+  }
+}
+.desctop-big {
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: block;
+  }
+}
+
+.mobile {
+  @media (min-width: 768px) {
+    display: none !important;
+  }
+}
+
+.mobile-big {
+  @media (min-width: 1024px) {
+    display: none !important;
+  }
+}
+
+.no-active {
+  display: none !important;
+}

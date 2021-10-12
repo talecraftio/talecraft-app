@@ -1,0 +1,11 @@
+.craft-section {
+  padding: 8rem 0;
+
+  @media (min-width: 1024px) {
+    padding: 15.5rem 0 13rem;
+  }
+
+  .btn {
+    margin: 0 auto;
+  }
+}

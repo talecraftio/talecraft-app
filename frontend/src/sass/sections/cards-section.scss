@@ -1,0 +1,27 @@
+.cards-section {
+  .section-title {
+    margin-bottom: 2.9rem;
+  }
+
+  .card {
+    width: 100%;
+    &__wrap {
+      flex-wrap: wrap;
+      @media (min-width: 1024px) {
+        justify-content: center;
+      }
+    }
+
+    &__row {
+      width: 100%;
+      @media (min-width: 768px) {
+        max-width: 53rem;
+      }
+    }
+
+    .section-title {
+      margin-bottom: 1.6rem;
+      font-weight: 400;
+    }
+  }
+}

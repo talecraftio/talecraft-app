@@ -1,0 +1,89 @@
+.video-section {
+  padding: 14rem 0;
+  @media (min-width: 1024px) {
+    padding: 15.5rem 0 13rem;
+  }
+}
+
+.video-wrap {
+  background-color: #292F36;
+  border: 2px solid #99763E;
+  box-shadow: inset 4px 4px 15px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1.5rem;
+  @media (min-width: 1024px) {
+    padding: 3.2rem;
+    justify-content: space-between;
+  }
+
+  .card__img {
+    margin: 0;
+  }
+}
+
+.video-text {
+  width: 100%;
+  margin-bottom: 2rem;
+  @media (min-width: 1024px) {
+    width: 40%;
+    margin-bottom: 0;
+    padding-right: 2.3rem;
+  }
+
+  .base-text {
+    @media (min-width: 1200px) {
+      font-size: 2rem;
+    }
+  }
+}
+
+
+.video {
+  width: 100%;
+  @media (min-width: 1024px) {
+    width: 60%;
+    max-width: 65.2rem;
+  }
+
+  &__link {
+    width: 100%;
+    position: relative;
+    display: block;
+    &:hover {
+      .video__btn {
+        background-image: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%), linear-gradient(184.23deg, #c79954 3.42%, #bb8e47 96.56%);
+      }
+    }
+
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  &__btn {
+    width: 8rem;
+    height: 8rem;
+    background-image: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%), linear-gradient(184.23deg, #B28847 3.42%, #B08746 96.56%);
+    box-shadow: inset 4px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    transition: $base-transition;
+
+    button {
+      width: 3.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 3;
+    }
+  }
+}

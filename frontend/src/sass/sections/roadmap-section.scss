@@ -1,0 +1,113 @@
+.roadmap-section {
+
+}
+
+.roadmap-wrap {
+    position: relative;
+    padding: 5rem 0;
+    &::after {
+        content: "";
+        background-image: url('../images/roadmap-bg.png');
+        background-size: cover;
+        position: absolute;
+        top: 0;
+        left: -9px;
+        width: 2rem;
+        height: 100%;
+        z-index: -1;
+        @media (min-width: 768px) {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    }
+}
+
+.roadmap-row {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    margin-bottom: 3.2rem;
+    &:last-child {
+        margin-bottom: 0;
+    }
+    &:nth-child(2n){
+        @media (min-width: 768px) {
+            justify-content: flex-start;
+        }
+        .roadmap {
+            &__wrap {
+                @media (min-width: 768px) {
+                    text-align: right;
+                    padding: 0 8rem 0 0 ;
+                    &::before {
+                        left: auto;
+                        right: -13px;
+                        transform: scale(-1);
+                    }
+                }
+            }
+
+            ul {
+                @media (min-width: 768px) {
+                    align-items: flex-end;
+                    li {
+                        padding: 0 1rem 0 0;
+                        &::before {
+                            left: auto;
+                            right: 0;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+.roadmap {
+    width: 100%;
+    @media (min-width: 768px) {
+        width: 50%;
+    }
+
+    &__wrap {
+        width: 100%;
+        padding-left: 3rem;
+        position: relative;
+        @media (min-width: 768px) {
+            padding-left: 8rem;
+        }
+        &::before {
+            content: url('../images/road-2.png');
+            position: absolute;
+            top: 6px;
+            left: -5px;
+        }
+    }
+
+    ul {
+        display: flex;
+        flex-direction: column;
+    }
+
+    li {
+        position: relative;
+        padding-left: 1rem;
+        width: fit-content;
+        &::before {
+            content: "-";
+            position: absolute;
+            top: auto;
+            left: 0;
+            color: $white;
+        }
+    }
+
+    .section-subtitle {
+        margin-bottom: 0.8rem;
+        padding-left: 5rem;
+        @media (min-width: 768px) {
+            padding: 0;
+        }
+    }
+}

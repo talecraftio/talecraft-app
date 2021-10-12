@@ -1,0 +1,78 @@
+a {
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  transition: $base-transition;
+}
+
+a:hover,
+a:active,
+a:focus {
+  text-decoration: none;
+}
+
+input {
+  border: none;
+  background-color: transparent;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  display: none;
+}
+
+// For Mozilla
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  margin: 0;
+}
+
+//For Chrome
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+textarea {
+  resize: none;
+  border: none;
+  background-color: transparent;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input,
+textarea {
+  &::placeholder {
+    transition: $base-transition;
+  }
+
+  &:focus::placeholder {
+    opacity: 0;
+  }
+}
+
+button {
+  padding: 0;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  transition: $base-transition;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+select {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  transition: $base-transition;
+  outline: none;
+  -webkit-appearance: none;
+}
