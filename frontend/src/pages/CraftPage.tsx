@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import _ from "lodash";
 import IntroSection from "../components/IntroSection";
 import { toast } from "react-toastify";
-import { Redirect } from "react-router";
+import { Redirect, RouteChildrenProps } from "react-router";
 import { observer } from "mobx-react";
 import { useInjection } from "inversify-react";
 import WalletStore, { BLOCK_EXPLORER } from "../stores/WalletStore";
@@ -37,13 +37,13 @@ const PendingCraft = ({ craft, craftId, callback }: { craft: PendingcraftRespons
         try {
             const contract = walletStore.resourceContract;
             const tx = await walletStore.sendTransaction(contract.methods.claimCraft(craftId));
+            await walletStore.waitForNextBlock();
             toast.success(
                 <>
                     Craft was successfully claimed<br />
                     <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                 </>
             );
-            await walletStore.waitForNextBlock();
             callback();
         } catch (e) {
             toast.error('An error has occurred');

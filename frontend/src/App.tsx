@@ -27,7 +27,7 @@ const App = observer(() => {
                 <Header />
                 <Switch>
                     <Route exact path='/' component={IndexPage} />
-                    <Route path='/card' component={CardPage} />
+                    <Route path='/card/:tokenId' component={CardPage} />
                     <Route path='/chest' component={ChestPage} />
                     <Route path='/marketplace' component={MarketPage} />
                     <Route path='/staking' component={StakingPage} />

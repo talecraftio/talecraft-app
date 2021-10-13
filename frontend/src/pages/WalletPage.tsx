@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { Redirect } from "react-router";
 import { InventoryItem } from "../../types";
 import { IMAGES_CDN } from "../utils/const";
+import { Link } from 'react-router-dom';
 
 interface IWalletPageProps {
 }
@@ -77,7 +78,7 @@ const WalletPage = observer(({}: IWalletPageProps) => {
                                 ) : (
                                     inventory.length > 0 ? (
                                         inventory.map(inv => (
-                                            <a className="card card_market" href="#" key={inv.tokenId}>
+                                            <Link className="card card_market" to={`/card/${inv.tokenId}`} key={inv.tokenId}>
                                                 <div className="card__wrapper">
                                                     <div className="card__wrap">
                                                         <div className="card__image"><img src={`${IMAGES_CDN}/${inv.info.ipfsHash}.webp`} alt="" /></div>
@@ -87,7 +88,7 @@ const WalletPage = observer(({}: IWalletPageProps) => {
                                                         <p className="card__descr"><span>{inv.info.name}</span></p>
                                                     </div>
                                                 </div>
-                                            </a>
+                                            </Link>
                                         ))
                                     ) : (
                                         <p className='market__status'>You have no resources in your collection</p>
