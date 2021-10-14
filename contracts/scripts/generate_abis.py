@@ -1,6 +1,6 @@
 import json
 
-from brownie import accounts, Contract, PHI, ChestSale, Resource
+from brownie import accounts, Contract, PHI, ChestSale, Resource, DuelStaking
 
 
 def main():
@@ -12,3 +12,6 @@ def main():
 
     with open('../frontend/src/utils/contracts/chest.abi.json', 'w') as f:
         json.dump(ChestSale.abi, f)
+
+    with open('../frontend/src/utils/contracts/staking.abi.json', 'w') as f:
+        json.dump(DuelStaking.abi, f)

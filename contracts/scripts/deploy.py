@@ -2,7 +2,8 @@ import csv
 import json
 
 import requests
-from brownie import accounts, Contract, PHI, ChestSale, Resource
+from brownie import accounts, Contract, PHI, ChestSale, Resource, DuelStaking
+from brownie.network import Chain
 
 from scripts._utils import sourcify_publish
 
@@ -28,7 +29,24 @@ def main():
     addresses['chest'] = chest.address
     sourcify_publish(chest)
 
+    current_block = len(Chain())
+    staking = DuelStaking.deploy(
+        phi.address,
+        phi.address,
+        current_block,
+        current_block + 302400,
+        1 * 302400,
+        deployer.address,
+        [0, 0, 0, 0],
+        [1, 2, 3, 4],
+        {'from': deployer}
+    )
+    addresses['staking'] = staking.address
+    sourcify_publish(staking)
+
     resource.initialMint(chest.address)
+    phi.approve(staking.address, 1000e18)
+    staking.deposit(0, 1000e18)
 
     with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:
         f.write('export default ' + json.dumps(addresses))
