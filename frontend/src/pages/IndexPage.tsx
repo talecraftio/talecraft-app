@@ -1,15 +1,23 @@
-import React, { useRef } from 'react';
-
-import { Swiper, SwiperSlide } from "swiper/react";
-import 'swiper/swiper-bundle.css';
-import { Navigation } from "swiper";
-// import { Navigation } from "swiper";
+import React, { useRef, useState } from 'react';
+import Carousel from "react-multi-carousel";
+import classNames from "classnames";
 
 interface IIndexPageProps {
 }
 
 const IndexPage = ({}: IIndexPageProps) => {
-    const swiperNext = useRef(null);
+    const carousel = useRef<Carousel>(null);
+
+    const [ swiperSlide, setSwiperSlide ] = useState(0);
+
+    const goToSwiperSlide = i => {
+        const currentSlide = carousel.current.state.currentSlide;
+        if (currentSlide % 5 > i % 5) {
+            carousel.current.goToSlide(Math.ceil(currentSlide / 5) * 5 + i);
+        } else {
+            carousel.current.goToSlide(Math.floor(currentSlide / 5) * 5 + i);
+        }
+    }
 
     return (
         <main className="main">
@@ -61,84 +69,153 @@ const IndexPage = ({}: IIndexPageProps) => {
                     <h2 className="section-title text-center">Cards</h2>
                     <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
                     <div className="slider-wrap">
-                        <Swiper
-                            slidesPerView={1}
-                            spaceBetween={10}
-                            modules={[Navigation]}
-                            loop
-                            navigation={{
-                                nextEl: '.swiper-button-next',
-                                prevEl: '.swiper-button-prev',
-                            }}
-                            breakpoints={{
-                                600: {
-                                    slidesPerView: 3,
-                                    spaceBetween: 24,
-                                },
-                                992: {
-                                    slidesPerView: 4,
-                                    spaceBetween: 24,
-                                },
-                                1200: {
-                                    slidesPerView: 5,
-                                    spaceBetween: 24,
-                                },
-                            }}
-                            className="card-slider"
-                        >
-                            <div className="swiper-wrapper">
-                                <SwiperSlide className="swiper-slide">
-                                    <div className="stone">
+                        {/*<Swiper*/}
+                        {/*    slidesPerView={1}*/}
+                        {/*    spaceBetween={10}*/}
+                        {/*    modules={[Navigation]}*/}
+                        {/*    // loop*/}
+                        {/*    navigation={{*/}
+                        {/*        prevEl: '.swiper-button-prev',*/}
+                        {/*    }}*/}
+                        {/*    breakpoints={{*/}
+                        {/*        600: {*/}
+                        {/*            slidesPerView: 3,*/}
+                        {/*            spaceBetween: 24,*/}
+                        {/*        },*/}
+                        {/*        992: {*/}
+                        {/*            slidesPerView: 4,*/}
+                        {/*            spaceBetween: 24,*/}
+                        {/*        },*/}
+                        {/*        1200: {*/}
+                        {/*            slidesPerView: 5,*/}
+                        {/*            spaceBetween: 24,*/}
+                        {/*        },*/}
+                        {/*    }}*/}
+                        {/*    className="card-slider"*/}
+                        {/*    onSlideChange={swiper => setSwiperSlide(swiper.activeIndex)}*/}
+                        {/*    onClick={swiper => { swiper.slideTo(swiper.clickedIndex); console.log(swiper.clickedIndex) }}*/}
+                        {/*>*/}
+                            <Carousel
+                                arrows
+                                draggable
+                                infinite
+                                slidesToSlide={1}
+                                swipeable
+                                className='card-slider'
+                                responsive={{
+                                    mobile: {
+                                        breakpoint: {
+                                            min: 0,
+                                            max: 600,
+                                        },
+                                        items: 1,
+                                        partialVisibilityGutter: 24,
+                                    },
+                                    tablet: {
+                                        breakpoint: {
+                                            min: 600,
+                                            max: 992,
+                                        },
+                                        items: 3,
+                                        partialVisibilityGutter: 24,
+                                    },
+                                    desktop: {
+                                        breakpoint: {
+                                            min: 992,
+                                            max: 1200,
+                                        },
+                                        items: 4,
+                                        partialVisibilityGutter: 24,
+                                    },
+                                    desktopLarge: {
+                                        breakpoint: {
+                                            min: 1200,
+                                            max: 99999,
+                                        },
+                                        items: 5,
+                                        partialVisibilityGutter: 24,
+                                    },
+                                }}
+                                customLeftArrow={<button className="carousel-button-prev" type="button"><img src={require('url:../images/arrow.png')} alt="" /></button>}
+                                customRightArrow={<button className="carousel-button-next" type="button"><img src={require('url:../images/arrow.png')} alt="" /></button>}
+                                beforeChange={arg => setSwiperSlide(arg % 5)}
+                                ref={carousel}
+                            >
+                                <div className={classNames("swiper-slide", swiperSlide === 0 && 'swiper-slide-active')} onClick={() => goToSwiperSlide(0)}>
+                                    <div className='stone'>
                                         <div className="stone__wrap">
                                             <div className="stone__img"><img src={require('url:../images/stone-1.png')} alt="" /></div>
                                         </div>
                                     </div>
-                                </SwiperSlide>
-                                <SwiperSlide className="swiper-slide">
-                                    <div className="stone">
+                                </div>
+                                <div className={classNames("swiper-slide", swiperSlide === 1 && 'swiper-slide-active')} onClick={() => goToSwiperSlide(1)}>
+                                    <div className='stone'>
                                         <div className="stone__wrap">
                                             <div className="stone__img"><img src={require('url:../images/stone-2.png')} alt="" /></div>
                                         </div>
                                     </div>
-                                </SwiperSlide>
-                                <SwiperSlide className="swiper-slide">
-                                    <div className="stone">
+                                </div>
+                                <div className={classNames("swiper-slide", swiperSlide === 2 && 'swiper-slide-active')} onClick={() => goToSwiperSlide(2)}>
+                                    <div className='stone'>
                                         <div className="stone__wrap">
                                             <div className="stone__img"><img src={require('url:../images/stone-3.png')} alt="" /></div>
                                         </div>
                                     </div>
-                                </SwiperSlide>
-                                <SwiperSlide className="swiper-slide">
-                                    <div className="stone">
+                                </div>
+                                <div className={classNames("swiper-slide", swiperSlide === 3 && 'swiper-slide-active')} onClick={() => goToSwiperSlide(3)}>
+                                    <div className='stone'>
                                         <div className="stone__wrap">
                                             <div className="stone__img"><img src={require('url:../images/stone-4.png')} alt="" /></div>
                                         </div>
                                     </div>
-                                </SwiperSlide>
-                                <SwiperSlide className="swiper-slide">
-                                    <div className="stone">
+                                </div>
+                                <div className={classNames("swiper-slide", swiperSlide === 4 && 'swiper-slide-active')} onClick={() => goToSwiperSlide(4)}>
+                                    <div className='stone'>
                                         <div className="stone__wrap">
                                             <div className="stone__img"><img src={require('url:../images/stone-5.png')} alt="" /></div>
                                         </div>
                                     </div>
-                                </SwiperSlide>
-                            </div>
-                            <button ref={swiperNext} className="swiper-button-next" type="button"><img src={require('url:../images/arrow.png')} alt="" /></button>
-                        </Swiper>
+                                </div>
+                            </Carousel>
+
+                        {/*</Swiper>*/}
                     </div>
                     <div className="card">
                         <div className="card__wrap">
                             <div className="card__img">
                                 <img src={require('url:../images/card1.png')} alt="" />
                                 <div className="card__stone">
-                                    <img src={require('url:../images/stone1.png')} alt="" />
+                                    <img src={[
+                                        require('url:../images/stone-1.png'),
+                                        require('url:../images/stone-2.png'),
+                                        require('url:../images/stone-3.png'),
+                                        require('url:../images/stone-4.png'),
+                                        require('url:../images/stone-5.png'),
+                                    ][swiperSlide]} alt="" />
                                 </div>
                             </div>
                             <div className="card__row">
-                                <h3 className="section-title">Stone Tier</h3>
-                                <span className="card__text">These are the first tier cards that can be created with 4 elements,
-                                    after opening the Alchemist Chest, members can craft both of the 4 elements in combination to
-                                    produce the stone level card, members can craft to the iron tier by combining the stone tier cards.</span>
+                                <h3 className="section-title">{['Stone', 'Iron', 'Silver', 'Gold', 'Phi Stone'][swiperSlide]} Tier</h3>
+                                <span className="card__text">
+                                    {swiperSlide === 0 && <>These are the first tier cards that can be created with 4 elements,
+                                        after opening the Alchemist Chest, members can craft both of the 4 elements in combination to
+                                        produce the stone level card, members can craft to the iron tier by combining the stone tier cards.</>}
+                                    {swiperSlide === 1 && <>These cards are second-level cards.  Iron tier cards are crafted with stone tier cards.
+                                        Users can create silver level cards with these cards. Although iron level cards are second level cards,
+                                        holding them can give you a win.  people can buy these cards from you in the market at a high price.
+                                        For silver and gold level cards, they can buy these cards from you.</>}
+                                    {swiperSlide === 2 && <>Silver level cards are third level cards.  Crafting time is longer than iron and stone tiers.
+                                        With these cards, gold level cards can be produced. Silver level cards may be the preferred cards for crafting time in the marketplace.
+                                        People who do not want to start from scratch to craft gold level cards may want to buy your cards from the market.</>}
+                                    {swiperSlide === 3 && <>Gold tier cards are fourth tier cards. They are very few in addition to this they are very important cards.
+                                        You must have these cards in order to have the philosopher's stone card level.
+                                        In addition, the crafting time of these cards is quite high compared to silver, iron, stone levels.
+                                        However, it is quite reasonable for the value it creates.</>}
+                                    {swiperSlide === 4 && <>These cards are the most important cards of this pack.
+                                        Crafting time and cost are quite high.  At the same time, the value it creates is incredibly high.
+                                        Usually contains metaverse items.  It has a very remarkable place in the marketplace.
+                                        Are the highest cards an alchemist can create.  It has a unique structure.</>}
+                                </span>
                             </div>
                         </div>
                     </div>

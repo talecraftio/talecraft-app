@@ -11,11 +11,21 @@
 
   .swiper-slide {
     transition: $base-transition;
+    top: 0;
+    position: relative;
   }
 
-  .swiper-button-next {
+  .carousel-button-prev {
+    position: absolute;
+    left: 0;
     width: 2.5rem;
+  }
+
+  .carousel-button-next {
+    position: absolute;
     right: 0;
+    width: 2.5rem;
+
     img {
       transform: scale(-1, -1);
     }

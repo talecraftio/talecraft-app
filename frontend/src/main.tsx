@@ -5,6 +5,7 @@ import 'babel-polyfill';
 
 import './sass/main.scss';
 import 'react-slidedown/lib/slidedown.css';
+import 'react-multi-carousel/lib/styles.css';
 import App from './App'
 import RootStore from "./stores/RootStore";
 import { Provider } from "inversify-react";
