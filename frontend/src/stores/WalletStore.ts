@@ -4,13 +4,15 @@ import Web3 from "web3";
 import { toast } from "react-toastify";
 import store from "store";
 import Timeout from "await-timeout";
-import { chestContract, phiContract, resourceContract } from "../utils/contracts";
+import { chestContract, phiContract, resourceContract, stakingContract } from "../utils/contracts";
 import { MethodReturnContext } from "../utils/contracts/phi";
 import { SendOptions } from "ethereum-abi-types-generator";
 import { Subscription } from 'web3-core-subscriptions';
 import { BlockHeader } from "web3-eth";
 import { InventoryItem } from "../../types";
 import _ from "lodash";
+
+import JOE_PAIR_ABI from '../utils/contracts/joePair.abi.json';
 
 export const CHAIN_ID = 43113;
 export const DEFAULT_RPC_WS = 'wss://api.avax-test.network/ext/bc/C/ws';
@@ -28,6 +30,8 @@ const chainParameters = {
     rpcUrls: [DEFAULT_RPC],
     blockExplorerUrls: [BLOCK_EXPLORER],
 }
+
+const mainWeb3 = new Web3(new Web3.providers.WebsocketProvider('wss://api.avax.network/ext/bc/C/ws'))
 
 class WalletStore {
     @observable initialized: boolean = false;
@@ -143,6 +147,10 @@ class WalletStore {
         return resourceContract(this.web3);
     }
 
+    get stakingContract() {
+        return stakingContract(this.web3);
+    }
+
     // updateProfile = async (input: ProfileInputType, removeAvatar: boolean, avatar: File | null) => {
     //     const { nonce, signature } = await generateSignature('UpdateProfile', this.address);
     //     const newProfile = await this.rootStore.api.updateProfile(input, removeAvatar, avatar, nonce, signature);
@@ -188,6 +196,22 @@ class WalletStore {
             await when(() => this.lastBlock !== currentBlock);
             resolve();
         });
+    }
+
+    getTokenPrice = async () => {
+        const contract = new mainWeb3.eth.Contract(JOE_PAIR_ABI as any, '0xFE15c2695F1F920da45C30AAE47d11dE51007AF9');
+        const token0 = await contract.methods.token0().call();
+        const token1 = await contract.methods.token1().call();
+        let avaxBalance, tokenBalance;
+        const reserves = await contract.methods.getReserves().call();
+        if (token0.toLowerCase() == '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7'.toLowerCase()) {
+            avaxBalance = reserves[0];
+            tokenBalance = reserves[1];
+        } else {
+            avaxBalance = reserves[1];
+            tokenBalance = reserves[0];
+        }
+        return parseInt(avaxBalance) / parseInt(tokenBalance)
     }
 }
 

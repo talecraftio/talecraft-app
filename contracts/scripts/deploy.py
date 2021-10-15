@@ -47,6 +47,7 @@ def main():
     resource.initialMint(chest.address)
     phi.approve(staking.address, 1000e18)
     staking.deposit(0, 1000e18)
+    phi.transfer('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', 5_000_000e18)
 
     with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:
         f.write('export default ' + json.dumps(addresses))
