@@ -3,9 +3,14 @@
   flex-wrap: wrap;
   justify-content: center;
   margin: 0 -0.6rem;
+  position: relative;
 
   @media (min-width: 768px) {
     margin: 0 -1.2rem;
+  }
+
+  &.animating .card {
+    position: absolute;
   }
 }
 
@@ -14,6 +19,7 @@
   width: 50%;
   padding: 0 0.6rem;
   margin-bottom: 1.2rem;
+  //transition: top .3s ease, left .3s ease, width .3s ease, height .3s ease;
 
   @media (min-width: 768px) {
     width: 33.33%;
@@ -69,13 +75,13 @@
           text-align: center;
         }
 
-        .card__image ~ .card__label {
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: -30px;
-          font-size: 24px;
-        }
+        //.card__image ~ .card__label {
+        //  position: absolute;
+        //  left: 0;
+        //  right: 0;
+        //  top: -30px;
+        //  font-size: 24px;
+        //}
       }
     }
   }
@@ -146,6 +152,11 @@
     z-index: 2;
     img {
       width: 100%;
+      &:nth-child(2) {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
     }
   }
 

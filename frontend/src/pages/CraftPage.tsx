@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import _ from "lodash";
 import IntroSection from "../components/IntroSection";
 import { toast } from "react-toastify";
@@ -13,18 +13,11 @@ import { PendingcraftResponse, ResourcetypeResponse } from "../utils/contracts/r
 import classNames from "classnames";
 import { toBN } from "../utils/number";
 import { ADDRESSES } from "../utils/contracts";
-import Timeout from "await-timeout";
+import AnimatedCardsWrap from "../components/AnimatedCardsWrap";
+import { motion } from 'framer-motion';
 
 interface ICraftPageProps {
 }
-
-const Card = ({ image, onClick }: { image: string, onClick: () => any }) => (
-    <div className="card" onClick={onClick}>
-        <div className="card__wrap">
-            <div className="card__image"><img src={image} alt="" /></div>
-        </div>
-    </div>
-)
 
 const PendingCraft = ({ craft, craftId, callback }: { craft: PendingcraftResponse, craftId: string, callback: () => any }) => {
     const walletStore = useInjection(WalletStore);
@@ -89,9 +82,15 @@ const PendingCraft = ({ craft, craftId, callback }: { craft: PendingcraftRespons
 const CraftPage = observer(({}: ICraftPageProps) => {
     const walletStore = useInjection(WalletStore);
 
+    const transitionOrigin = useRef<HTMLDivElement>();
+    const item1Slot = useRef<HTMLDivElement>();
+    const item2Slot = useRef<HTMLDivElement>();
+
     const [ inventory, setInventory ] = useState<InventoryItem[]>([]);
     const [ item1, setItem1 ] = useState<InventoryItem>();
     const [ item2, setItem2 ] = useState<InventoryItem>();
+    const [ item1i, setItem1i ] = useState(0);
+    const [ item2i, setItem2i ] = useState(0);
     const [ resultLoading, setResultLoading ] = useState(false);
     const [ resultItemId, setResultItemId ] = useState<string>();
     const [ resultItem, setResultItem ] = useState<ResourcetypeResponse>();
@@ -179,8 +178,7 @@ const CraftPage = observer(({}: ICraftPageProps) => {
     }
 
     const filteredInventory = inventory
-        .filter(item => q ? new RegExp(`.*${q}.*`, 'i').test(item.info.name) : true)
-        .map(item => ({ ...item, balance: item.balance - (item1?.tokenId == item.tokenId ? 1 : 0) - (item2?.tokenId == item.tokenId ? 1 : 0) }));
+        .filter(item => q ? new RegExp(`.*${q}.*`, 'i').test(item.info.name) : true);
 
     return (
         <main className="main">
@@ -191,11 +189,15 @@ const CraftPage = observer(({}: ICraftPageProps) => {
                         <div className="card card_craft">
                             <div className="card__wrapper">
                                 <div className="card__wrap">
-                                    {item1 && (
-                                        <div className="card__image" onClick={() => !craftLoading && setItem1(undefined)}>
-                                            <img src={`${IMAGES_CDN}/${item1.info.ipfsHash}.webp`} alt="" />
-                                        </div>
-                                    )}
+                                    <div className="card__image"
+                                         onClick={() => {
+                                             if (!craftLoading) { setItem1(undefined); transitionOrigin.current = item1Slot.current }
+                                         }}
+                                         ref={item1Slot}
+                                    >
+                                        <img src='data:image/svg+xml;utf8,<svg version="1.1" width="300" height="420" xmlns="http://www.w3.org/2000/svg"></svg>' />
+                                        {item1 && (<motion.img src={`${IMAGES_CDN}/${item1.info.ipfsHash}.webp`} style={{ display: 'none' }} animate={{ display: 'block' }} transition={{ delay: .3 }} alt="" />)}
+                                    </div>
                                     <p className="card__label">{!item1 && 'Select'} Item 1</p>
                                 </div>
                             </div>
@@ -203,11 +205,10 @@ const CraftPage = observer(({}: ICraftPageProps) => {
                         <div className="card card_craft">
                             <div className="card__wrapper">
                                 <div className="card__wrap">
-                                    {!resultLoading && resultItem && (
-                                        <div className="card__image">
-                                            <img src={`${IMAGES_CDN}/${resultItem.ipfsHash}.webp`} alt="" />
-                                        </div>
-                                    )}
+                                    <div className="card__image">
+                                        <img src='data:image/svg+xml;utf8,<svg version="1.1" width="300" height="420" xmlns="http://www.w3.org/2000/svg"></svg>' />
+                                        {resultItem && (<img src={`${IMAGES_CDN}/${resultItem.ipfsHash}.webp`} alt="" />)}
+                                    </div>
                                     <p className="card__label">
                                         {(!item1 || !item2) ? 'Select items' : (
                                             resultLoading ? 'Loading...' : (
@@ -221,11 +222,15 @@ const CraftPage = observer(({}: ICraftPageProps) => {
                         <div className="card card_craft">
                             <div className="card__wrapper">
                                 <div className="card__wrap">
-                                    {item2 && (
-                                        <div className="card__image" onClick={() => !craftLoading && setItem2(undefined)}>
-                                            <img src={`${IMAGES_CDN}/${item2.info.ipfsHash}.webp`} alt="" />
-                                        </div>
-                                    )}
+                                    <div className="card__image"
+                                         onClick={() => {
+                                             if (!craftLoading) { setItem2(undefined); transitionOrigin.current = item2Slot.current }
+                                         }}
+                                         ref={item2Slot}
+                                    >
+                                        <img src='data:image/svg+xml;utf8,<svg version="1.1" width="300" height="420" xmlns="http://www.w3.org/2000/svg"></svg>' />
+                                        {item2 && (<motion.img src={`${IMAGES_CDN}/${item2.info.ipfsHash}.webp`} style={{ display: 'none' }} animate={{ display: 'block' }} transition={{ delay: .3 }} alt="" />)}
+                                    </div>
                                     <p className="card__label">{!item2 && 'Select'} Item 2</p>
                                 </div>
                             </div>
@@ -264,29 +269,46 @@ const CraftPage = observer(({}: ICraftPageProps) => {
                             </div>
                         </form>
                     </div>
-                    <div className="cards-wrap">
-                        {filteredInventory.map(item => (
-                            <React.Fragment key={item.tokenId}>
-                                {_.range(item.balance).map(i => (
-                                    <Card
-                                        image={`${IMAGES_CDN}/${item.info.ipfsHash}.webp`}
-                                        key={i}
+                    <AnimatedCardsWrap transitionOrigin={transitionOrigin.current}>
+                        {_.flatten(filteredInventory.map(item => (
+                            _.range(item.balance).filter(i => !((item1 && item1?.tokenId == item.tokenId && i == item1i) || (item2 && item2?.tokenId == item.tokenId && i == item2i))).map(i => (
+                                // <div key={`${item.tokenId}-${i}`} className="card">
+                                    <div
+                                        className="card__wrap"
+                                        key={`${item.tokenId}-${i}`}
                                         onClick={() => {
                                             if (craftLoading)
                                                 return;
 
-                                            if (!item1)
+                                            if (!item1) {
                                                 setItem1(item);
-                                            else if (!item2)
+                                                setItem1i(i);
+                                                transitionOrigin.current = item1Slot.current;
+                                            } else if (!item2) {
                                                 setItem2(item);
-                                            else
+                                                setItem2i(i);
+                                                transitionOrigin.current = item2Slot.current;
+                                            } else
                                                 toast.error('Please free an item slot first');
                                         }}
-                                    />
-                                ))}
-                            </React.Fragment>
-                        ))}
-                    </div>
+                                    >
+                                        <div className="card__image">
+                                            <img src='data:image/svg+xml;utf8,<svg version="1.1" width="300" height="420" xmlns="http://www.w3.org/2000/svg"></svg>' />
+                                            <img src={`${IMAGES_CDN}/${item.info.ipfsHash}.webp`} alt="" />
+                                        </div>
+                                    </div>
+                                // </div>
+                            ))
+                        ))).concat(_.range(4).map(i => (
+                            // <div className="card" key={`filler-${i}`}>
+                                <div className="card__wrap" key={`filler-${i}`}>
+                                    <div className="card__image">
+                                        <img src='data:image/svg+xml;utf8,<svg version="1.1" width="300" height="420" xmlns="http://www.w3.org/2000/svg"></svg>' />
+                                    </div>
+                                </div>
+                            // </div>
+                        )))}
+                    </AnimatedCardsWrap>
                 </div>
             </section>
         </main>
