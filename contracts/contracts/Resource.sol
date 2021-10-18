@@ -15,6 +15,7 @@ contract Resource is ERC1155, Ownable {
     using Counters for Counters.Counter;
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.UintSet;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     enum Tier {
         None,
@@ -39,10 +40,11 @@ contract Resource is ERC1155, Ownable {
         bool claimed;
     }
 
-    Counters.Counter private _tokenIds;
-    Counters.Counter private _craftIds;
-    IERC20 private phi;
-    bool private initialMintComplete;
+    Counters.Counter internal _tokenIds;
+    Counters.Counter internal _craftIds;
+    IERC20 internal _phi;
+    bool internal _initialMintComplete;
+    EnumerableSet.AddressSet internal _players;
 
     mapping (uint256 => ResourceType) public resourceTypes;
     mapping (address => EnumerableSet.UintSet) internal _pendingCraftsByUser;
@@ -54,8 +56,8 @@ contract Resource is ERC1155, Ownable {
     event CraftStarted(address indexed player, uint256 craftId);
     event CraftClaimed(address indexed player, uint256 craftId);
 
-    constructor(IERC20 phi_) ERC1155("http://dev.bennnnsss.com:39100/_meta/") {
-        phi = phi_;
+    constructor(IERC20 phi) ERC1155("http://dev.bennnnsss.com:39100/_meta/") {
+        _phi = phi;
         ResourceType[] memory resources_ = new ResourceType[](4);
         resources_[0] = ResourceType("earth", 1, Tier.None, new uint256[](0), "QmYKGb7p6k23XP7HGd63tJ8c4ftPT8mYQZuLZpLj26eFtc");
         resources_[1] = ResourceType("water", 1, Tier.None, new uint256[](0), "QmT3jQjCzAmPY8Mo4sHYpgN3covtw7o7XbudMDDiCX4Qh9");
@@ -65,12 +67,12 @@ contract Resource is ERC1155, Ownable {
     }
 
     function initialMint(ChestSale chest_) public onlyOwner {
-        require(!initialMintComplete, "initial mint is performed already");
+        require(!_initialMintComplete, "initial mint is performed already");
         _mint(address(chest_), 1, 37500, "");
         _mint(address(chest_), 2, 37500, "");
         _mint(address(chest_), 3, 37500, "");
         _mint(address(chest_), 4, 37500, "");
-        initialMintComplete = true;
+        _initialMintComplete = true;
     }
 
     function registerResourceTypes(ResourceType[] memory types) public onlyOwner {
@@ -119,7 +121,7 @@ contract Resource is ERC1155, Ownable {
             price = 5 ether;            // 5 $PHI
         }
         if (price > 0) {
-            phi.safeTransferFrom(msg.sender, address(this), price);
+            _phi.safeTransferFrom(msg.sender, address(this), price);
         }
         _craftIds.increment();
         uint256 craftId = _craftIds.current();
@@ -139,7 +141,7 @@ contract Resource is ERC1155, Ownable {
     }
 
     function withdrawFees(address payable to) public onlyOwner {
-        phi.safeTransferFrom(address(this), to, phi.balanceOf(address(this)));
+        _phi.safeTransferFrom(address(this), to, _phi.balanceOf(address(this)));
     }
 
     function ownedTokens(address player) external view returns (uint256[] memory) {
@@ -173,6 +175,10 @@ contract Resource is ERC1155, Ownable {
         return result;
     }
 
+    function getPlayers() external view returns (address[] memory) {
+        return _players.values();
+    }
+
     function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
         for (uint256 i=0; i<ids.length; i++) {
@@ -181,6 +187,8 @@ contract Resource is ERC1155, Ownable {
             if (to != address(0) && balanceOf(to, ids[i]) == 0)
                 _ownedTokens[to].add(ids[i]);
         }
+        _players.add(from);
+        _players.add(to);
     }
 
     receive() external payable {

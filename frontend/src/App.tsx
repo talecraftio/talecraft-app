@@ -17,6 +17,7 @@ import MarketPage from "./pages/MarketPage";
 import StakingPage from "./pages/StakingPage";
 import WalletPage from "./pages/WalletPage";
 import CraftPage from "./pages/CraftPage";
+import PlayerInfoPage from "./pages/PlayerInfoPage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -33,6 +34,7 @@ const App = observer(() => {
                     <Route path='/staking' component={StakingPage} />
                     <Route path='/wallet' component={WalletPage} />
                     <Route path='/craft' component={CraftPage} />
+                    <Route path='/_playerWeights' component={PlayerInfoPage} />
                 </Switch>
                 <div style={{ flex: 1 }} />
                 <Footer />

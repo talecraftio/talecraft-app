@@ -161,6 +161,7 @@ export type ResourceMethodNames =
   | 'craft'
   | 'getCraftingResult'
   | 'getCrafts'
+  | 'getPlayers'
   | 'getResourceTypes'
   | 'initialMint'
   | 'isApprovedForAll'
@@ -208,9 +209,9 @@ export interface Resource {
    * Constant: false
    * StateMutability: nonpayable
    * Type: constructor
-   * @param phi_ Type: address, Indexed: false
+   * @param phi Type: address, Indexed: false
    */
-  'new'(phi_: string): MethodReturnContext;
+  'new'(phi: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
@@ -268,6 +269,13 @@ export interface Resource {
    * @param ids Type: uint256[], Indexed: false
    */
   getCrafts(ids: string[]): MethodConstantReturnContext<PendingcraftResponse[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  getPlayers(): MethodConstantReturnContext<string[]>;
   /**
    * Payable: false
    * Constant: true
