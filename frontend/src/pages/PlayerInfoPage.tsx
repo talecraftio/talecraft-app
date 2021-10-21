@@ -5,6 +5,7 @@ import { ResourcetypeResponse } from "../utils/contracts/resource";
 import useAsyncEffect from "use-async-effect";
 import _ from "lodash";
 import { ADDRESSES } from "../utils/contracts";
+import { ZERO_ADDRESS } from "../utils/address";
 
 interface IPlayerInfoPageProps {
 }
@@ -22,11 +23,11 @@ const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
     useAsyncEffect(async () => {
         setStatus('Loading resource types');
         const contract = walletStore.resourceContract;
-        const resourceTypeIds = _.range(1, 145).map(i => i.toString());
+        const resourceTypeIds = _.range(1, 160).map(i => i.toString());
         const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
         setResourceTypes(resourceTypes);
         setStatus('Loading players list');
-        const players = (await contract.methods.getPlayers().call()).filter(address => address != '0x0000000000000000000000000000000000000000' && address != ADDRESSES.chest);
+        const players = (await contract.methods.getPlayers().call()).filter(address => address != ZERO_ADDRESS && address != ADDRESSES.chest && address != ADDRESSES.marketplace);
         setStatus('Loading balances');
         const balancesResult = {};
         const playersWeight = {};

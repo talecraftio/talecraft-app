@@ -18,6 +18,7 @@ import StakingPage from "./pages/StakingPage";
 import WalletPage from "./pages/WalletPage";
 import CraftPage from "./pages/CraftPage";
 import PlayerInfoPage from "./pages/PlayerInfoPage";
+import MarketListingPage from "./pages/MarketListingPage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -30,7 +31,8 @@ const App = observer(() => {
                     <Route exact path='/' component={IndexPage} />
                     <Route path='/card/:tokenId' component={CardPage} />
                     <Route path='/chest' component={ChestPage} />
-                    <Route path='/marketplace' component={MarketPage} />
+                    <Route exact path='/marketplace' component={MarketPage} />
+                    <Route path='/marketplace/:listingId' component={MarketListingPage} />
                     <Route path='/staking' component={StakingPage} />
                     <Route path='/wallet' component={WalletPage} />
                     <Route path='/craft' component={CraftPage} />

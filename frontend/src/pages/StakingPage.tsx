@@ -64,7 +64,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                 const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.staking, MAX_UINT256));
                 toast.success(
                     <>
-                        $PHI was successfully approved<br />
+                        $CRAFT was successfully approved<br />
                         <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                     </>
                 );
@@ -136,17 +136,17 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                     <div className="staking-wrap">
                         <div className="staking">
                             <form className="staking__wrap" onSubmit={onSubmit}>
-                                <h2 className="section-title text-center">Earn PHI</h2>
+                                <h2 className="section-title text-center">Earn $CRAFT</h2>
                                 <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
-                                <h4 className="section-subtitle">Stake PHI</h4>
+                                <h4 className="section-subtitle">Stake $CRAFT</h4>
                                 <div className="staking__row">
                                     <p className="staking__category">APR:</p>
                                     <p className="staking__count">{apr?.toFixed(2) || '0.00'}%</p>
                                 </div>
                                 <div className="staking__row">
                                     <p className="staking__count">
-                                        <span>$PHI earned</span>
-                                        {earned.toFixed(6)} $PHI
+                                        <span>$CRAFT earned</span>
+                                        {earned.toFixed(6)} $CRAFT
                                     </p>
                                     <button className="btn up" type="button" disabled={loading || earned.isZero()} onClick={onHarvest}>HARVEST</button>
                                 </div>

@@ -2,7 +2,7 @@ import csv
 import json
 
 import requests
-from brownie import accounts, Contract, PHI, ChestSale, Resource, DuelStaking
+from brownie import accounts, Contract, PHI, ChestSale, Resource, DuelStaking, Marketplace
 from brownie.network import Chain
 
 from scripts._utils import sourcify_publish
@@ -10,8 +10,8 @@ from scripts._utils import sourcify_publish
 
 def main():
     try:
-        with open('addresses.json', 'r') as f:
-            addresses = json.load(f)
+        with open('../frontend/src/utils/contracts/addresses.ts', 'r') as f:
+            addresses = json.loads(f.read()[14:])
     except:
         addresses = {}
 
@@ -43,6 +43,10 @@ def main():
     )
     addresses['staking'] = staking.address
     sourcify_publish(staking)
+
+    marketplace = Marketplace.deploy(resource.address, {'from': deployer})
+    addresses['marketplace'] = marketplace.address
+    sourcify_publish(marketplace)
 
     resource.initialMint(chest.address)
     phi.approve(staking.address, 1000e18)

@@ -4,7 +4,7 @@ import Web3 from "web3";
 import { toast } from "react-toastify";
 import store from "store";
 import Timeout from "await-timeout";
-import { chestContract, phiContract, resourceContract, stakingContract } from "../utils/contracts";
+import { chestContract, marketplaceContract, phiContract, resourceContract, stakingContract } from "../utils/contracts";
 import { MethodReturnContext } from "../utils/contracts/phi";
 import { SendOptions } from "ethereum-abi-types-generator";
 import { Subscription } from 'web3-core-subscriptions';
@@ -151,6 +151,10 @@ class WalletStore {
         return stakingContract(this.web3);
     }
 
+    get marketplaceContract() {
+        return marketplaceContract(this.web3);
+    }
+
     // updateProfile = async (input: ProfileInputType, removeAvatar: boolean, avatar: File | null) => {
     //     const { nonce, signature } = await generateSignature('UpdateProfile', this.address);
     //     const newProfile = await this.rootStore.api.updateProfile(input, removeAvatar, avatar, nonce, signature);
@@ -187,7 +191,7 @@ class WalletStore {
             info: resourceInfos[i],
             tokenId,
             balance: parseInt(balances[i]),
-        }));
+        })).filter(({ balance }) => balance > 0);
     }
 
     waitForNextBlock = () => {

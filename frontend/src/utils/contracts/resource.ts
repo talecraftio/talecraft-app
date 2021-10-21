@@ -170,6 +170,7 @@ export type ResourceMethodNames =
   | 'pendingCrafts'
   | 'registerResourceTypes'
   | 'renounceOwnership'
+  | 'resourceCount'
   | 'resourceTypes'
   | 'safeBatchTransferFrom'
   | 'safeTransferFrom'
@@ -346,6 +347,13 @@ export interface Resource {
    * Type: function
    */
   renounceOwnership(): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  resourceCount(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true

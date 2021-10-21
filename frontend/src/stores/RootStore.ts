@@ -5,10 +5,8 @@ import { wrapHistory } from "oaf-react-router";
 import { HistoryStore, RouterStore } from "./index";
 import SettingsStore from "./SettingsStore";
 import WalletStore from "./WalletStore";
-// import { Api } from "../graphql/api";
 import { ModalStore } from "./ModalStore";
-import store from 'store';
-// import { Api } from "../utils/api";
+import { Api } from "../graphql/api";
 
 class RootStore {
     public historyStore: History;
@@ -38,13 +36,12 @@ class RootStore {
         this.container.bind(SettingsStore).toConstantValue(this.settingsStore);
         this.container.bind(WalletStore).toConstantValue(this.walletStore);
         this.container.bind(ModalStore).toConstantValue(this.modalStore);
-        // this.container.bind(Api).toDynamicValue(() => this.api);
+        this.container.bind(Api).toDynamicValue(() => this.api);
     }
 
-    // get api() {
-    //     const token = store.get('token');
-    //     return new Api(process.env.ENVIRONMENT === 'build' ? '/graphql' : 'http://dev.bennnnsss.com:39000/graphql', token || undefined);
-    // }
+    get api() {
+        return new Api(process.env.ENVIRONMENT === 'build' ? '/graphql' : 'http://dev.bennnnsss.com:39100/graphql');
+    }
 }
 
 export default RootStore;

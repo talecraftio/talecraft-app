@@ -150,7 +150,7 @@ const CraftPage = observer(({}: ICraftPageProps) => {
                 const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.resource, MAX_UINT256));
                 toast.success(
                     <>
-                        PHI approved successfully<br />
+                        $CRAFT approved successfully<br />
                         <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                     </>
                 );

@@ -238,7 +238,7 @@ const IndexPage = ({}: IIndexPageProps) => {
                                     <p className="base-text">Alchemist's chest is a system where 4 main elements are sold per week.
                                         You only need 4 main elements to mint cards in TaleCraft. These are Air-Water-Earth-Fire.
                                         These 4 elements are supplied by weekly sales. 25,000 chests are put on sale every week.
-                                        1 Chest includes 1 main element NFT 1 Chest Price = 10 PHI + 0.1 AVAX fee</p>
+                                        1 Chest includes 1 main element NFT 1 Chest Price = 10 $CRAFT + 0.1 AVAX fee</p>
                                 </div>
                             </div>
                         </div>
@@ -259,7 +259,7 @@ const IndexPage = ({}: IIndexPageProps) => {
                                 <div className="feature__img"><img src={require('url:../images/f-3.png')} alt="" /></div>
                                 <div className="feature__body">
                                     <h4 className="section-subtitle">Crafting</h4>
-                                    <p className="base-text">Users will open chests with the PHI token,<br/>
+                                    <p className="base-text">Users will open chests with the $CRAFT token,<br/>
                                         one of the 4 elemental NFTs will come out of the chests<br/>
                                         and craft the elemental NFTs from the chests to craft NFTs at higher tiers.</p>
                                 </div>
@@ -271,7 +271,7 @@ const IndexPage = ({}: IIndexPageProps) => {
                                 <div className="feature__body">
                                     <h4 className="section-subtitle">Staking</h4>
                                     <p className="base-text">Crafter fees spent on Crafting will be collected in a pool
-                                        and rewarded for those who stake PHI in the Crafter pool. This way, PHI holders
+                                        and rewarded for those who stake $CRAFT in the Crafter pool. This way, $CRAFT holders
                                         will be rewarded.</p>
                                 </div>
                             </div>

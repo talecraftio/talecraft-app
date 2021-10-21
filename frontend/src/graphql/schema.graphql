@@ -1,0 +1,32 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: Query
+}
+
+type MarketplaceListingResponseType {
+    items: [MarketplaceListingType!]
+    totalItems: Int
+}
+
+type MarketplaceListingType {
+    amount: Int!
+    buyer: String
+    closed: Boolean!
+    listingId: Int!
+    price: Int!
+    resource: ResourceType
+    seller: String!
+}
+
+type Query {
+    listings(order: String, page: Int, tiers: [String], weights: [String]): MarketplaceListingResponseType
+}
+
+type ResourceType {
+    ipfsHash: String!
+    name: String!
+    tier: Int!
+    tokenId: Int!
+    weight: Int!
+}

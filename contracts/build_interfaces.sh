@@ -4,3 +4,4 @@ node ../frontend/node_modules/.bin/abi-types-generator ../frontend/src/utils/con
 node ../frontend/node_modules/.bin/abi-types-generator ../frontend/src/utils/contracts/resource.abi.json --output ../frontend/src/utils/contracts
 node ../frontend/node_modules/.bin/abi-types-generator ../frontend/src/utils/contracts/phi.abi.json --output ../frontend/src/utils/contracts
 node ../frontend/node_modules/.bin/abi-types-generator ../frontend/src/utils/contracts/staking.abi.json --output ../frontend/src/utils/contracts
+node ../frontend/node_modules/.bin/abi-types-generator ../frontend/src/utils/contracts/marketplace.abi.json --output ../frontend/src/utils/contracts

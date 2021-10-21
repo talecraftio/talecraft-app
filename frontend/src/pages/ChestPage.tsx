@@ -48,7 +48,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
             const totalPhiPrice = parseInt(phiPrice) * parseInt(chestsCount);
             const totalEthPrice = parseInt(ethPrice) * parseInt(chestsCount);
             if (parseInt(await phi.methods.balanceOf(walletStore.address).call()) < totalPhiPrice) {
-                toast.error('Insufficient PHI balance');
+                toast.error('Insufficient $CRAFT balance');
                 return;
             }
             if (parseInt(await walletStore.web3.eth.getBalance(walletStore.address)) < totalEthPrice) {
@@ -59,7 +59,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
                 const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.chest, MAX_UINT256));
                 toast.success(
                     <>
-                        PHI approved successfully<br />
+                        $CRAFT approved successfully<br />
                         <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                     </>
                 );

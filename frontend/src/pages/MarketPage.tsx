@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
+import useStateRef from 'react-usestateref';
 import { Link } from 'react-router-dom';
 import DDSlick from "../components/DDSlick";
+import { useInjection } from "inversify-react";
+import { Api } from "../graphql/api";
+import { MarketplaceListingType } from "../graphql/sdk";
+import useAsyncEffect from "use-async-effect";
+import { IMAGES_CDN } from "../utils/const";
+import ReactPaginate from "react-paginate";
+import Timeout from "await-timeout";
 
 interface IMarketPageProps {
 }
@@ -19,9 +27,62 @@ const CardItem = ({ image }: { image: string }) => (
     </Link>
 )
 
+const TIERS = [
+    [ 'Stone Tier', '1' ],
+    [ 'Iron Tier', '2' ],
+    [ 'Silver Tier', '3' ],
+    [ 'Gold Tier', '4' ],
+    [ 'Phi Stone Tier', '5' ],
+];
+
+const WEIGHTS = [
+    '0-49',
+    '50-99',
+    '100-199',
+    '200-399',
+]
+
 const MarketPage = ({}: IMarketPageProps) => {
-    const [ statusFilter, setStatusFilter ] = useState<'sale' | 'notsale'>('sale');
-    const [ sort, setSort ] = useState<'lowestprice' | 'highestprice'>('lowestprice');
+    const api = useInjection(Api);
+
+    const [ sort, setSort, sortRef ] = useStateRef<'price' | '-price'>('-price');
+    const [ tiers, setTiers, tiersRef ] = useStateRef<string[]>([]);
+    const [ weights, setWeights, weightsRef ] = useStateRef<string[]>([]);
+    const [ page, setPage, pageRef ] = useStateRef(0);
+    const [ items, setItems ] = useState<MarketplaceListingType[]>([]);
+    const [ pagesCount, setPagesCount ] = useState(0);
+    const [ loading, setLoading ] = useState(false);
+
+    const toggleTier = (val: string) => {
+        if (tiers.includes(val)) {
+            setTiers(tiers.filter(i => i !== val));
+        } else {
+            setTiers(tiers.concat([val]));
+        }
+        setPage(0);
+        loadPage();
+    }
+
+    const toggleWeight = (val: string) => {
+        if (weights.includes(val)) {
+            setWeights(weights.filter(i => i !== val));
+        } else {
+            setWeights(weights.concat([val]));
+        }
+        setPage(0);
+        loadPage();
+    }
+
+    const loadPage = async (page_ = pageRef.current) => {
+        await Timeout.set(0);
+        setLoading(true);
+        const r = await api.getListings(weightsRef.current, tiersRef.current, sortRef.current, page_);
+        setItems(r.items);
+        setPagesCount(Math.ceil(r.totalItems / 16));
+        setLoading(false);
+    }
+
+    useAsyncEffect(() => loadPage(), []);
 
     return (
         <main className="main">
@@ -29,7 +90,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                 <div className="container">
                     <div className="intro">
                         <div className="intro__wrap">
-                            <button className="btn primary" type="button">Market Place</button>
+                            <button className="btn primary" type="button">Marketplace</button>
                         </div>
                         <div className="intro-bar">
                             <div className="intro-bar__bg">
@@ -46,15 +107,9 @@ const MarketPage = ({}: IMarketPageProps) => {
                 <div className="container">
                     <div className="market-head">
                         <div className="select-wrap">
-                            <DDSlick selected={statusFilter} onChange={setStatusFilter}>
-                                <option value="sale">For Sale</option>
-                                <option value="notsale">Not for Sale</option>
-                            </DDSlick>
-                        </div>
-                        <div className="select-wrap">
-                            <DDSlick selected={sort} onChange={setSort}>
-                                <option value="lowestprice">LowestPrice</option>
-                                <option value="highestprice">HighestPrice</option>
+                            <DDSlick selected={sort} onChange={val => { setSort(val); setPage(0) }}>
+                                <option value="-price">LowestPrice</option>
+                                <option value="price">HighestPrice</option>
                             </DDSlick>
                         </div>
                     </div>
@@ -62,33 +117,19 @@ const MarketPage = ({}: IMarketPageProps) => {
                         <div className="market-sidebar">
                             <div className="filter">
                                 <form className="form" action="#">
-                                    <h2 className="section-title">Filter </h2>
+                                    <h2 className="section-title">Filter</h2>
                                     <div className="filter__wrap">
                                         <div className="filter__item">
                                             <div className="filter__head">
                                                 <span className="filter__title">Tier</span>
                                             </div>
                                             <div className="filter__body">
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="1" name="1" />
-                                                    <label className="form__checkbox-label" htmlFor="1">Stone Tier</label>
-                                                </div>
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="2" name="2" />
-                                                    <label className="form__checkbox-label" htmlFor="2">Iron Tier</label>
-                                                </div>
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="3" name="3" />
-                                                    <label className="form__checkbox-label" htmlFor="3">Silver Tier</label>
-                                                </div>
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="4" name="4" />
-                                                    <label className="form__checkbox-label" htmlFor="4">Gold Tier</label>
-                                                </div>
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="5" name="5" />
-                                                    <label className="form__checkbox-label" htmlFor="5">Phi Stone Tier</label>
-                                                </div>
+                                                {TIERS.map(([ name, value ]) => (
+                                                    <div className="form__checkbox" key={value}>
+                                                        <input className="form__checkbox-input" type="checkbox" id={value} onChange={() => toggleTier(value)} checked={tiers.includes(value)} />
+                                                        <label className="form__checkbox-label" htmlFor={value}>{name}</label>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                         <div className="filter__item">
@@ -96,22 +137,12 @@ const MarketPage = ({}: IMarketPageProps) => {
                                                 <span className="filter__title">Weight</span>
                                             </div>
                                             <div className="filter__body">
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="2-1" name="2-1" />
-                                                    <label className="form__checkbox-label" htmlFor="2-1">0-50</label>
-                                                </div>
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="2-2" name="2-2" />
-                                                    <label className="form__checkbox-label" htmlFor="2-2">51-99</label>
-                                                </div>
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="2-3" name="2-3" />
-                                                    <label className="form__checkbox-label" htmlFor="2-3">100-199</label>
-                                                </div>
-                                                <div className="form__checkbox">
-                                                    <input className="form__checkbox-input" type="checkbox" id="2-4" name="2-4" />
-                                                    <label className="form__checkbox-label" htmlFor="2-4">200-400</label>
-                                                </div>
+                                                {WEIGHTS.map(weight => (
+                                                    <div className="form__checkbox" key={weight}>
+                                                        <input className="form__checkbox-input" type="checkbox" id={weight} onChange={() => toggleWeight(weight)} checked={weights.includes(weight)} />
+                                                        <label className="form__checkbox-label" htmlFor={weight}>{weight}</label>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>
@@ -119,24 +150,31 @@ const MarketPage = ({}: IMarketPageProps) => {
                             </div>
                         </div>
                         <div className="market-wrap">
+                            {loading && <p className='market__status'>Loading...</p>}
                             <div className="cards-wrap">
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Earth.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Air.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Astronaut.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Avax.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/banana_bread.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/banana.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Beehive.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Beer.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Bird.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Bitcoin.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Boat.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Bone.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Bread.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Brick.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Bull.png')} />
-                                <CardItem image={require('url:../../../contracts/images_utils/images/Cake.png')} />
+                                {items.map(item => (
+                                    <Link className="card card_market" to={`/marketplace/${item.listingId}`} key={item.listingId}>
+                                        <div className="card__wrapper">
+                                            <div className="card__wrap">
+                                                <div className="card__image">
+                                                    <img src={`${IMAGES_CDN}/${item.resource.ipfsHash}.webp`} alt="" />
+                                                </div>
+                                            </div>
+                                            <div className="card__body">
+                                                <p className="card__text">{item.amount}x #{item.resource.tokenId}</p>
+                                                <p className="card__descr"><span>Price: </span>{item.price} AVAX</p>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
+                            <ReactPaginate
+                                containerClassName='pagination'
+                                pageCount={pagesCount}
+                                pageRangeDisplayed={3}
+                                marginPagesDisplayed={3}
+                                onPageChange={({ selected }) => { setPage(selected); loadPage(); }}
+                            />
                         </div>
                     </div>
                 </div>

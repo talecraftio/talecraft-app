@@ -1,0 +1,24 @@
+fragment resource on ResourceType {
+  tokenId
+  name
+  tier
+  ipfsHash
+  weight
+}
+
+query getListings($tiers: [String], $weights: [String], $order: String, $page: Int) {
+  listings(tiers: $tiers, weights: $weights, order: $order, page: $page) {
+    totalItems
+    items {
+      listingId
+      resource {
+        ...resource
+      }
+      amount
+      price
+      seller
+      buyer
+      closed
+    }
+  }
+}

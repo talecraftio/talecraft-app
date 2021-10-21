@@ -59,7 +59,7 @@ const WalletPage = observer(({}: IWalletPageProps) => {
                                         <p className="staking__text">AVAX balance: <span>{fd(ethBalance)} AVAX</span></p>
                                     </div>
                                     <div className="staking__row">
-                                        <p className="staking__text">$PHI balance: <span>{fd(phiBalance)} $PHI</span></p>
+                                        <p className="staking__text">$CRAFT balance: <span>{fd(phiBalance)} $CRAFT</span></p>
                                     </div>
                                     <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
                                     <div className="staking__row">
