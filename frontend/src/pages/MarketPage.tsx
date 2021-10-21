@@ -152,6 +152,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                         <div className="market-wrap">
                             {loading && <p className='market__status'>Loading...</p>}
                             <div className="cards-wrap">
+                                {!loading && !items.length && <p className='market__status'>No items found</p>}
                                 {items.map(item => (
                                     <Link className="card card_market" to={`/marketplace/${item.listingId}`} key={item.listingId}>
                                         <div className="card__wrapper">
@@ -168,13 +169,15 @@ const MarketPage = ({}: IMarketPageProps) => {
                                     </Link>
                                 ))}
                             </div>
-                            <ReactPaginate
-                                containerClassName='pagination'
-                                pageCount={pagesCount}
-                                pageRangeDisplayed={3}
-                                marginPagesDisplayed={3}
-                                onPageChange={({ selected }) => { setPage(selected); loadPage(); }}
-                            />
+                            {items.length && (
+                                <ReactPaginate
+                                    containerClassName='pagination'
+                                    pageCount={pagesCount}
+                                    pageRangeDisplayed={3}
+                                    marginPagesDisplayed={3}
+                                    onPageChange={({ selected }) => { setPage(selected); loadPage(); }}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
