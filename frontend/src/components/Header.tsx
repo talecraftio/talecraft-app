@@ -35,14 +35,22 @@ const Header = observer(({}: IHeaderProps) => {
                             )}
                             <li className="nav__items"><NavLink className="nav__link" to="/marketplace" onClick={() => setBurger(false)}>MarketPlace</NavLink></li>
                             {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/wallet" onClick={() => setBurger(false)}>My Collection</NavLink></li>}
-                            <li className="nav__items"><a className="nav__link" target="_blank" href="https://docs.talecraft.io/crafting-guideline">Guideline</a></li>
+                            {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/loyalty" onClick={() => setBurger(false)}>Loyalty</NavLink></li>}
+                            <li className="nav__items"><a className="nav__link" target="_blank" href="https://docs.talecraft.io/crafting-guideline" onClick={() => setBurger(false)}>Guideline</a></li>
                         </ul>
                     </div>
-                    {walletStore.connected ? (
-                        <a className='nav__link desctop' onClick={() => walletStore.resetWallet()}>{trimAddress(walletStore.address)}</a>
-                    ) : (
-                        <a className="nav__link desctop" onClick={() => walletStore.connect()}>Connect wallet</a>
-                    )}
+                    <div className="nav__wrap">
+                        <ul className="nav__list">
+                            {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/game" onClick={() => setBurger(false)}>PLAY GAME</NavLink></li>}
+                            <li className="nav__items">
+                                {walletStore.connected ? (
+                                    <a className='nav__link desctop' onClick={() => walletStore.resetWallet()}>{trimAddress(walletStore.address)}</a>
+                                ) : (
+                                    <a className="nav__link desctop" onClick={() => walletStore.connect()}>Connect wallet</a>
+                                )}
+                            </li>
+                        </ul>
+                    </div>
                 </nav>
                 {walletStore.connected ? (
                     <a className='nav__link mobile-link' onClick={() => walletStore.resetWallet()}>{trimAddress(walletStore.address)}</a>

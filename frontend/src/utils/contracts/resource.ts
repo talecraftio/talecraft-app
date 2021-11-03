@@ -163,6 +163,7 @@ export type ResourceMethodNames =
   | 'getCrafts'
   | 'getPlayers'
   | 'getResourceTypes'
+  | 'getResourceWeight'
   | 'initialMint'
   | 'isApprovedForAll'
   | 'ownedTokens'
@@ -287,6 +288,14 @@ export interface Resource {
   getResourceTypes(
     ids: string[]
   ): MethodConstantReturnContext<ResourcetypeResponse[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param id Type: uint256, Indexed: false
+   */
+  getResourceWeight(id: string): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: false

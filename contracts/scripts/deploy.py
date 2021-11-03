@@ -2,7 +2,7 @@ import csv
 import json
 
 import requests
-from brownie import accounts, Contract, PHI, ChestSale, Resource, DuelStaking, Marketplace
+from brownie import accounts, Contract, PHI, ChestSale, Resource, DuelStaking, Marketplace, Game
 from brownie.network import Chain
 
 from scripts._utils import sourcify_publish
@@ -47,6 +47,10 @@ def main():
     marketplace = Marketplace.deploy(resource.address, {'from': deployer})
     addresses['marketplace'] = marketplace.address
     sourcify_publish(marketplace)
+
+    game = Game.deploy(resource.address, {'from': deployer})
+    addresses['game'] = game.address
+    sourcify_publish(game)
 
     resource.initialMint(chest.address)
     phi.approve(staking.address, 1000e18)

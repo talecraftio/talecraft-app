@@ -19,6 +19,9 @@ import WalletPage from "./pages/WalletPage";
 import CraftPage from "./pages/CraftPage";
 import PlayerInfoPage from "./pages/PlayerInfoPage";
 import MarketListingPage from "./pages/MarketListingPage";
+import GameTestPage from "./pages/GameTestPage";
+import GamePage from "./pages/GamePage";
+import LoyaltyPage from "./pages/LoyaltyPage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -37,6 +40,9 @@ const App = observer(() => {
                     <Route path='/wallet' component={WalletPage} />
                     <Route path='/craft' component={CraftPage} />
                     <Route path='/_playerWeights' component={PlayerInfoPage} />
+                    <Route path='/game' component={GamePage} />
+                    <Route path='/loyalty' component={LoyaltyPage} />
+                    <Route path='/_gameTest' component={GameTestPage} />
                 </Switch>
                 <div style={{ flex: 1 }} />
                 <Footer />

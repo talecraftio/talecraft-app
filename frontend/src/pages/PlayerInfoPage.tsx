@@ -23,7 +23,8 @@ const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
     useAsyncEffect(async () => {
         setStatus('Loading resource types');
         const contract = walletStore.resourceContract;
-        const resourceTypeIds = _.range(1, 160).map(i => i.toString());
+        const rtCount = await contract.methods.resourceCount().call();
+        const resourceTypeIds = _.range(1, parseInt(rtCount)).map(i => i.toString());
         const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
         setResourceTypes(resourceTypes);
         setStatus('Loading players list');

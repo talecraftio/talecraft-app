@@ -85,6 +85,7 @@
     "reflect-metadata": "^0.1.13",
     "store": "^2.0.12",
     "use-async-effect": "^2.2.3",
+    "use-async-memo": "^1.2.3",
     "web3": "^1.5.2"
   },
   "browserslist": "> 0.5%, last 2 versions, not dead"

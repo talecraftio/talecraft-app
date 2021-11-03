@@ -1,0 +1,31 @@
+.game-section {
+    padding: 14rem 0 6rem;
+    @media (min-width: 1360px) {
+        padding: 14rem 0 10rem;
+    }
+}
+
+.join-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin: 0 -5px -10px;
+}
+
+.join-col {
+    width: 50%;
+    padding: 0 5px;
+    margin-bottom: 10px;
+    @media (min-width: 540px) {
+        width: 33.333%;
+    }
+    @media (min-width: 768px) {
+        width: 25%;
+    }
+    @media (min-width: 1024px) {
+        width: 20%;
+    }
+    @media (min-width: 1200px) {
+        width: calc(100% / 7)
+    }
+}

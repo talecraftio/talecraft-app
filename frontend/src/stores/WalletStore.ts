@@ -4,7 +4,14 @@ import Web3 from "web3";
 import { toast } from "react-toastify";
 import store from "store";
 import Timeout from "await-timeout";
-import { chestContract, marketplaceContract, phiContract, resourceContract, stakingContract } from "../utils/contracts";
+import {
+    chestContract,
+    gameContract,
+    marketplaceContract,
+    phiContract,
+    resourceContract,
+    stakingContract
+} from "../utils/contracts";
 import { MethodReturnContext } from "../utils/contracts/phi";
 import { SendOptions } from "ethereum-abi-types-generator";
 import { Subscription } from 'web3-core-subscriptions';
@@ -155,6 +162,10 @@ class WalletStore {
         return marketplaceContract(this.web3);
     }
 
+    get gameContract() {
+        return gameContract(this.web3);
+    }
+
     // updateProfile = async (input: ProfileInputType, removeAvatar: boolean, avatar: File | null) => {
     //     const { nonce, signature } = await generateSignature('UpdateProfile', this.address);
     //     const newProfile = await this.rootStore.api.updateProfile(input, removeAvatar, avatar, nonce, signature);
@@ -174,7 +185,12 @@ class WalletStore {
         try {
             gas = await tx.estimateGas({ from: this.address, ...(options || {}) });
         } catch (e) {
-            console.error('estimate', e);
+            if ((e.message as string).includes('reverted')) {
+                const msg = e.message.replace(/.*{(.*)}.*/sm, '{$1}');
+                const data = JSON.parse(msg);
+                toast.error(data.message);
+                // throw e;
+            }
             toast.warning('Unable to estimate gas limit, please check transaction confirmation window')
         }
         return tx.send({ from: this.address, gas, gasPrice: '25000000000', ...(options || {}) });

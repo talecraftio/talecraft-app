@@ -1,6 +1,6 @@
 import json
 
-from brownie import accounts, Contract, Resource, Marketplace
+from brownie import accounts, Contract, Resource, Marketplace, Game
 
 from scripts._utils import sourcify_publish
 
@@ -14,9 +14,9 @@ def main():
 
     deployer = accounts.load('deployer')
 
-    marketplace = Marketplace.deploy(Resource[-1].address, {'from': deployer})
-    addresses['marketplace'] = marketplace.address
-    sourcify_publish(marketplace)
+    game = Game.deploy(Resource[-1].address, {'from': deployer})
+    addresses['game'] = game.address
+    sourcify_publish(game)
 
     with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:
         f.write('export default ' + json.dumps(addresses))

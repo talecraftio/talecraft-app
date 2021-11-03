@@ -66,7 +66,7 @@ contract Resource is ERC1155, Ownable {
         registerResourceTypes(resources_);
     }
 
-    function initialMint(ChestSale chest_) public onlyOwner {
+    function initialMint(ChestSale chest_) external onlyOwner {
         require(!_initialMintComplete, "initial mint is performed already");
         _mint(address(chest_), 1, 37500, "");
         _mint(address(chest_), 2, 37500, "");
@@ -91,7 +91,7 @@ contract Resource is ERC1155, Ownable {
         }
     }
 
-    function craft(uint256 tokenId) public {
+    function craft(uint256 tokenId) external {
         require(resourceTypes[tokenId].ingredients.length > 0, "No recipe for this resource");
         uint256[] memory ingredients = resourceTypes[tokenId].ingredients;
         Tier maxTier = Tier.None;
@@ -130,7 +130,7 @@ contract Resource is ERC1155, Ownable {
         emit CraftStarted(msg.sender, craftId);
     }
 
-    function claimCraft(uint256 craftId) public {
+    function claimCraft(uint256 craftId) external {
         require(_pendingCraftsByUser[msg.sender].contains(craftId), "this craft is not pending for you");
         PendingCraft storage craft_ = _pendingCrafts[craftId];
         require(craft_.finishTimestamp <= block.timestamp, "this craft is still pending");
@@ -140,7 +140,7 @@ contract Resource is ERC1155, Ownable {
         emit CraftClaimed(msg.sender, craftId);
     }
 
-    function withdrawFees(address payable to) public onlyOwner {
+    function withdrawFees(address payable to) external onlyOwner {
         _phi.safeTransferFrom(address(this), to, _phi.balanceOf(address(this)));
     }
 
@@ -154,6 +154,10 @@ contract Resource is ERC1155, Ownable {
             result[i] = resourceTypes[ids[i]];
         }
         return result;
+    }
+
+    function getResourceWeight(uint256 id) external view returns (uint256) {
+        return resourceTypes[id].weight;
     }
 
     function getCraftingResult(uint256 tokenId1, uint256 tokenId2) external view returns (uint256) {
