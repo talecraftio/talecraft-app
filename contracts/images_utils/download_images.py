@@ -4,7 +4,7 @@ import ipfshttpclient
 
 ipfs = ipfshttpclient.Client()
 
-with open('items.csv') as f:
+with open('../items.csv') as f:
     csv_reader = csv.reader(f, delimiter=',')
     items = []
     for name, in1, in2, weight, tier, ipfs_hash in csv_reader:

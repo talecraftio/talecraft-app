@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "parcel index.html -p 39101",
     "build": "ENVIRONMENT=build parcel build --dist-dir build index.html",
-    "generate": "graphql-codegen --config codegen.yml"
+    "generate": "graphql-codegen --config codegen.yml",
+    "surge": "cp -r ../contracts/images_utils/images_compressed ./build/cards && cd build && cp index.html 200.html && surge . talecraft.surge.sh"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.15.4",

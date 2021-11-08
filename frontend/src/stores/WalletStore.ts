@@ -189,7 +189,7 @@ class WalletStore {
                 const msg = e.message.replace(/.*{(.*)}.*/sm, '{$1}');
                 const data = JSON.parse(msg);
                 toast.error(data.message);
-                // throw e;
+                throw e;
             }
             toast.warning('Unable to estimate gas limit, please check transaction confirmation window')
         }
