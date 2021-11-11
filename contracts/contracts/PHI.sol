@@ -8,7 +8,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/access/Ownable.sol";
 
 contract PHI is ERC20, Ownable {
     constructor() ERC20("$CRAFT", "$CRAFT") {
-        _mint(msg.sender, 12_000_000 ether);
+        _mint(msg.sender, 30_000_000 ether);
     }
 
     function burn(uint256 value) public {

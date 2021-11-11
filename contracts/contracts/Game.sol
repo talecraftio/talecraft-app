@@ -48,7 +48,6 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         for (uint256 i=0; i < 50; i++) {
             _createNewGame(i);
         }
-        _mint(0x174d7BbF81820Ec9CCFed8c775AfA816f2cCCBc8, 1);
     }
 
     function decimals() public view override returns (uint8) {

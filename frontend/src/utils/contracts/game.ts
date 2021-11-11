@@ -191,7 +191,6 @@ export type GameMethodNames =
   | 'decimals'
   | 'decreaseAllowance'
   | 'enterGame'
-  | 'exchangeTokens'
   | 'exitGame'
   | 'getAllGames'
   | 'getGameById'
@@ -204,15 +203,13 @@ export type GameMethodNames =
   | 'owner'
   | 'placeCard'
   | 'renounceOwnership'
-  | 'setWhitelistedContractAddress'
   | 'startGames'
   | 'supportsInterface'
   | 'symbol'
   | 'totalSupply'
   | 'transfer'
   | 'transferFrom'
-  | 'transferOwnership'
-  | 'whitelistedContractAddress';
+  | 'transferOwnership';
 export interface Player1Response {
   addr: string;
   placedCards: [string, string, string, string];
@@ -321,13 +318,6 @@ export interface Game {
    * @param poolSlot Type: uint256, Indexed: false
    */
   enterGame(poolSlot: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   */
-  exchangeTokens(): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -448,14 +438,6 @@ export interface Game {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
-   * @param addr Type: address, Indexed: false
-   */
-  setWhitelistedContractAddress(addr: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
    * @param poolSlots Type: uint256[], Indexed: false
    */
   startGames(poolSlots: string[]): MethodReturnContext;
@@ -514,11 +496,4 @@ export interface Game {
    * @param newOwner Type: address, Indexed: false
    */
   transferOwnership(newOwner: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  whitelistedContractAddress(): MethodConstantReturnContext<string>;
 }

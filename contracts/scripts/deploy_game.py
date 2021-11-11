@@ -2,7 +2,7 @@ import json
 
 from brownie import accounts, Contract, Resource, Marketplace, Game
 
-from scripts._utils import sourcify_publish
+from scripts._utils import snowtrace_publish
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
 
     game = Game.deploy(Resource[-1].address, {'from': deployer})
     addresses['game'] = game.address
-    sourcify_publish(game)
+    snowtrace_publish(game)
 
     with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:
         f.write('export default ' + json.dumps(addresses))

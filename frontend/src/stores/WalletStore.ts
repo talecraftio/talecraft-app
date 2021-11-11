@@ -10,7 +10,7 @@ import {
     marketplaceContract,
     phiContract,
     resourceContract,
-    stakingContract
+    stakingContract, timelockContract, vestingContract, vestingFactoryContract
 } from "../utils/contracts";
 import { MethodReturnContext } from "../utils/contracts/phi";
 import { SendOptions } from "ethereum-abi-types-generator";
@@ -164,6 +164,18 @@ class WalletStore {
 
     get gameContract() {
         return gameContract(this.web3);
+    }
+
+    get vestingFactoryContract() {
+        return vestingFactoryContract(this.web3);
+    }
+
+    getVestingContract(address: string) {
+        return vestingContract(this.web3, address);
+    }
+
+    getTimelockContract(address: string) {
+        return timelockContract(this.web3, address);
     }
 
     // updateProfile = async (input: ProfileInputType, removeAvatar: boolean, avatar: File | null) => {

@@ -5,7 +5,7 @@ import requests
 from brownie import accounts, Contract, PHI, ChestSale, Resource, DuelStaking, Marketplace, Game
 from brownie.network import Chain
 
-from scripts._utils import sourcify_publish
+from scripts._utils import snowtrace_publish
 
 
 def main():
@@ -19,15 +19,15 @@ def main():
 
     phi: Contract = PHI.deploy({'from': deployer})
     addresses['phi'] = phi.address
-    sourcify_publish(phi)
+    snowtrace_publish(phi)
 
     resource = Resource.deploy(phi.address, {'from': deployer})
     addresses['resource'] = resource.address
-    sourcify_publish(resource)
+    snowtrace_publish(resource)
 
     chest = ChestSale.deploy(resource.address, phi.address, {'from': deployer})
     addresses['chest'] = chest.address
-    sourcify_publish(chest)
+    snowtrace_publish(chest)
 
     current_block = len(Chain())
     staking = DuelStaking.deploy(
@@ -42,15 +42,15 @@ def main():
         {'from': deployer}
     )
     addresses['staking'] = staking.address
-    sourcify_publish(staking)
+    snowtrace_publish(staking)
 
     marketplace = Marketplace.deploy(resource.address, {'from': deployer})
     addresses['marketplace'] = marketplace.address
-    sourcify_publish(marketplace)
+    snowtrace_publish(marketplace)
 
     game = Game.deploy(resource.address, {'from': deployer})
     addresses['game'] = game.address
-    sourcify_publish(game)
+    snowtrace_publish(game)
 
     resource.initialMint(chest.address)
     phi.approve(staking.address, 1000e18)
