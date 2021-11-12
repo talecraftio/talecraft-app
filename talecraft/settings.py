@@ -145,6 +145,8 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:39101',
     'http://dev.bennnnsss.com:39101',
     'https://39101.dev.bennnnsss.com',
+    'http://talecraft.surge.sh',
+    'https://talecraft.surge.sh',
 ]
 
 CONSTANCE_CONFIG = {
