@@ -17,7 +17,7 @@ const Footer = ({}: IFooterProps) => {
                     </div>
                     <div className="footer__col"><span className="footer__title">About</span>
                         <ul className="footer-list">
-                            <li><a href={require('url:../images/TaleCraft_Pitchdeck.pdf')} target='_blank'>Whitepaper</a></li>
+                            <li><a href='https://app.talecraft.io/images/TaleCraft_Pitchdeck.pdf' target='_blank'>Whitepaper</a></li>
                             <li><a href="https://docs.talecraft.io/" target='_blank'>Project Overview</a></li>
                             <li><a href="https://docs.talecraft.io/tokenomics" target='_blank'>Tokenmetrics</a></li>
                             <li><Link to="/team">Team</Link></li>

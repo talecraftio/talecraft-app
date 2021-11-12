@@ -1,0 +1,7 @@
+uwsgi:
+  socket: /tmp/talecraft.sock
+  module: talecraft.wsgi:application
+  chmod-socket: 666
+  master: true
+  processes: 4
+  enable-threads: true

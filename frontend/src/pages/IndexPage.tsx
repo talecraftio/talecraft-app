@@ -31,7 +31,7 @@ const IndexPage = ({}: IIndexPageProps) => {
                             <div className="intro__baner">
                                 <span className="intro__text">The Middle Age</span>
                             </div>
-                            <button className="btn primary up intro-btn" type="button">Buy phi</button>
+                            <a className="btn primary up intro-btn" href='https://app.pangolin.exchange/#/swap?outputCurrency=0x75A8BA4e0Ec3f481d2A2c77007ADa4af80b36EE4' target='_blank'>Buy CRAFT</a>
                             <div className="intro__baner">
                                 <span className="intro__text">Metaverse</span>
                             </div>
