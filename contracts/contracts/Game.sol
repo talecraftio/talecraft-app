@@ -176,7 +176,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         }
     }
 
-    function startGames(uint256[] calldata poolSlots) external {
+    function startGames(uint256[] calldata poolSlots) external onlyOwner {
         for (uint8 i=0; i < poolSlots.length; i++) {
             _createNewGame(i);
         }

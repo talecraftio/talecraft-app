@@ -2,7 +2,7 @@ import csv
 import json
 
 import requests
-from brownie import accounts, Contract, PHI, ChestSale, Resource, DuelStaking, Marketplace, Game
+from brownie import accounts, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game
 from brownie.network import Chain
 
 from scripts._utils import snowtrace_publish
@@ -30,7 +30,7 @@ def main():
     snowtrace_publish(chest)
 
     current_block = len(Chain())
-    staking = DuelStaking.deploy(
+    staking = CraftStaking.deploy(
         phi.address,
         phi.address,
         current_block,
