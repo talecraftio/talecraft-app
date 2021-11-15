@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import DDSlick from "../components/DDSlick";
 import { useInjection } from "inversify-react";
 import { Api } from "../graphql/api";
-import { MarketplaceListingType } from "../graphql/sdk";
+import { MarketplaceListingType, MarketplaceStats } from "../graphql/sdk";
 import useAsyncEffect from "use-async-effect";
 import { IMAGES_CDN } from "../utils/const";
 import ReactPaginate from "react-paginate";
@@ -12,20 +12,6 @@ import Timeout from "await-timeout";
 
 interface IMarketPageProps {
 }
-
-const CardItem = ({ image }: { image: string }) => (
-    <Link className="card card_market" to="/card">
-        <div className="card__wrapper">
-            <div className="card__wrap">
-                <div className="card__image"><img src={image} alt="" /></div>
-            </div>
-            <div className="card__body">
-                <p className="card__text">#4444</p>
-                <p className="card__descr"><span>Price: </span>1.38 AVAX</p>
-            </div>
-        </div>
-    </Link>
-)
 
 const TIERS = [
     [ 'Stone Tier', '1' ],
@@ -52,6 +38,7 @@ const MarketPage = ({}: IMarketPageProps) => {
     const [ items, setItems ] = useState<MarketplaceListingType[]>([]);
     const [ pagesCount, setPagesCount ] = useState(0);
     const [ loading, setLoading ] = useState(false);
+    const [ stats, setStats ] = useState<MarketplaceStats>();
 
     const toggleTier = (val: string) => {
         if (tiers.includes(val)) {
@@ -82,7 +69,10 @@ const MarketPage = ({}: IMarketPageProps) => {
         setLoading(false);
     }
 
-    useAsyncEffect(() => loadPage(), []);
+    useAsyncEffect(async () => {
+        loadPage();
+        setStats(await api.getMarketplaceStats());
+    }, []);
 
     return (
         <main className="main">
@@ -112,6 +102,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                                 <option value="price">HighestPrice</option>
                             </DDSlick>
                         </div>
+                        <div className='stats'>Element Floor Price{': '}{stats?.minElementPrice} AVAX</div>
                     </div>
                     <div className="market-content">
                         <div className="market-sidebar">

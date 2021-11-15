@@ -12,6 +12,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The `Decimal` scalar type represents a python Decimal. */
+  Decimal: any;
 };
 
 export type MarketplaceListingResponseType = {
@@ -29,8 +31,13 @@ export type MarketplaceListingType = {
   seller: Scalars['String'];
 };
 
+export type MarketplaceStatsType = {
+  minElementPrice?: Maybe<Scalars['Decimal']>;
+};
+
 export type Query = {
   listings?: Maybe<MarketplaceListingResponseType>;
+  marketplaceStats?: Maybe<MarketplaceStatsType>;
 };
 
 
@@ -61,6 +68,13 @@ export type GetListingsVariables = Exact<{
 
 export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: number, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number }> }>> }> };
 
+export type MarketplaceStats = { minElementPrice?: Maybe<any> };
+
+export type GetMarketplaceStatsVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMarketplaceStats = { marketplaceStats?: Maybe<{ minElementPrice?: Maybe<any> }> };
+
 export const Resource = gql`
     fragment resource on ResourceType {
   tokenId
@@ -68,6 +82,11 @@ export const Resource = gql`
   tier
   ipfsHash
   weight
+}
+    `;
+export const MarketplaceStats = gql`
+    fragment marketplaceStats on MarketplaceStatsType {
+  minElementPrice
 }
     `;
 export const GetListingsDocument = gql`
@@ -88,6 +107,13 @@ export const GetListingsDocument = gql`
   }
 }
     ${Resource}`;
+export const GetMarketplaceStatsDocument = gql`
+    query getMarketplaceStats {
+  marketplaceStats {
+    ...marketplaceStats
+  }
+}
+    ${MarketplaceStats}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -98,6 +124,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     getListings(variables?: GetListingsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetListings> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetListings>(GetListingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getListings');
+    },
+    getMarketplaceStats(variables?: GetMarketplaceStatsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMarketplaceStats> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetMarketplaceStats>(GetMarketplaceStatsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMarketplaceStats');
     }
   };
 }

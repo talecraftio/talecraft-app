@@ -14,4 +14,9 @@ export class Api {
         const r = await this.sdk.getListings({ weights, tiers, order, page });
         return r.listings;
     }
+
+    async getMarketplaceStats() {
+        const r = await this.sdk.getMarketplaceStats();
+        return r.marketplaceStats;
+    }
 }

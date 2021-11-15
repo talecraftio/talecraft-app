@@ -2,17 +2,17 @@
 name = "talecraft"
 version = "0.1.0"
 description = ""
-authors = ["bakatrouble <bakatrouble@gmail.com>"]
+authors = [""]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 Django = "^3.2.7"
 eth-brownie = "^1.16.4"
 Wand = "^0.6.7"
-django-environ = "^0.8.0"
+django-environ = "^0.8.1"
 django-redis = "^5.0.0"
 uWSGI = "^2.0.20"
-psycopg2-binary = "^2.9.1"
+psycopg2-binary = "^2.9.2"
 django-dbsettings = "^1.1.0"
 graphene-django = "^3.0.0b7"
 django-spa = "^0.3.5"

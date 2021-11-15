@@ -22,3 +22,13 @@ query getListings($tiers: [String], $weights: [String], $order: String, $page: I
     }
   }
 }
+
+fragment marketplaceStats on MarketplaceStatsType {
+  minElementPrice
+}
+
+query getMarketplaceStats {
+  marketplaceStats {
+    ...marketplaceStats
+  }
+}

@@ -16,6 +16,8 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*'])
 REDIS_URL = env.str('REDIS_URL', 'redis://localhost:6379/1')
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
+
     'dbsettings',
     'graphene_django',
     'corsheaders',
@@ -32,6 +34,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'spa.middleware.SPAMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',

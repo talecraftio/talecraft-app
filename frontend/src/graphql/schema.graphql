@@ -19,8 +19,13 @@ type MarketplaceListingType {
     seller: String!
 }
 
+type MarketplaceStatsType {
+    minElementPrice: Decimal
+}
+
 type Query {
     listings(order: String, page: Int, tiers: [String], weights: [String]): MarketplaceListingResponseType
+    marketplaceStats: MarketplaceStatsType
 }
 
 type ResourceType {
@@ -30,3 +35,7 @@ type ResourceType {
     tokenId: Int!
     weight: Int!
 }
+
+
+"The `Decimal` scalar type represents a python Decimal."
+scalar Decimal

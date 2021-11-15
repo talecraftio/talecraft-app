@@ -27,3 +27,7 @@ class MarketplaceListingType(DjangoObjectType):
 
 
 MarketplaceListingResponseType = paginated_type('MarketplaceListingResponseType', MarketplaceListingType)
+
+
+class MarketplaceStatsType(graphene.ObjectType):
+    min_element_price = graphene.Decimal()

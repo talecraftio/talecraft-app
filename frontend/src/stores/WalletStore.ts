@@ -67,15 +67,11 @@ class WalletStore {
             await this.connect();
         }
         runInAction(() => this.initialized = true);
-        // const info = await this.rootStore.api.getInfo();
-        // runInAction(() => this.info = info);
     }
 
     loadProfile = async () => {
         if (!this.address)
             return;
-        // const profile = await this.rootStore.api.getProfile(this.address);
-        // runInAction(() => this.profile = profile);
     }
 
     resetWallet = async (chainId?: string) => {
@@ -119,12 +115,6 @@ class WalletStore {
         }
 
         const accounts = await this.web3.eth.getAccounts();
-        // if (store.get('address') !== accounts[0] || !store.get('token')) {
-        //     const { nonce, signature } = await generateSignature('SignIn', accounts[0]);
-        //     const token = await this.rootStore.api.signIn(nonce, signature);
-        //     store.set('address', accounts[0]);
-        //     store.set('token', token);
-        // }
         runInAction(() => { this.address = accounts[0]; this.connected = true });
         await this.loadProfile();
         store.set('connected', true);
@@ -177,20 +167,6 @@ class WalletStore {
     getTimelockContract(address: string) {
         return timelockContract(this.web3, address);
     }
-
-    // updateProfile = async (input: ProfileInputType, removeAvatar: boolean, avatar: File | null) => {
-    //     const { nonce, signature } = await generateSignature('UpdateProfile', this.address);
-    //     const newProfile = await this.rootStore.api.updateProfile(input, removeAvatar, avatar, nonce, signature);
-    //     runInAction(() => this.profile = newProfile);
-    // }
-    //
-    // get nftContract(): NFTContractContext {
-    //     return new this.web3.eth.Contract(NFTContractAbi as any, ADDRESSES.nft) as any;
-    // }
-    //
-    // get paymentTokenContract(): PaymentTokenContractContext {
-    //     return new this.web3.eth.Contract(PaymentTokenContractAbi as any, ADDRESSES.payment_token) as any;
-    // }
 
     sendTransaction = async (tx: MethodReturnContext, options?: Partial<SendOptions>) => {
         let gas;
