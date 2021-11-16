@@ -14,6 +14,9 @@ class Resource(models.Model):
     ingredients = models.ManyToManyField('self')
     weight = models.PositiveIntegerField()
 
+    def __str__(self):
+        return self.name
+
 
 class MarketplaceListing(models.Model):
     listing_id = models.PositiveBigIntegerField(db_index=True)

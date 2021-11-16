@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from app.models import MarketplaceListing
+
+
+@admin.register(MarketplaceListing)
+class MarketplaceListingAdmin(admin.ModelAdmin):
+    list_display = 'id', 'listing_id', 'resource', 'seller',
