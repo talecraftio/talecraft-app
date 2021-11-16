@@ -17,7 +17,6 @@ def main():
     # factory = TokenVestingFactory.deploy(deployer.address, {'from': deployer})
     # addresses['vestingFactory'] = factory.address
     # snowtrace_publish(factory)
-    PHI.publish_source(PHI[-1])
 
     # with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:
     #     f.write('export default ' + json.dumps(addresses))

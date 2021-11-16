@@ -2,7 +2,7 @@ import csv
 import json
 
 import requests
-from brownie import accounts, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game
+from brownie import accounts, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenVestingFactory
 from brownie.network import Chain
 
 from scripts._utils import snowtrace_publish
@@ -24,6 +24,9 @@ def main():
     resource = Resource.deploy(phi.address, {'from': deployer})
     addresses['resource'] = resource.address
     snowtrace_publish(resource)
+
+    resource = Resource[-1]
+    phi = PHI[-1]
 
     chest = ChestSale.deploy(resource.address, phi.address, {'from': deployer})
     addresses['chest'] = chest.address
@@ -52,10 +55,14 @@ def main():
     addresses['game'] = game.address
     snowtrace_publish(game)
 
-    resource.initialMint(chest.address)
-    phi.approve(staking.address, 1000e18)
-    staking.deposit(0, 1000e18)
-    phi.transfer('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', 5_000_000e18)
+    factory = TokenVestingFactory.deploy(deployer.address, {'from': deployer})
+    addresses['vestingFactory'] = factory.address
+    snowtrace_publish(factory)
+
+    resource.initialMint(chest.address, {'from': deployer})
+    phi.approve(staking.address, 1000e18, {'from': deployer})
+    # staking.deposit(0, 1000e18, {'from': deployer})
+    phi.transfer('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', 5_000_000e18, {'from': deployer})
 
     with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:
         f.write('export default ' + json.dumps(addresses))
