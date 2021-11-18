@@ -157,7 +157,7 @@ const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardP
                                         </tr>
                                         {apiResourceType.sales.map(s => (
                                             <tr>
-                                                <td><Moment date={s.datetime} /></td>
+                                                <td><Moment date={s.datetime} format='LLL' withTitle /></td>
                                                 <td>{s.amount}</td>
                                                 <td>{s.price}</td>
                                             </tr>
