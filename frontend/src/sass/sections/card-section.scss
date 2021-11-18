@@ -53,7 +53,14 @@
     width: 100%;
 
     th {
-      text-align: left;
+      padding: 5px;
+      margin-bottom: 5px;
+      border-bottom: 1px gray solid;
+    }
+
+    td {
+      margin: 0;
+      padding: 10px;
     }
   }
 }
