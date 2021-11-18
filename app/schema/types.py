@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import graphene
 from graphene_django import DjangoObjectType, DjangoListField
 
@@ -26,8 +28,8 @@ class ResourceType(DjangoObjectType):
         sales = MarketplaceListing.objects.filter(resource=resource, closed=True, buyer__isnull=False).order_by('-closed_at')
         return [{
             'datetime': l.closed_at,
-            'amount': l.amount,
-            'price': l.price,
+            'amount': Decimal(l.amount),
+            'price': Decimal(l.price),
         } for l in sales[:10]]
 
     class Meta:
