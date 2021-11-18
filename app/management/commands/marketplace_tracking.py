@@ -4,6 +4,7 @@ import time
 
 from django.core.management import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 from web3 import Web3, HTTPProvider
 
 from talecraft.settings import BASE_DIR
@@ -51,6 +52,7 @@ class Command(BaseCommand):
                             listing = MarketplaceListing.objects.filter(listing_id=evt.args.listingId).first()
                             if listing:
                                 listing.closed = True
+                                listing.closed_at = timezone.now()
                                 listing.save()
                                 logging.warning(f'    Listing #{evt.args.listingId} cancelled')
                             else:
@@ -62,6 +64,7 @@ class Command(BaseCommand):
                             if listing:
                                 listing.buyer = evt.args.buyer
                                 listing.closed = True
+                                listing.closed_at = timezone.now()
                                 listing.save()
                                 logging.warning(f'    Listing #{evt.args.listingId} finished')
                             else:

@@ -4,8 +4,8 @@ import graphene
 from django.db.models import Q
 from graphene_django import DjangoListField
 
-from app.models import MarketplaceListing
-from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType
+from app.models import MarketplaceListing, Resource
+from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType
 
 
 class Query(graphene.ObjectType):
@@ -15,6 +15,7 @@ class Query(graphene.ObjectType):
                               order=graphene.String(required=False),
                               page=graphene.Int())
     marketplace_stats = graphene.Field(MarketplaceStatsType)
+    resource = graphene.Field(ResourceType, token_id=graphene.ID())
 
     @classmethod
     def resolve_listings(cls, root, info, tiers=None, weights=None, order='price', page=0):
@@ -56,3 +57,7 @@ class Query(graphene.ObjectType):
         return {
             'min_element_price': Decimal(min([e.price for e in elements if e] or [0])),
         }
+
+    @classmethod
+    def resolve_resource(cls, root, info, token_id):
+        return Resource.objects.filter(token_id=token_id).first()

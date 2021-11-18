@@ -8,6 +8,9 @@ import WalletStore from "../stores/WalletStore";
 import { toast } from "react-toastify";
 import { IMAGES_CDN } from "../utils/const";
 import { observer } from "mobx-react";
+import { ResourceType } from "../graphql/sdk";
+import { Api } from "../graphql/api";
+import Moment from "react-moment";
 
 interface ICardPageProps extends RouteChildrenProps<{ tokenId: string }> {
 }
@@ -29,7 +32,6 @@ const CardPage = observer(({ match: { params: { tokenId } } }: ICardPageProps) =
             setBalance(0);
         }
     }
-
 
     useAsyncEffect(async () => {
         setLoading(true);

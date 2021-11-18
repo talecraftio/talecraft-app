@@ -12,6 +12,12 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /**
+   * The `DateTime` scalar type represents a DateTime
+   * value as specified by
+   * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+   */
+  DateTime: any;
   /** The `Decimal` scalar type represents a python Decimal. */
   Decimal: any;
 };
@@ -38,6 +44,7 @@ export type MarketplaceStatsType = {
 export type Query = {
   listings?: Maybe<MarketplaceListingResponseType>;
   marketplaceStats?: Maybe<MarketplaceStatsType>;
+  resource?: Maybe<ResourceType>;
 };
 
 
@@ -48,15 +55,27 @@ export type Query_ListingsArgs = {
   weights?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+
+export type Query_ResourceArgs = {
+  tokenId?: Maybe<Scalars['ID']>;
+};
+
+export type ResourceSaleEntry = {
+  amount?: Maybe<Scalars['Int']>;
+  datetime?: Maybe<Scalars['DateTime']>;
+  price?: Maybe<Scalars['Decimal']>;
+};
+
 export type ResourceType = {
   ipfsHash: Scalars['String'];
   name: Scalars['String'];
+  sales?: Maybe<Array<Maybe<ResourceSaleEntry>>>;
   tier: Scalars['Int'];
   tokenId: Scalars['Int'];
   weight: Scalars['Int'];
 };
 
-export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number };
+export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> };
 
 export type GetListingsVariables = Exact<{
   tiers?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
@@ -66,7 +85,7 @@ export type GetListingsVariables = Exact<{
 }>;
 
 
-export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: number, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number }> }>> }> };
+export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: number, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
 
 export type MarketplaceStats = { minElementPrice?: Maybe<any> };
 
@@ -75,6 +94,13 @@ export type GetMarketplaceStatsVariables = Exact<{ [key: string]: never; }>;
 
 export type GetMarketplaceStats = { marketplaceStats?: Maybe<{ minElementPrice?: Maybe<any> }> };
 
+export type GetResourceVariables = Exact<{
+  tokenId: Scalars['ID'];
+}>;
+
+
+export type GetResource = { resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> };
+
 export const Resource = gql`
     fragment resource on ResourceType {
   tokenId
@@ -82,6 +108,11 @@ export const Resource = gql`
   tier
   ipfsHash
   weight
+  sales {
+    datetime
+    amount
+    price
+  }
 }
     `;
 export const MarketplaceStats = gql`
@@ -114,6 +145,13 @@ export const GetMarketplaceStatsDocument = gql`
   }
 }
     ${MarketplaceStats}`;
+export const GetResourceDocument = gql`
+    query getResource($tokenId: ID!) {
+  resource(tokenId: $tokenId) {
+    ...resource
+  }
+}
+    ${Resource}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -127,6 +165,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getMarketplaceStats(variables?: GetMarketplaceStatsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMarketplaceStats> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetMarketplaceStats>(GetMarketplaceStatsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMarketplaceStats');
+    },
+    getResource(variables: GetResourceVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResource> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetResource>(GetResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResource');
     }
   };
 }

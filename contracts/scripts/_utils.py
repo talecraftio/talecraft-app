@@ -150,3 +150,6 @@ def snowtrace_publish(c: Contract):
             print(f"Verification complete. Result: {color(col)}{data['result']}{color}")
             return data["message"] == "OK"
         time.sleep(10)
+
+
+

@@ -12,10 +12,27 @@ def paginated_type(name, cls):
     return _
 
 
+class ResourceSaleEntry(graphene.ObjectType):
+    datetime = graphene.DateTime()
+    amount = graphene.Int()
+    price = graphene.Decimal()
+
+
 class ResourceType(DjangoObjectType):
+    sales = graphene.List(ResourceSaleEntry)
+
+    @staticmethod
+    def resolve_sales(resource: Resource, info):
+        sales = MarketplaceListing.objects.filter(resource=resource, closed=True, buyer__isnull=False).order_by('-closed_at')
+        return [{
+            'datetime': l.closed_at,
+            'amount': l.amount,
+            'price': l.price,
+        } for l in sales[:10]]
+
     class Meta:
         model = Resource
-        fields = 'token_id', 'name', 'tier', 'ipfs_hash', 'weight',
+        fields = 'token_id', 'name', 'tier', 'ipfs_hash', 'weight', 'sales',
 
 
 class MarketplaceListingType(DjangoObjectType):

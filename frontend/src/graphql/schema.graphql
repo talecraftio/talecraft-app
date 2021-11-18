@@ -26,16 +26,31 @@ type MarketplaceStatsType {
 type Query {
     listings(order: String, page: Int, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType
+    resource(tokenId: ID): ResourceType
+}
+
+type ResourceSaleEntry {
+    amount: Int
+    datetime: DateTime
+    price: Decimal
 }
 
 type ResourceType {
     ipfsHash: String!
     name: String!
+    sales: [ResourceSaleEntry]
     tier: Int!
     tokenId: Int!
     weight: Int!
 }
 
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
 
 "The `Decimal` scalar type represents a python Decimal."
 scalar Decimal

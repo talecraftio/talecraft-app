@@ -4,6 +4,11 @@ fragment resource on ResourceType {
   tier
   ipfsHash
   weight
+  sales {
+    datetime
+    amount
+    price
+  }
 }
 
 query getListings($tiers: [String], $weights: [String], $order: String, $page: Int) {
@@ -30,5 +35,11 @@ fragment marketplaceStats on MarketplaceStatsType {
 query getMarketplaceStats {
   marketplaceStats {
     ...marketplaceStats
+  }
+}
+
+query getResource($tokenId: ID!) {
+  resource(tokenId: $tokenId) {
+    ...resource
   }
 }

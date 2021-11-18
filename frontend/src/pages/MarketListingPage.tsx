@@ -11,6 +11,9 @@ import { observer } from "mobx-react";
 import { ListingResponse } from "../utils/contracts/marketplace";
 import { ZERO_ADDRESS } from "../utils/address";
 import { toBN } from "../utils/number";
+import Moment from "react-moment";
+import { Api } from "../graphql/api";
+import { ResourceType } from "../graphql/sdk";
 
 interface ICardPageProps extends RouteChildrenProps<{ listingId: string }> {
 }
@@ -18,12 +21,14 @@ interface ICardPageProps extends RouteChildrenProps<{ listingId: string }> {
 const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardPageProps) => {
     const modalStore = useInjection(ModalStore);
     const walletStore = useInjection(WalletStore);
+    const api = useInjection(Api);
 
     const [ listing, setListing ] = useState<ListingResponse & { listingId: string }>();
     const [ resourceType, setResourceType ] = useState<ResourcetypeResponse>();
     const [ balance, setBalance ] = useState(0);
     const [ loading, setLoading ] = useState(true);
     const [ actionLoading, setActionLoading ] = useState(false);
+    const [ apiResourceType, setApiResourceType ] = useState<ResourceType>();
 
     const loadBalance = async () => {
         const contract = walletStore.resourceContract;
@@ -48,6 +53,7 @@ const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardP
             const resource = walletStore.resourceContract;
             const resourceType = (await resource.methods.getResourceTypes([listing.tokenId]).call())[0];
             setResourceType(resourceType);
+            setApiResourceType(await api.getResource(listing.tokenId));
         } catch (e) {
             toast.error('An error has occurred');
         } finally {
@@ -102,7 +108,7 @@ const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardP
             <section className="card-section">
                 <div className="container">
                     {loading ? 'Loading...' : (
-                        resourceType ? (
+                        resourceType && apiResourceType ? (
                             <div className="card-wrap">
                                 <div className="card card_market">
                                     <div className="card__wrapper">
@@ -142,6 +148,21 @@ const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardP
                                             <button className="btn primary" type="button" disabled={actionLoading} onClick={() => onBuy()}>Buy</button>
                                         )}
                                     </div>
+                                    <h2 className="section-title">Sale history</h2>
+                                    <table>
+                                        <tr>
+                                            <th>Datetime</th>
+                                            <th>Amount</th>
+                                            <th>Price</th>
+                                        </tr>
+                                        {apiResourceType.sales.map(s => (
+                                            <tr>
+                                                <td><Moment date={s.datetime} /></td>
+                                                <td>{s.amount}</td>
+                                                <td>{s.price}</td>
+                                            </tr>
+                                        ))}
+                                    </table>
                                 </div>
                             </div>
                         ) : (

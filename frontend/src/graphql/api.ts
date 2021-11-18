@@ -19,4 +19,10 @@ export class Api {
         const r = await this.sdk.getMarketplaceStats();
         return r.marketplaceStats;
     }
+
+    async getResource(tokenId: string) {
+        const r = await this.sdk.getResource({ tokenId });
+        return r.resource;
+    }
 }
+
