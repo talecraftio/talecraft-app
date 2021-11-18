@@ -286,8 +286,8 @@ contract CraftStaking is Ownable {
      * @dev Updates reward per second, only owner.
      */
     function setTokenPerSecond(uint256 _amount) external onlyOwner {
-        require(_amount <= 30 * 1e18, "DuelStaking: Max 30 tokens per second");
-        require(_amount >= 1 * 1e16, "DuelStaking: Min 1 token per second");
+        require(_amount <= 30 ether, "DuelStaking: Max 30 tokens per second");
+        require(_amount >= .0001 ether, "DuelStaking: Min .0001 token per second");
         tokenPerSecond = _amount;
     }
 
