@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useInjection } from "inversify-react";
 import WalletStore from "../stores/WalletStore";
-import { Game50Response } from "../utils/contracts/game";
+import { GameinfoResponse } from "../utils/contracts/game";
 import { observer } from "mobx-react";
 import useAsyncEffect from "use-async-effect";
 import { useAsyncMemo } from "use-async-memo";
@@ -30,8 +30,8 @@ const GamePage = observer(({}: IGamePageProps) => {
     const item2RivalSlot = useRef<HTMLDivElement>();
     const item3RivalSlot = useRef<HTMLDivElement>();
 
-    const [ slots, setSlots ] = useState<Game50Response[]>([]);
-    const [ activeGame, setActiveGame ] = useState<Game50Response>();
+    const [ slots, setSlots ] = useState<GameinfoResponse[]>([]);
+    const [ activeGame, setActiveGame ] = useState<GameinfoResponse>();
     const [ activeSlot, setActiveSlot ] = useState<number>();
     const [ q, setQ ] = useState('');
     const [ logEntries, setLogEntries ] = useState<string[]>([]);
@@ -96,7 +96,7 @@ const GamePage = observer(({}: IGamePageProps) => {
         return <div>Connect wallet first</div>;
     }
 
-    const onJoin = async (slot: number, game: Game50Response) => {
+    const onJoin = async (slot: number, game: GameinfoResponse) => {
         if (game.gameId === activeGame?.gameId) {
             toast.warning('Selected already');
             return;
@@ -124,6 +124,11 @@ const GamePage = observer(({}: IGamePageProps) => {
 
         await walletStore.sendTransaction(gameContract.methods.placeCard(activeSlot.toString(), placeTokenId));
         toast.success('Placed');
+    }
+
+    const onAbort = async () => {
+        const tx = await walletStore.sendTransaction(gameContract.methods.abortGame(activeSlot.toString()));
+        toast.success('Game aborted');
     }
 
     const filteredInventory = inventory
@@ -160,6 +165,9 @@ const GamePage = observer(({}: IGamePageProps) => {
 
             {activeGame && resourceTypes && (
                 <>
+                    {!isTurn && !activeGame.finished && (+new Date() / 1000 - parseInt(activeGame.lastAction) >= 5 * 60) && (
+                        <button className='btn primary' onClick={onAbort}>Abort game</button>
+                    )}
                     <section className="table-section" style={{ backgroundImage: `url(${require('../images/table-bg.jpeg')})` }}>
                         <div className="container">
                             <h2 className="section-title text-center" style={{ color: "white" }}>
