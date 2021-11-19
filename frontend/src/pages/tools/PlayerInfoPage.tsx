@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useInjection } from "inversify-react";
-import WalletStore from "../stores/WalletStore";
-import { ResourcetypeResponse } from "../utils/contracts/resource";
+import WalletStore from "../../stores/WalletStore";
+import { ResourcetypeResponse } from "../../utils/contracts/resource";
 import useAsyncEffect from "use-async-effect";
 import _ from "lodash";
-import { ADDRESSES } from "../utils/contracts";
-import { ZERO_ADDRESS } from "../utils/address";
+import { ADDRESSES } from "../../utils/contracts";
+import { ZERO_ADDRESS } from "../../utils/address";
 
 interface IPlayerInfoPageProps {
 }

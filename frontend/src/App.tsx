@@ -17,7 +17,7 @@ import MarketPage from "./pages/MarketPage";
 import StakingPage from "./pages/StakingPage";
 import WalletPage from "./pages/WalletPage";
 import CraftPage from "./pages/CraftPage";
-import PlayerInfoPage from "./pages/PlayerInfoPage";
+import PlayerInfoPage from "./pages/tools/PlayerInfoPage";
 import MarketListingPage from "./pages/MarketListingPage";
 import GamePage from "./pages/GamePage";
 import LoyaltyPage from "./pages/LoyaltyPage";
