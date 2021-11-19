@@ -113,8 +113,8 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         try {
             const contract = walletStore.stakingContract;
 
-            const pending = await contract.methods.getPendingRewards('0', walletStore.address).call();
-            const tx = await walletStore.sendTransaction(contract.methods.withdraw('0', pending));
+            const staked = (await contract.methods.userInfo('0', walletStore.address).call()).amount;
+            const tx = await walletStore.sendTransaction(contract.methods.withdraw('0', staked));
             toast.success(
                 <>
                     Tokens were successfully harvested<br />
