@@ -97,7 +97,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                 <div className="container">
                     <div className="market-head">
                         <div className="select-wrap">
-                            <DDSlick selected={sort} onChange={val => { setSort(val); setPage(0) }}>
+                            <DDSlick selected={sort} onChange={val => { setSort(val); setPage(0); loadPage() }}>
                                 <option value="-price">LowestPrice</option>
                                 <option value="price">HighestPrice</option>
                             </DDSlick>
