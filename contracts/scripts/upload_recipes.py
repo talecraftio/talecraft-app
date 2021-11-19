@@ -41,3 +41,5 @@ def main():
             ] for item in list(items.values())[i:i+BATCH_SIZE] if item['tier'] > 0
         ], {'from': deployer})
 
+    contract.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+

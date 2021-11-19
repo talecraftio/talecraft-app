@@ -116,7 +116,7 @@ contract ChestSale is Ownable, ERC1155Holder {
     function withdrawFees(address to) external onlyOwner {
         (bool sent, bytes memory data) = to.call{value: address(this).balance}("");
         require(sent, "an error occurred while sending avax");
-        _phi.safeTransferFrom(address(this), to, _phi.balanceOf(address(this)));
+        _phi.safeTransfer(to, _phi.balanceOf(address(this)));
     }
 
     /// @notice Changes AVAX fee amount

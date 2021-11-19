@@ -20,17 +20,16 @@ def main():
     phi: Contract = PHI.deploy({'from': deployer})
     addresses['phi'] = phi.address
     snowtrace_publish(phi)
+    phi.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     resource = Resource.deploy(phi.address, {'from': deployer})
     addresses['resource'] = resource.address
     snowtrace_publish(resource)
 
-    resource = Resource[-1]
-    phi = PHI[-1]
-
     chest = ChestSale.deploy(resource.address, phi.address, {'from': deployer})
     addresses['chest'] = chest.address
     snowtrace_publish(chest)
+    chest.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     staking = CraftStaking.deploy(
         phi.address,
@@ -45,6 +44,7 @@ def main():
     )
     addresses['staking'] = staking.address
     snowtrace_publish(staking)
+    staking.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     marketplace = Marketplace.deploy(resource.address, {'from': deployer})
     addresses['marketplace'] = marketplace.address

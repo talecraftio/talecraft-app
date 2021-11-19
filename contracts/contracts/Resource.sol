@@ -151,7 +151,7 @@ contract Resource is ERC1155, Ownable {
     /// @notice Withdraw PHI fees
     /// @param to Address to withdraw fees to
     function withdrawFees(address to) external onlyOwner {
-        _phi.safeTransferFrom(address(this), to, _phi.balanceOf(address(this)));
+        _phi.safeTransfer(to, _phi.balanceOf(address(this)));
     }
 
     /// @notice List token IDs owned by an address
