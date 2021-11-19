@@ -18,6 +18,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
     const [ amount, setAmount ] = useState('');
     const [ loading, setLoading ] = useState(false);
     const [ balance, setBalance ] = useState<BN>(toBN(0));
+    const [ staked, setStaked ] = useState<BN>(toBN(0));
     const [ allowance, setAllowance ] = useState<BN>(toBN(0));
     const [ earned, setEarned ] = useState<BN>(toBN(0));
     const [ apr, setApr ] = useState<BN>(toBN(0));
@@ -31,6 +32,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         setEarned(toBN(await contract.methods.getPendingRewards('0', walletStore.address).call()).div('1e18'));
         setBalance(toBN(await phi.methods.balanceOf(walletStore.address).call()).div('1e18'));
         setAllowance(toBN(await phi.methods.allowance(walletStore.address, ADDRESSES.staking).call()).div('1e18'));
+        setStaked(toBN((await contract.methods.userInfo('0', walletStore.address).call()).amount).div('1e18'));
 
         const poolInfo = await contract.methods.poolInfo('0').call();
         const totalStakedAmount = toBN(poolInfo.supply);
@@ -92,6 +94,25 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         try {
             const contract = walletStore.stakingContract;
 
+            const tx = await walletStore.sendTransaction(contract.methods.withdraw('0', '0'));
+            toast.success(
+                <>
+                    Tokens were successfully harvested<br />
+                    <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
+                </>
+            );
+        } catch (e) {
+            toast.error('An error has occurred');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const onWithdraw = async () => {
+        setLoading(true);
+        try {
+            const contract = walletStore.stakingContract;
+
             const pending = await contract.methods.getPendingRewards('0', walletStore.address).call();
             const tx = await walletStore.sendTransaction(contract.methods.withdraw('0', pending));
             toast.success(
@@ -142,6 +163,13 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                                 <div className="staking__row">
                                     <p className="staking__category">APR:</p>
                                     <p className="staking__count">{apr?.toFixed(2) || '0.00'}%</p>
+                                </div>
+                                <div className="staking__row">
+                                    <p className="staking__count">
+                                        <span>$CRAFT staked</span>
+                                        {staked.toFixed(6)} $CRAFT
+                                    </p>
+                                    <button className="btn up" type="button" disabled={loading || staked.isZero()} onClick={onWithdraw}>WITHDRAW</button>
                                 </div>
                                 <div className="staking__row">
                                     <p className="staking__count">
