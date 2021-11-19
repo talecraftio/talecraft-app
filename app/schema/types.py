@@ -41,6 +41,10 @@ class MarketplaceListingType(DjangoObjectType):
     resource = graphene.Field(ResourceType)
     price = graphene.Decimal()
 
+    @staticmethod
+    def resolve_price(listing: MarketplaceListing, info):
+        return Decimal(listing.price)
+
     class Meta:
         model = MarketplaceListing
         fields = 'listing_id', 'resource', 'amount', 'price', 'seller', 'buyer', 'closed',
