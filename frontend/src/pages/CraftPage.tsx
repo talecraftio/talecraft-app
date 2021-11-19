@@ -257,8 +257,18 @@ const CraftPage = observer(({}: ICraftPageProps) => {
                     <div className="form-search-wrap">
                         <form className="form-search" action="#">
                             <div className="form-search__wrap">
-                                <input className="form__input" type="search" name="search" id="search"
-                                       placeholder="Type your search here" value={q} onChange={e => setQ(e.target.value)} />
+                                <input
+                                    className="form__input"
+                                    type="search"
+                                    name="search"
+                                    id="search"
+                                    placeholder="Type your search here"
+                                    value={q}
+                                    onChange={e => {
+                                        transitionOrigin.current = undefined;
+                                        setQ(e.target.value);
+                                    }}
+                                />
                                 <button className="form-search__btn" type="submit">
                                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                                         <path

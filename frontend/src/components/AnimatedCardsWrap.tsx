@@ -39,7 +39,7 @@ const AnimatedCardsWrap = ({ children, transitionOrigin }: IAnimatedCardsWrapPro
     const [ flyingCloneTargetPosition, setFlyingCloneTargetPosition ] = useState<Position>();
 
     useEffect(() => {
-        if (initialized.current) {
+        if (initialized.current && transitionOrigin) {
             if (children.length !== prevChildren.current.length) {
                 console.log(lastChild);
                 const { fullWidth: lastChildWidth, fullHeight: lastChildHeight, width, height, paddingH } = getElementSize(lastChild.current);
