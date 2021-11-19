@@ -39,6 +39,7 @@ class ResourceType(DjangoObjectType):
 
 class MarketplaceListingType(DjangoObjectType):
     resource = graphene.Field(ResourceType)
+    price = graphene.Decimal()
 
     class Meta:
         model = MarketplaceListing
