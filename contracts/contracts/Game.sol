@@ -32,7 +32,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     Counters.Counter internal _gameIds;
     mapping (uint256 => GameInfo) _games;
     mapping (uint256 => uint256) internal _pools;
-    uint256 public constant AVAX_PER_TOKEN = .5 ether;
+    uint256 public avaxPerToken = .5 ether;
     uint256 public constant ABORT_TIMEOUT = 5 * 60;  // seconds
     uint256 public maxSlotId = 49;
 
@@ -44,13 +44,16 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     event PlayerPlacedCard(uint256 indexed gameId, uint256 indexed poolSlot, address indexed player, uint256 tokenId);
     event GameFinished(uint256 indexed gameId, uint256 indexed poolSlot, address indexed winner);
     event CreatedNewGame(uint256 indexed gameId, uint256 indexed poolSlot);
+
     event TokensExchanged(address indexed player, uint256 tokensSpent);
+    event AvaxPerTokenUpdated(uint256 newValue);
 
     constructor(Resource resource) ERC20("Loyalty Point", "LP") {
         _resource = resource;
         for (uint256 i=0; i <= maxSlotId; i++) {
             _createNewGame(i);
         }
+        emit AvaxPerTokenUpdated(avaxPerToken);
     }
 
     function decimals() public view override returns (uint8) {
@@ -214,11 +217,16 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     }
 
     function burn(uint256 amount) external {
-        uint256 sum = amount * AVAX_PER_TOKEN;
+        uint256 sum = amount * avaxPerToken;
         require(address(this).balance >= sum, "Not enough balance on contract");
         payable(msg.sender).transfer(sum);
         emit TokensExchanged(msg.sender, amount);
         _burn(msg.sender, amount);
+    }
+
+    function updateAvaxPerToken(uint256 newValue) external onlyOwner {
+        avaxPerToken = newValue;
+        emit AvaxPerTokenUpdated(newValue);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
