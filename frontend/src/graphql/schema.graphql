@@ -24,7 +24,7 @@ type MarketplaceStatsType {
 }
 
 type Query {
-    listings(order: String, page: Int, q: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
+    listings(order: String, page: Int, q: String, seller: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType
     resource(tokenId: ID): ResourceType
 }

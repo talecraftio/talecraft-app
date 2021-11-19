@@ -10,8 +10,8 @@ export class Api {
         this.sdk = getSdk(this.client);
     }
 
-    async getListings(weights?: string[], tiers?: string[], q?: string, order?: string, page?: number) {
-        const r = await this.sdk.getListings({ weights, tiers, order, page, q });
+    async getListings(weights?: string[], tiers?: string[], q?: string, seller?: string, order?: string, page?: number) {
+        const r = await this.sdk.getListings({ weights, tiers, order, seller, page, q });
         return r.listings;
     }
 

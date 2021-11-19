@@ -52,6 +52,7 @@ export type Query_ListingsArgs = {
   order?: Maybe<Scalars['String']>;
   page?: Maybe<Scalars['Int']>;
   q?: Maybe<Scalars['String']>;
+  seller?: Maybe<Scalars['String']>;
   tiers?: Maybe<Array<Maybe<Scalars['String']>>>;
   weights?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
@@ -82,6 +83,7 @@ export type GetListingsVariables = Exact<{
   tiers?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
   weights?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
   q?: Maybe<Scalars['String']>;
+  seller?: Maybe<Scalars['String']>;
   order?: Maybe<Scalars['String']>;
   page?: Maybe<Scalars['Int']>;
 }>;
@@ -123,8 +125,15 @@ export const MarketplaceStats = gql`
 }
     `;
 export const GetListingsDocument = gql`
-    query getListings($tiers: [String], $weights: [String], $q: String, $order: String, $page: Int) {
-  listings(tiers: $tiers, weights: $weights, q: $q, order: $order, page: $page) {
+    query getListings($tiers: [String], $weights: [String], $q: String, $seller: String, $order: String, $page: Int) {
+  listings(
+    tiers: $tiers
+    weights: $weights
+    q: $q
+    seller: $seller
+    order: $order
+    page: $page
+  ) {
     totalItems
     items {
       listingId

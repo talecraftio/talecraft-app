@@ -10,6 +10,7 @@ import { IMAGES_CDN } from "../utils/const";
 import ReactPaginate from "react-paginate";
 import Timeout from "await-timeout";
 import _ from "lodash";
+import WalletStore from "../stores/WalletStore";
 
 interface IMarketPageProps {
 }
@@ -31,11 +32,13 @@ const WEIGHTS = [
 
 const MarketPage = ({}: IMarketPageProps) => {
     const api = useInjection(Api);
+    const walletStore = useInjection(WalletStore);
 
     const [ sort, setSort, sortRef ] = useStateRef<'price' | '-price'>('price');
     const [ tiers, setTiers, tiersRef ] = useStateRef<string[]>([]);
     const [ weights, setWeights, weightsRef ] = useStateRef<string[]>([]);
     const [ q, setQ, qRef ] = useStateRef<string>('')
+    const [ owned, setOwned, ownedRef ] = useStateRef(false);
     const [ page, setPage, pageRef ] = useStateRef(0);
     const [ items, setItems ] = useState<MarketplaceListingType[]>([]);
     const [ pagesCount, setPagesCount ] = useState(0);
@@ -62,10 +65,23 @@ const MarketPage = ({}: IMarketPageProps) => {
         loadPage();
     }
 
+    const toggleOwned = () => {
+        setOwned(!owned);
+        setPage(0);
+        loadPage();
+    }
+
     const loadPage = async (page_ = pageRef.current) => {
         await Timeout.set(0);
         setLoading(true);
-        const r = await api.getListings(weightsRef.current, tiersRef.current, qRef.current, sortRef.current, page_);
+        const r = await api.getListings(
+            weightsRef.current,
+            tiersRef.current,
+            qRef.current,
+            ownedRef.current && walletStore.address ? walletStore.address : '',
+            sortRef.current,
+            page_
+        );
         setItems(r.items);
         setPagesCount(Math.ceil(r.totalItems / 16));
         setLoading(false);
@@ -163,6 +179,19 @@ const MarketPage = ({}: IMarketPageProps) => {
                                                         <label className="form__checkbox-label" htmlFor={weight}>{weight}</label>
                                                     </div>
                                                 ))}
+                                            </div>
+                                        </div>
+                                        <div className="filter__item">
+                                            <div className="filter__head">
+                                                <span className="filter__title">Misc</span>
+                                            </div>
+                                            <div className="filter__body">
+                                                {walletStore.address && (
+                                                    <div className="form__checkbox">
+                                                        <input className="form__checkbox-input" type="checkbox" id='self-chk' onChange={() => toggleOwned()} checked={owned} />
+                                                        <label className="form__checkbox-label" htmlFor='self-chk'>Sold by you</label>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
