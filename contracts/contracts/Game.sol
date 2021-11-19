@@ -189,6 +189,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         require(isPlayer1 || isPlayer2, "You are not playing in this pool");
         require(game.started && !game.finished, "Game should be running");
         require(block.timestamp - game.lastAction >= ABORT_TIMEOUT, "Timeout has not passed");
+        require(isPlayer1 && game.turn != 1 || isPlayer2 && game.turn != 2, "You can't abort game at your turn");
 
         game.finished = true;
         game.winner = msg.sender;
