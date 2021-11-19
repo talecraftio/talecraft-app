@@ -12,13 +12,14 @@ class Query(graphene.ObjectType):
     listings = graphene.Field(MarketplaceListingResponseType,
                               tiers=graphene.List(graphene.String, required=False),
                               weights=graphene.List(graphene.String, required=False),
+                              q=graphene.String(required=False),
                               order=graphene.String(required=False),
                               page=graphene.Int())
     marketplace_stats = graphene.Field(MarketplaceStatsType)
     resource = graphene.Field(ResourceType, token_id=graphene.ID())
 
     @classmethod
-    def resolve_listings(cls, root, info, tiers=None, weights=None, order='price', page=0):
+    def resolve_listings(cls, root, info, tiers=None, weights=None, q='', order='price', page=0):
         weights_q = Q()
         weights_cnt = 0
         tiers_q = Q()
@@ -43,6 +44,8 @@ class Query(graphene.ObjectType):
             qs = qs.filter(weights_q)
         if tiers_cnt:
             qs = qs.filter(tiers_q)
+        if q:
+            qs = qs.filter(resource__name__icontains=q)
         qs = qs.order_by(order)
 
         return {

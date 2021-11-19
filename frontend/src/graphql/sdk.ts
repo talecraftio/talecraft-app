@@ -32,7 +32,7 @@ export type MarketplaceListingType = {
   buyer?: Maybe<Scalars['String']>;
   closed: Scalars['Boolean'];
   listingId: Scalars['Int'];
-  price: Scalars['Int'];
+  price: Scalars['Decimal'];
   resource?: Maybe<ResourceType>;
   seller: Scalars['String'];
 };
@@ -51,6 +51,7 @@ export type Query = {
 export type Query_ListingsArgs = {
   order?: Maybe<Scalars['String']>;
   page?: Maybe<Scalars['Int']>;
+  q?: Maybe<Scalars['String']>;
   tiers?: Maybe<Array<Maybe<Scalars['String']>>>;
   weights?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
@@ -80,12 +81,13 @@ export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: 
 export type GetListingsVariables = Exact<{
   tiers?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
   weights?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
+  q?: Maybe<Scalars['String']>;
   order?: Maybe<Scalars['String']>;
   page?: Maybe<Scalars['Int']>;
 }>;
 
 
-export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: number, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
+export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: any, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
 
 export type MarketplaceStats = { minElementPrice?: Maybe<any> };
 
@@ -121,8 +123,8 @@ export const MarketplaceStats = gql`
 }
     `;
 export const GetListingsDocument = gql`
-    query getListings($tiers: [String], $weights: [String], $order: String, $page: Int) {
-  listings(tiers: $tiers, weights: $weights, order: $order, page: $page) {
+    query getListings($tiers: [String], $weights: [String], $q: String, $order: String, $page: Int) {
+  listings(tiers: $tiers, weights: $weights, q: $q, order: $order, page: $page) {
     totalItems
     items {
       listingId

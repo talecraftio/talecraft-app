@@ -14,7 +14,7 @@ type MarketplaceListingType {
     buyer: String
     closed: Boolean!
     listingId: Int!
-    price: Int!
+    price: Decimal!
     resource: ResourceType
     seller: String!
 }
@@ -24,7 +24,7 @@ type MarketplaceStatsType {
 }
 
 type Query {
-    listings(order: String, page: Int, tiers: [String], weights: [String]): MarketplaceListingResponseType
+    listings(order: String, page: Int, q: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType
     resource(tokenId: ID): ResourceType
 }

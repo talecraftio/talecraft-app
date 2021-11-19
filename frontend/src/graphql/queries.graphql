@@ -11,8 +11,8 @@ fragment resource on ResourceType {
   }
 }
 
-query getListings($tiers: [String], $weights: [String], $order: String, $page: Int) {
-  listings(tiers: $tiers, weights: $weights, order: $order, page: $page) {
+query getListings($tiers: [String], $weights: [String], $q: String, $order: String, $page: Int) {
+  listings(tiers: $tiers, weights: $weights, q: $q, order: $order, page: $page) {
     totalItems
     items {
       listingId
