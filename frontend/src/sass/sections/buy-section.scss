@@ -106,23 +106,17 @@
   z-index: 2;
 
   &__fill {
-    position: absolute;
-    top: 50%;
-    left: 0.9%;
-    transform: translateY(-50%);
-    background-color: rgba(70, 97, 117, 1);
-    color: rgba(153, 162, 168, 1);
-    font-size: 1rem;
-    height: 60%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 0.5rem;
-    z-index: 2;
-    transition: width .1s ease;
-    @media (min-width: 1024px) {
-      font-size: 1.2rem;
+    &-wrapper {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      bottom: 10px;
+      right: 10px;
     }
+
+    height: 100%;
+    background-color: rgba(70, 97, 117, 1);
+    transition: width .1s ease;
   }
 
   &__bg {
@@ -142,6 +136,7 @@
     color: rgba(153, 162, 168, 1);
     font-size: 1rem;
     text-transform: uppercase;
+    z-index: 2;
     @media (min-width: 1024px) {
       font-size: 1.2rem;
     }

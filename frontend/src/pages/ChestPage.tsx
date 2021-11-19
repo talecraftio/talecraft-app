@@ -141,9 +141,11 @@ const ChestPage = observer(({}: IChestPageProps) => {
                         </div>
                         <div className="progress-bar">
                             <div className="progress-bar__bg">
-                                <span className="progress-bar__name">{soldChests} / {totalChests} weekly chests sold</span>
                                 <img src={require('url:../images/empty3.png')} alt="" />
-                                <div className="progress-bar__fill" style={{ width: `${saleProgress}%` }}/>
+                                <div className="progress-bar__fill-wrapper">
+                                    <div className="progress-bar__fill" style={{ width: `${saleProgress * 100}%` }}/>
+                                </div>
+                                <span className="progress-bar__name">{soldChests} / {totalChests} weekly chests sold</span>
                             </div>
                         </div>
                     </div>
