@@ -31,7 +31,7 @@ const WEIGHTS = [
 const MarketPage = ({}: IMarketPageProps) => {
     const api = useInjection(Api);
 
-    const [ sort, setSort, sortRef ] = useStateRef<'price' | '-price'>('-price');
+    const [ sort, setSort, sortRef ] = useStateRef<'price' | '-price'>('price');
     const [ tiers, setTiers, tiersRef ] = useStateRef<string[]>([]);
     const [ weights, setWeights, weightsRef ] = useStateRef<string[]>([]);
     const [ page, setPage, pageRef ] = useStateRef(0);
@@ -98,8 +98,8 @@ const MarketPage = ({}: IMarketPageProps) => {
                     <div className="market-head">
                         <div className="select-wrap">
                             <DDSlick selected={sort} onChange={val => { setSort(val); setPage(0); loadPage() }}>
-                                <option value="-price">LowestPrice</option>
-                                <option value="price">HighestPrice</option>
+                                <option value="price">LowestPrice</option>
+                                <option value="-price">HighestPrice</option>
                             </DDSlick>
                         </div>
                         <div className='stats'>Element Floor Price{': '}{stats?.minElementPrice} AVAX</div>
