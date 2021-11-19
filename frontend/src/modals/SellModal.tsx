@@ -91,7 +91,7 @@ const SellModal = ({ modalId, data: { tokenId, balance } }: ISellModalProps) => 
                     </div>
                     <div className="form__field-btn">
                         <button className="section-subtitle" type="button" onClick={() => modalStore.hideModal(modalId)}>Cancel</button>
-                        <button className="btn primary" type="submit" disabled={loading}>List</button>
+                        <button className="btn primary" type="submit" disabled={loading || toBN(price).isZero() || toBN(amount).isZero()}>List</button>
                     </div>
                 </div>
             </form>
