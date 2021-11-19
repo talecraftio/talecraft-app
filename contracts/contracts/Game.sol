@@ -31,9 +31,10 @@ contract Game is ERC20, Ownable, ERC1155Holder {
 
     Counters.Counter internal _gameIds;
     mapping (uint256 => GameInfo) _games;
-    uint256[50] internal _pools;
+    mapping (uint256 => uint256) internal _pools;
     uint256 public constant AVAX_PER_TOKEN = .5 ether;
     uint256 public constant ABORT_TIMEOUT = 5 * 60;  // seconds
+    uint256 public maxSlotId = 49;
 
     Resource internal _resource;
 
@@ -47,7 +48,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
 
     constructor(Resource resource) ERC20("Loyalty Point", "LP") {
         _resource = resource;
-        for (uint256 i=0; i < 50; i++) {
+        for (uint256 i=0; i <= maxSlotId; i++) {
             _createNewGame(i);
         }
     }
@@ -73,9 +74,9 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         return _games[gameId];
     }
 
-    function getAllGames() external view returns (GameInfo[50] memory) {
-        GameInfo[50] memory games;
-        for (uint8 i=0; i < 50; i++) {
+    function getAllGames() external view returns (GameInfo[] memory) {
+        GameInfo[] memory games = new GameInfo[](maxSlotId + 1);
+        for (uint8 i=0; i <= maxSlotId; i++) {
             games[i] = _games[_pools[i]];
         }
         return games;
@@ -88,7 +89,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     function enterGame(uint256 poolSlot) external {
         GameInfo storage game = _games[_pools[poolSlot]];
         require(!game.started, "Game has already started");
-        for (uint8 i=0; i < 50; i++) {
+        for (uint8 i=0; i <= maxSlotId; i++) {
             require(_games[_pools[i]].finished || _games[_pools[i]].player1.addr != msg.sender && _games[_pools[i]].player2.addr != msg.sender, "You are already playing in some other pool");
         }
         uint256[] memory ownedTokens = _resource.ownedTokens(msg.sender);
@@ -206,7 +207,9 @@ contract Game is ERC20, Ownable, ERC1155Holder {
 
     function startGames(uint256[] calldata poolSlots) external onlyOwner {
         for (uint8 i=0; i < poolSlots.length; i++) {
-            _createNewGame(i);
+            _createNewGame(poolSlots[i]);
+            if (poolSlots[i] > maxSlotId)
+                maxSlotId = poolSlots[i];
         }
     }
 
