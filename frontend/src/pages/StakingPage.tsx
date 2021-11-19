@@ -113,11 +113,17 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         try {
             const contract = walletStore.stakingContract;
 
-            const staked = (await contract.methods.userInfo('0', walletStore.address).call()).amount;
-            const tx = await walletStore.sendTransaction(contract.methods.withdraw('0', staked));
+            let tx = await walletStore.sendTransaction(contract.methods.withdraw('0', '0'));
             toast.success(
                 <>
                     Tokens were successfully harvested<br />
+                    <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
+                </>
+            );
+            tx = await walletStore.sendTransaction(contract.methods.emergencyWithdraw('0'));
+            toast.success(
+                <>
+                    Stake was successfully withdrawn<br />
                     <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                 </>
             );
