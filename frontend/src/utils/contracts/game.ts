@@ -183,7 +183,9 @@ export interface GameEventsContext {
 }
 export type GameMethodNames =
   | 'new'
+  | 'ABORT_TIMEOUT'
   | 'AVAX_PER_TOKEN'
+  | 'abortGame'
   | 'allowance'
   | 'approve'
   | 'balanceOf'
@@ -197,6 +199,7 @@ export type GameMethodNames =
   | 'getGameByPoolSlot'
   | 'getLastGameId'
   | 'increaseAllowance'
+  | 'maxSlotId'
   | 'name'
   | 'onERC1155BatchReceived'
   | 'onERC1155Received'
@@ -218,7 +221,7 @@ export interface Player2Response {
   addr: string;
   placedCards: [string, string, string, string];
 }
-export interface Game50Response {
+export interface GameinfoResponse {
   gameId: string;
   player1: Player1Response;
   player2: Player2Response;
@@ -227,16 +230,7 @@ export interface Game50Response {
   turn: string;
   winner: string;
   round: string;
-}
-export interface GameResponse {
-  gameId: string;
-  player1: Player1Response;
-  player2: Player2Response;
-  started: boolean;
-  finished: boolean;
-  turn: string;
-  winner: string;
-  round: string;
+  lastAction: string;
 }
 export interface Game {
   /**
@@ -253,7 +247,22 @@ export interface Game {
    * StateMutability: view
    * Type: function
    */
+  ABORT_TIMEOUT(): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
   AVAX_PER_TOKEN(): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param poolSlot Type: uint256, Indexed: false
+   */
+  abortGame(poolSlot: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
@@ -332,7 +341,7 @@ export interface Game {
    * StateMutability: view
    * Type: function
    */
-  getAllGames(): MethodConstantReturnContext<Game50Response[]>;
+  getAllGames(): MethodConstantReturnContext<GameinfoResponse[]>;
   /**
    * Payable: false
    * Constant: true
@@ -340,7 +349,7 @@ export interface Game {
    * Type: function
    * @param gameId Type: uint256, Indexed: false
    */
-  getGameById(gameId: string): MethodConstantReturnContext<GameResponse>;
+  getGameById(gameId: string): MethodConstantReturnContext<GameinfoResponse>;
   /**
    * Payable: false
    * Constant: true
@@ -350,7 +359,7 @@ export interface Game {
    */
   getGameByPoolSlot(
     poolSlot: string
-  ): MethodConstantReturnContext<GameResponse>;
+  ): MethodConstantReturnContext<GameinfoResponse>;
   /**
    * Payable: false
    * Constant: true
@@ -367,6 +376,13 @@ export interface Game {
    * @param addedValue Type: uint256, Indexed: false
    */
   increaseAllowance(spender: string, addedValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  maxSlotId(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true

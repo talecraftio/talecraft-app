@@ -162,11 +162,13 @@ export type ResourceMethodNames =
   | 'getCraftingResult'
   | 'getCrafts'
   | 'getPlayers'
+  | 'getPlayersPaginated'
   | 'getResourceTypes'
   | 'getResourceWeight'
   | 'initialMint'
   | 'isApprovedForAll'
   | 'ownedTokens'
+  | 'ownedTokensPaginated'
   | 'owner'
   | 'pendingCrafts'
   | 'registerResourceTypes'
@@ -283,6 +285,18 @@ export interface Resource {
    * Constant: true
    * StateMutability: view
    * Type: function
+   * @param offset Type: uint256, Indexed: false
+   * @param count Type: uint256, Indexed: false
+   */
+  getPlayersPaginated(
+    offset: string,
+    count: string
+  ): MethodConstantReturnContext<string[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
    * @param ids Type: uint256[], Indexed: false
    */
   getResourceTypes(
@@ -301,9 +315,9 @@ export interface Resource {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
-   * @param chest_ Type: address, Indexed: false
+   * @param chest Type: address, Indexed: false
    */
-  initialMint(chest_: string): MethodReturnContext;
+  initialMint(chest: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
@@ -324,6 +338,20 @@ export interface Resource {
    * @param player Type: address, Indexed: false
    */
   ownedTokens(player: string): MethodConstantReturnContext<string[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param player Type: address, Indexed: false
+   * @param offset Type: uint256, Indexed: false
+   * @param count Type: uint256, Indexed: false
+   */
+  ownedTokensPaginated(
+    player: string,
+    offset: string,
+    count: string
+  ): MethodConstantReturnContext<string[]>;
   /**
    * Payable: false
    * Constant: true

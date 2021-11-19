@@ -133,12 +133,11 @@ export type StakingMethodNames =
   | 'new'
   | 'FEE_BASE'
   | 'addAllocation'
-  | 'blockDeltaFeeStage'
   | 'bonusMultiplier'
   | 'claimLeftovers'
   | 'deposit'
   | 'emergencyWithdraw'
-  | 'endBlock'
+  | 'endTimestamp'
   | 'feeRecipient'
   | 'feeStage'
   | 'getMultiplier'
@@ -147,15 +146,16 @@ export type StakingMethodNames =
   | 'poolInfo'
   | 'renounceOwnership'
   | 'rewardToken'
-  | 'setBlockDeltaFeeStage'
-  | 'setEndBlock'
+  | 'setEndTimestamp'
   | 'setFeeRecipient'
   | 'setFeeStage'
   | 'setMultiplier'
-  | 'setStartBlock'
-  | 'setTokenPerBlock'
-  | 'startBlock'
-  | 'tokenPerBlock'
+  | 'setStartTimestamp'
+  | 'setTimestampDeltaFeeStage'
+  | 'setTokenPerSecond'
+  | 'startTimestamp'
+  | 'timestampDeltaFeeStage'
+  | 'tokenPerSecond'
   | 'totalAllocPoint'
   | 'transferOwnership'
   | 'updatePool'
@@ -165,7 +165,7 @@ export interface PoolInfoResponse {
   token: string;
   supply: string;
   allocPoint: string;
-  lastRewardBlock: string;
+  lastRewardTimestamp: string;
   accTokenPerShare: string;
   totalAllocation: string;
   totalReward: string;
@@ -173,10 +173,10 @@ export interface PoolInfoResponse {
 export interface UserInfoResponse {
   amount: string;
   rewardDebt: string;
-  rewardDebtAtBlock: string;
-  lastWithdrawBlock: string;
-  firstDepositBlock: string;
-  lastDepositBlock: string;
+  rewardDebtAtTimestamp: string;
+  lastWithdrawTimestamp: string;
+  firstDepositTimestamp: string;
+  lastDepositTimestamp: string;
 }
 export interface Staking {
   /**
@@ -186,22 +186,22 @@ export interface Staking {
    * Type: constructor
    * @param _rewardToken Type: address, Indexed: false
    * @param _stakingToken Type: address, Indexed: false
-   * @param _startBlock Type: uint256, Indexed: false
-   * @param _endBlock Type: uint256, Indexed: false
+   * @param _startTimestamp Type: uint256, Indexed: false
+   * @param _endTimestamp Type: uint256, Indexed: false
    * @param _allocation Type: uint256, Indexed: false
    * @param _feeRecipient Type: address, Indexed: false
    * @param _feeStage Type: uint256[], Indexed: false
-   * @param _blockDeltaFeeStage Type: uint256[], Indexed: false
+   * @param _timestampDeltaFeeStage Type: uint256[], Indexed: false
    */
   'new'(
     _rewardToken: string,
     _stakingToken: string,
-    _startBlock: string,
-    _endBlock: string,
+    _startTimestamp: string,
+    _endTimestamp: string,
     _allocation: string,
     _feeRecipient: string,
     _feeStage: string[],
-    _blockDeltaFeeStage: string[]
+    _timestampDeltaFeeStage: string[]
   ): MethodReturnContext;
   /**
    * Payable: false
@@ -219,14 +219,6 @@ export interface Staking {
    * @param _amount Type: uint256, Indexed: false
    */
   addAllocation(_pid: string, _amount: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param parameter0 Type: uint256, Indexed: false
-   */
-  blockDeltaFeeStage(parameter0: string): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -264,7 +256,7 @@ export interface Staking {
    * StateMutability: view
    * Type: function
    */
-  endBlock(): MethodConstantReturnContext<string>;
+  endTimestamp(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -338,17 +330,9 @@ export interface Staking {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
-   * @param _blockDeltas Type: uint256[], Indexed: false
+   * @param _timestamp Type: uint256, Indexed: false
    */
-  setBlockDeltaFeeStage(_blockDeltas: string[]): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param _block Type: uint256, Indexed: false
-   */
-  setEndBlock(_block: string): MethodReturnContext;
+  setEndTimestamp(_timestamp: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -378,9 +362,17 @@ export interface Staking {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
-   * @param _block Type: uint256, Indexed: false
+   * @param _timestamp Type: uint256, Indexed: false
    */
-  setStartBlock(_block: string): MethodReturnContext;
+  setStartTimestamp(_timestamp: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param _timestampDeltas Type: uint256[], Indexed: false
+   */
+  setTimestampDeltaFeeStage(_timestampDeltas: string[]): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -388,21 +380,31 @@ export interface Staking {
    * Type: function
    * @param _amount Type: uint256, Indexed: false
    */
-  setTokenPerBlock(_amount: string): MethodReturnContext;
+  setTokenPerSecond(_amount: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
    */
-  startBlock(): MethodConstantReturnContext<string>;
+  startTimestamp(): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param parameter0 Type: uint256, Indexed: false
+   */
+  timestampDeltaFeeStage(
+    parameter0: string
+  ): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
    */
-  tokenPerBlock(): MethodConstantReturnContext<string>;
+  tokenPerSecond(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true

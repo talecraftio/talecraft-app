@@ -108,6 +108,7 @@ export interface ChestEventsContext {
 export type ChestMethodNames =
   | 'new'
   | 'CHESTS_PER_WEEK'
+  | 'LIMIT_PER_USER'
   | 'TOTAL_CHESTS'
   | 'TOTAL_WEEKS'
   | 'WEEK'
@@ -145,6 +146,13 @@ export interface Chest {
    * Type: function
    */
   CHESTS_PER_WEEK(): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  LIMIT_PER_USER(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true

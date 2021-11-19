@@ -25,6 +25,7 @@ contract Marketplace is ERC1155Holder {
     Counters.Counter internal _listingIds;
     mapping (uint256 => Listing) internal _listings;
     mapping (address => EnumerableSet.UintSet) internal _listingsBySeller;
+    mapping (address => EnumerableSet.UintSet) internal _activeListingsBySeller;
     EnumerableSet.UintSet internal _activeListings;
 
     event NewListing(address indexed seller, uint256 indexed listingId);
@@ -50,37 +51,46 @@ contract Marketplace is ERC1155Holder {
         _listings[listingId].seller = msg.sender;
 
         _listingsBySeller[msg.sender].add(listingId);
+        _activeListingsBySeller[msg.sender].add(listingId);
         _activeListings.add(listingId);
 
         emit NewListing(msg.sender, listingId);
     }
 
     function cancelSale(uint256 listingId) external {
-        require(_listings[listingId].seller == msg.sender, "you did not create this listing");
-        require(!_listings[listingId].closed, "this listing is already closed");
+        Listing storage listing = _listings[listingId];
+        require(listing.seller == msg.sender, "you did not create this listing");
+        require(!listing.closed, "this listing is already closed");
 
-        _listings[listingId].closed = true;
-        _resource.safeTransferFrom(address(this), msg.sender, _listings[listingId].tokenId, _listings[listingId].amount, "");
+        listing.closed = true;
+        _resource.safeTransferFrom(address(this), msg.sender, listing.tokenId, listing.amount, "");
         _activeListings.remove(listingId);
+        _activeListingsBySeller[listing.seller].remove(listingId);
 
         emit ListingCancelled(listingId);
     }
 
     function buyListing(uint256 listingId) external payable {
-        require(!_listings[listingId].closed, "this listing is already closed");
-        require(msg.value == _listings[listingId].price, "invalid value sent");
+        Listing storage listing = _listings[listingId];
+        require(!listing.closed, "this listing is already closed");
+        require(msg.value == listing.price, "invalid value sent");
 
-        _listings[listingId].buyer = msg.sender;
-        _listings[listingId].closed = true;
-        _resource.safeTransferFrom(address(this), msg.sender, _listings[listingId].tokenId, _listings[listingId].amount, "");
-        payable(_listings[listingId].seller).transfer(msg.value);
+        listing.buyer = msg.sender;
+        listing.closed = true;
+        _resource.safeTransferFrom(address(this), msg.sender, listing.tokenId, listing.amount, "");
+        payable(listing.seller).transfer(msg.value);
         _activeListings.remove(listingId);
+        _activeListingsBySeller[listing.seller].remove(listingId);
 
-        emit Trade(_listings[listingId].seller, msg.sender, listingId);
+        emit Trade(listing.seller, msg.sender, listingId);
     }
 
     function getListing(uint256 listingId) external view returns (Listing memory) {
         require(listingId > 0 && listingId <= _listingIds.current(), "invalid listing id");
         return _listings[listingId];
+    }
+
+    function getListingsBySeller(address seller) external view returns (uint256[] memory) {
+        return _activeListingsBySeller[seller].values();
     }
 }

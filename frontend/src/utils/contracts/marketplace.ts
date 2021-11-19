@@ -98,6 +98,7 @@ export type MarketplaceMethodNames =
   | 'buyListing'
   | 'cancelSale'
   | 'getListing'
+  | 'getListingsBySeller'
   | 'onERC1155BatchReceived'
   | 'onERC1155Received'
   | 'putOnSale'
@@ -143,6 +144,14 @@ export interface Marketplace {
    * @param listingId Type: uint256, Indexed: false
    */
   getListing(listingId: string): MethodConstantReturnContext<ListingResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param seller Type: address, Indexed: false
+   */
+  getListingsBySeller(seller: string): MethodConstantReturnContext<string[]>;
   /**
    * Payable: false
    * Constant: false
