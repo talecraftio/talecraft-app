@@ -32,15 +32,14 @@ def main():
     addresses['chest'] = chest.address
     snowtrace_publish(chest)
 
-    current_block = len(Chain())
     staking = CraftStaking.deploy(
         phi.address,
         phi.address,
-        current_block,
-        current_block + 302400,
-        1 * 302400,
-        deployer.address,
-        [0, 0, 0, 0],
+        1637332200,
+        1645281000,
+        7948800000000000000000,
+        '0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14',
+        [4, 3, 2, 1],
         [1, 2, 3, 4],
         {'from': deployer}
     )
@@ -54,6 +53,7 @@ def main():
     game = Game.deploy(resource.address, {'from': deployer})
     addresses['game'] = game.address
     snowtrace_publish(game)
+    game.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     factory = TokenVestingFactory.deploy(deployer.address, {'from': deployer})
     addresses['vestingFactory'] = factory.address
