@@ -77,7 +77,7 @@ contract CraftStaking is Ownable {
         address _feeRecipient,
         uint256[] memory _feeStage,
         uint256[] memory _timestampDeltaFeeStage
-    ) public {
+    ) {
         rewardToken = _rewardToken;
         feeRecipient = _feeRecipient;
         startTimestamp = _startTimestamp;

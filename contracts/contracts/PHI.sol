@@ -11,7 +11,7 @@ contract PHI is ERC20, Ownable {
         _mint(msg.sender, 30_000_000 ether);
     }
 
-    function burn(uint256 value) public {
+    function burn(uint256 value) external {
         _burn(_msgSender(), value);
     }
 }

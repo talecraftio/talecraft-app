@@ -42,7 +42,7 @@ contract Resource is ERC1155, Ownable {
 
     Counters.Counter internal _tokenIds;
     Counters.Counter internal _craftIds;
-    IERC20 internal _phi;
+    IERC20 internal immutable _phi;
     bool internal _initialMintComplete;
     EnumerableSet.AddressSet internal _players;
 
@@ -66,15 +66,19 @@ contract Resource is ERC1155, Ownable {
         registerResourceTypes(resources_);
     }
 
-    function initialMint(ChestSale chest_) external onlyOwner {
+    /// @notice Mint base resource token amounts to the chest contract
+    /// @param chest Address to mint tokens to
+    function initialMint(ChestSale chest) external onlyOwner {
         require(!_initialMintComplete, "initial mint is performed already");
-        _mint(address(chest_), 1, 37500, "");
-        _mint(address(chest_), 2, 37500, "");
-        _mint(address(chest_), 3, 37500, "");
-        _mint(address(chest_), 4, 37500, "");
+        _mint(address(chest), 1, 37500, "");
+        _mint(address(chest), 2, 37500, "");
+        _mint(address(chest), 3, 37500, "");
+        _mint(address(chest), 4, 37500, "");
         _initialMintComplete = true;
     }
 
+    /// @notice Register new resource types
+    /// @param types Array of resource types data ([name, weight, tier, [ingredient1, ingredient2], ipfsHash]) to register
     function registerResourceTypes(ResourceType[] memory types) public onlyOwner {
         for (uint256 i=0; i < types.length; i++) {
             _tokenIds.increment();
@@ -91,6 +95,8 @@ contract Resource is ERC1155, Ownable {
         }
     }
 
+    /// @notice Start crafting a token
+    /// @param tokenId A token ID to craft
     function craft(uint256 tokenId) external {
         require(resourceTypes[tokenId].ingredients.length > 0, "No recipe for this resource");
         uint256[] memory ingredients = resourceTypes[tokenId].ingredients;
@@ -130,6 +136,8 @@ contract Resource is ERC1155, Ownable {
         emit CraftStarted(msg.sender, craftId);
     }
 
+    /// @notice Claim result token from craft started using craft(tokenId) method
+    /// @param craftId Craft ID to claim result from
     function claimCraft(uint256 craftId) external {
         require(_pendingCraftsByUser[msg.sender].contains(craftId), "this craft is not pending for you");
         PendingCraft storage craft_ = _pendingCrafts[craftId];
@@ -140,14 +148,36 @@ contract Resource is ERC1155, Ownable {
         emit CraftClaimed(msg.sender, craftId);
     }
 
-    function withdrawFees(address payable to) external onlyOwner {
+    /// @notice Withdraw PHI fees
+    /// @param to Address to withdraw fees to
+    function withdrawFees(address to) external onlyOwner {
         _phi.safeTransferFrom(address(this), to, _phi.balanceOf(address(this)));
     }
 
+    /// @notice List token IDs owned by an address
+    /// @param player Address to list owned tokens for
+    /// @return List of token IDs
     function ownedTokens(address player) external view returns (uint256[] memory) {
         return _ownedTokens[player].values();
     }
 
+    /// @notice List token IDs owned by an address (paginated)
+    /// @param player Address to list owned tokens for
+    /// @param offset Array offset
+    /// @param count Count of items to return
+    /// @return List of token IDs
+    function ownedTokensPaginated(address player, uint256 offset, uint256 count) external view returns (uint256[] memory) {
+        uint256[] memory values = _ownedTokens[player].values();
+        uint256[] memory result = new uint256[](count);
+        for (uint256 i=0; i < count; i++) {
+            result[i] = values[offset + i];
+        }
+        return result;
+    }
+
+    /// @notice Get resource types info by IDs
+    /// @param ids Array of resource types IDs to return info for
+    /// @return Resource type array
     function getResourceTypes(uint256[] memory ids) external view returns (ResourceType[] memory) {
         ResourceType[] memory result = new ResourceType[](ids.length);
         for (uint256 i=0; i<ids.length; i++) {
@@ -156,10 +186,17 @@ contract Resource is ERC1155, Ownable {
         return result;
     }
 
+    /// @notice Get resource type weight by IDs
+    /// @param id Resource type ID to return weight for
+    /// @return Resource type weight
     function getResourceWeight(uint256 id) external view returns (uint256) {
         return resourceTypes[id].weight;
     }
 
+    /// @notice Get result of crafting with two ingredients
+    /// @param tokenId1 Ingredient 1
+    /// @param tokenId2 Ingredient 2
+    /// @return Result token ID, 0 if no matching recipe
     function getCraftingResult(uint256 tokenId1, uint256 tokenId2) external view returns (uint256) {
         uint256 result = _recipes[tokenId1][tokenId2];
         if (result == 0)
@@ -167,10 +204,16 @@ contract Resource is ERC1155, Ownable {
         return result;
     }
 
+    /// @notice Get pending crafts for a player
+    /// @param player Player address
+    /// @return Array of craft IDs
     function pendingCrafts(address player) external view returns (uint256[] memory) {
         return _pendingCraftsByUser[player].values();
     }
 
+    /// @notice Get pending crafts by IDs
+    /// @param ids Craft IDs to return
+    /// @return Crafts info
     function getCrafts(uint256[] memory ids) external view returns (PendingCraft[] memory) {
         PendingCraft[] memory result = new PendingCraft[](ids.length);
         for (uint256 i=0; i<ids.length; i++) {
@@ -179,12 +222,29 @@ contract Resource is ERC1155, Ownable {
         return result;
     }
 
+    /// @notice Get all players addresses (all addresses that sent or received tokens)
+    /// @return Array of players addresses
     function getPlayers() external view returns (address[] memory) {
         return _players.values();
     }
 
+    /// @notice Get all players addresses (all addresses that sent or received tokens) (paginated)
+    /// @param offset Array offset
+    /// @param count Count of items to return
+    /// @return Array of players addresses
+    function getPlayersPaginated(uint256 offset, uint256 count) external view returns (address[] memory) {
+        address[] memory values = _players.values();
+        address[] memory result = new address[](count);
+        for (uint256 i=0; i < count; i++) {
+            result[i] = values[offset + i];
+        }
+        return result;
+    }
+
+    /// @notice Get resource types count
+    /// @return Resource types count
     function resourceCount() external view returns (uint256) {
-        return _tokenIds.current() - 1;
+        return _tokenIds.current();
     }
 
     function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override {
@@ -197,9 +257,5 @@ contract Resource is ERC1155, Ownable {
         }
         _players.add(from);
         _players.add(to);
-    }
-
-    receive() external payable {
-        revert();
     }
 }

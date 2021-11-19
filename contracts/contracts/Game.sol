@@ -17,7 +17,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         uint256[3] placedCards;
     }
 
-    struct Game {
+    struct GameInfo {
         uint256 gameId;
         GamePlayer player1;
         GamePlayer player2;
@@ -26,12 +26,14 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         uint8 turn;
         address winner;
         uint8 round;
+        uint256 lastAction;
     }
 
     Counters.Counter internal _gameIds;
-    mapping (uint256 => Game) _games;
+    mapping (uint256 => GameInfo) _games;
     uint256[50] internal _pools;
     uint256 public constant AVAX_PER_TOKEN = .5 ether;
+    uint256 public constant ABORT_TIMEOUT = 5 * 60;  // seconds
 
     Resource internal _resource;
 
@@ -63,16 +65,16 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         emit CreatedNewGame(gameId, poolSlot);
     }
 
-    function getGameByPoolSlot(uint256 poolSlot) external view returns (Game memory) {
+    function getGameByPoolSlot(uint256 poolSlot) external view returns (GameInfo memory) {
         return _games[_pools[poolSlot]];
     }
 
-    function getGameById(uint256 gameId) external view returns (Game memory) {
+    function getGameById(uint256 gameId) external view returns (GameInfo memory) {
         return _games[gameId];
     }
 
-    function getAllGames() external view returns (Game[50] memory) {
-        Game[50] memory games;
+    function getAllGames() external view returns (GameInfo[50] memory) {
+        GameInfo[50] memory games;
         for (uint8 i=0; i < 50; i++) {
             games[i] = _games[_pools[i]];
         }
@@ -84,7 +86,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     }
 
     function enterGame(uint256 poolSlot) external {
-        Game storage game = _games[_pools[poolSlot]];
+        GameInfo storage game = _games[_pools[poolSlot]];
         require(!game.started, "Game has already started");
         for (uint8 i=0; i < 50; i++) {
             require(_games[_pools[i]].finished || _games[_pools[i]].player1.addr != msg.sender && _games[_pools[i]].player2.addr != msg.sender, "You are already playing in some other pool");
@@ -110,10 +112,12 @@ contract Game is ERC20, Ownable, ERC1155Holder {
             game.started = true;
             emit GameStarted(game.gameId, poolSlot);
         }
+
+        game.lastAction = block.timestamp;
     }
 
     function exitGame(uint256 poolSlot) external {
-        Game storage game = _games[_pools[poolSlot]];
+        GameInfo storage game = _games[_pools[poolSlot]];
         require(!game.started, "Game has already started");
         if (game.player1.addr == msg.sender) {
             game.player1.addr = address(0);
@@ -126,7 +130,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     }
 
     function placeCard(uint256 poolSlot, uint256 tokenId) external {
-        Game storage game = _games[_pools[poolSlot]];
+        GameInfo storage game = _games[_pools[poolSlot]];
         bool isPlayer1 = game.player1.addr == msg.sender;
         bool isPlayer2 = game.player2.addr == msg.sender;
         require(isPlayer1 || isPlayer2, "You are not playing in this pool");
@@ -173,6 +177,29 @@ contract Game is ERC20, Ownable, ERC1155Holder {
             }
             _resource.safeBatchTransferFrom(address(this), game.player1.addr, placedCards1, amounts, "");
             _resource.safeBatchTransferFrom(address(this), game.player2.addr, placedCards2, amounts, "");
+        }
+
+        game.lastAction = block.timestamp;
+    }
+
+    function abortGame(uint256 poolSlot) external {
+        GameInfo storage game = _games[_pools[poolSlot]];
+        bool isPlayer1 = game.player1.addr == msg.sender;
+        bool isPlayer2 = game.player2.addr == msg.sender;
+        require(isPlayer1 || isPlayer2, "You are not playing in this pool");
+        require(game.started && !game.finished, "Game should be running");
+        require(block.timestamp - game.lastAction >= ABORT_TIMEOUT, "Timeout has not passed");
+
+        game.finished = true;
+        game.winner = msg.sender;
+        _mint(game.winner, 1);
+        emit GameFinished(game.gameId, poolSlot, game.winner);
+
+        for (uint8 i=0; i < 3; i++) {
+            if (game.player1.placedCards[i] != 0)
+                _resource.safeTransferFrom(address(this), game.player1.addr, game.player1.placedCards[i], 1, "");
+            if (game.player2.placedCards[i] != 0)
+                _resource.safeTransferFrom(address(this), game.player2.addr, game.player2.placedCards[i], 1, "");
         }
     }
 

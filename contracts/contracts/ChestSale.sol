@@ -18,7 +18,7 @@ contract ChestSale is Ownable, ERC1155Holder {
         uint256 chestsBought;
     }
 
-    uint256 constant public TOTAL_CHESTS = 150000;
+    uint256 constant public TOTAL_CHESTS = 150000;  // must be a multiple of TOTAL_WEEKS * 4
     uint256 constant public WEEK = 7 * 24 * 60 * 60;
     uint256 constant public TOTAL_WEEKS = 15;
     uint256 constant public CHESTS_PER_WEEK = TOTAL_CHESTS / TOTAL_WEEKS;
@@ -30,8 +30,8 @@ contract ChestSale is Ownable, ERC1155Holder {
     uint256 public chestPricePhi = 10 ether;
     uint256 public chestPriceEth = .1 ether;
 
-    Resource private _resource;
-    IERC20 private _phi;
+    Resource private immutable _resource;
+    IERC20 private immutable _phi;
     mapping (address => UserStats) private _userStats;
     uint256[4] public balances;
 
@@ -53,12 +53,18 @@ contract ChestSale is Ownable, ERC1155Holder {
         balances[0] = balances[1] = balances[2] = balances[3] = WEEK_BALANCE;
     }
 
-    function openChest(uint256 count) public payable {
+    /// @notice Open chests. User must have at least chestPricePhi * count PHI approved to this contract
+    ///         and send value of chestPriceEth * count
+    /// @param count The number of chests to open
+    function openChest(uint256 count) external payable {
+        uint256 phiFee = chestPricePhi * count;
+
         require(count > 0 && count <= 500, "invalid count");
         require(chestsLeft >= count, "not enough available chests");
         require(msg.value == chestPriceEth * count, "incorrect value sent");
-        require(_phi.balanceOf(msg.sender) >= chestPricePhi * count, "insufficient PHI balance");
+        require(_phi.balanceOf(msg.sender) >= phiFee, "insufficient PHI balance");
 
+        // update user's weekly limit
         UserStats storage userStats = _userStats[msg.sender];
         if (userStats.weeksValue != weeksLeft) {
             userStats.chestsBought = 0;
@@ -67,11 +73,14 @@ contract ChestSale is Ownable, ERC1155Holder {
         require(userStats.chestsBought + count < LIMIT_PER_USER, "your weekly limit is exceeded");
         userStats.chestsBought += count;
 
-        _phi.safeTransferFrom(msg.sender, address(this), chestPricePhi * count);
+        // take PHI fee
+        _phi.safeTransferFrom(msg.sender, address(this), phiFee);
 
+        // start next week if needed
         if (block.timestamp - weekStart >= WEEK)
             _startWeek();
 
+        // select tokens in opened chests
         uint256[] memory tokenIds = new uint256[](4);
         tokenIds[0] = 1;
         tokenIds[1] = 2;
@@ -79,7 +88,7 @@ contract ChestSale is Ownable, ERC1155Holder {
         tokenIds[3] = 4;
         uint256[] memory tokenAmounts = new uint256[](4);
         for (uint256 i=0; i<count; i++) {
-            uint256 tokenId = uint256(keccak256(abi.encodePacked(500 - i, block.timestamp, blockhash(block.number), i))) % 4;
+            uint256 tokenId = uint256(keccak256(abi.encodePacked(500 - i, block.timestamp, blockhash(block.number - 1), i))) % 4;
             if (balances[tokenId] == 0) {
                 if (balances[(tokenId+1) % 4] != 0) {
                     tokenId = (tokenId+1) % 4;
@@ -91,31 +100,38 @@ contract ChestSale is Ownable, ERC1155Holder {
                     revert("sold out");
                 }
             }
-            tokenAmounts[tokenId] += 1;
+            balances[tokenId]--;
+            tokenAmounts[tokenId]++;
         }
+
+        // send tokens
         _resource.safeBatchTransferFrom(address(this), msg.sender, tokenIds, tokenAmounts, "");
+
         chestsLeft -= count;
         emit ChestsOpened(msg.sender, tokenIds);
     }
 
-    function withdrawFees(address payable to) public onlyOwner {
-        to.transfer(address(this).balance);
+    /// @notice Withdraw AVAX and PHI fees
+    /// @param to Address to withdraw fees to
+    function withdrawFees(address to) external onlyOwner {
+        (bool sent, bytes memory data) = to.call{value: address(this).balance}("");
+        require(sent, "an error occurred while sending avax");
         _phi.safeTransferFrom(address(this), to, _phi.balanceOf(address(this)));
     }
 
-    function updateChestPriceEth(uint256 newValue) public onlyOwner {
+    /// @notice Changes AVAX fee amount
+    /// @param newValue New AVAX fee value
+    function updateChestPriceEth(uint256 newValue) external onlyOwner {
         require(newValue > 0, "must not be zero");
         chestPriceEth = newValue;
         emit ChestPriceEthUpdated(newValue);
     }
 
-    function updateChestPricePhi(uint256 newValue) public onlyOwner {
+    /// @notice Changes AVAX fee amount
+    /// @param newValue New AVAX fee value
+    function updateChestPricePhi(uint256 newValue) external onlyOwner {
         require(newValue > 0, "must not be zero");
         chestPricePhi = newValue;
         emit ChestPricePhiUpdated(newValue);
-    }
-
-    receive() external payable {
-        revert();
     }
 }
