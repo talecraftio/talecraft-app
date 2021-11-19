@@ -22,7 +22,7 @@ class MarketplaceListing(models.Model):
     listing_id = models.PositiveBigIntegerField(db_index=True)
     resource = models.ForeignKey(Resource, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.PositiveBigIntegerField()
-    price = models.PositiveBigIntegerField()
+    price = models.DecimalField(max_digits=128, decimal_places=0)
     seller = models.CharField(max_length=64)
     buyer = models.CharField(max_length=64, null=True, blank=True)
     closed = models.BooleanField(default=False, db_index=True)
