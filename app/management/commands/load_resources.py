@@ -27,6 +27,10 @@ class Command(BaseCommand):
             if ingredients:
                 res.ingredients.add(*Resource.objects.filter(token_id__in=ingredients))
             resource_objs.append(res)
+        # zero id
+        zid, _ = Resource.objects.update_or_create(token_id=0, defaults=dict(name='missingno', tier=0, ipfs_hash='', weight=0))
+        resource_objs.append(zid)
 
         Resource.objects.exclude(token_id__in=[r.token_id for r in resource_objs]).delete()
+
         print('Done')

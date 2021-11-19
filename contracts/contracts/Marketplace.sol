@@ -38,6 +38,7 @@ contract Marketplace is ERC1155Holder {
     function putOnSale(uint256 tokenId, uint256 amount, uint256 price) external {
         require(amount > 0, "amount cannot be zero");
         require(price > 0, "price cannot be zero");
+        require(tokenId > 0, "tokenId cannot be zero");
 
         _resource.safeTransferFrom(msg.sender, address(this), tokenId, amount, "");
 
