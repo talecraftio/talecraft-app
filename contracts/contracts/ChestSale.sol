@@ -18,9 +18,9 @@ contract ChestSale is Ownable, ERC1155Holder {
         uint256 chestsBought;
     }
 
-    uint256 constant public TOTAL_CHESTS = 150000;  // must be a multiple of TOTAL_WEEKS * 4
+    uint256 constant public TOTAL_CHESTS = 300000;  // must be a multiple of TOTAL_WEEKS * 4
     uint256 constant public WEEK = 7 * 24 * 60 * 60;
-    uint256 constant public TOTAL_WEEKS = 15;
+    uint256 constant public TOTAL_WEEKS = 30;
     uint256 constant public CHESTS_PER_WEEK = TOTAL_CHESTS / TOTAL_WEEKS;
     uint256 constant public WEEK_BALANCE = CHESTS_PER_WEEK / 4;
     uint256 constant public LIMIT_PER_USER = 250;
@@ -39,10 +39,12 @@ contract ChestSale is Ownable, ERC1155Holder {
     event ChestPricePhiUpdated(uint256 newValue);
     event ChestPriceEthUpdated(uint256 newValue);
 
-    constructor(Resource resource_, IERC20 phi_) {
+    constructor(Resource resource_, IERC20 phi_, uint256 delayStart) {
         _resource = resource_;
         _phi = phi_;
         _startWeek();
+        if (delayStart > 0)
+            weekStart = delayStart;
     }
 
     function _startWeek() private {
@@ -59,6 +61,7 @@ contract ChestSale is Ownable, ERC1155Holder {
     function openChest(uint256 count) external payable {
         uint256 phiFee = chestPricePhi * count;
 
+        require(block.timestamp >= weekStart, "chest sale is not started yet");
         require(count > 0 && count <= 500, "invalid count");
         require(chestsLeft >= count, "not enough available chests");
         require(msg.value == chestPriceEth * count, "incorrect value sent");

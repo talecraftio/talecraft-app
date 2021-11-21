@@ -45,6 +45,8 @@ contract Resource is ERC1155, Ownable {
     IERC20 internal immutable _phi;
     bool internal _initialMintComplete;
     EnumerableSet.AddressSet internal _players;
+    uint256 public craftWaitSkipPrice = 10 ether;  // default 10 CRAFT
+    bool public reverseCraftActive = false;
 
     mapping (uint256 => ResourceType) public resourceTypes;
     mapping (address => EnumerableSet.UintSet) internal _pendingCraftsByUser;
@@ -55,6 +57,9 @@ contract Resource is ERC1155, Ownable {
     event ResourceTypeRegistered(uint256 indexed tokenId, string name, uint256 weight, string ipfsHash);
     event CraftStarted(address indexed player, uint256 craftId);
     event CraftClaimed(address indexed player, uint256 craftId);
+
+    event CraftWaitSkipPriceUpdated(uint256 newValue);
+    event ReverseCraftStatusUpdated(bool newValue);
 
     constructor(IERC20 phi) ERC1155("http://dev.bennnnsss.com:39100/_meta/") {
         _phi = phi;
@@ -70,10 +75,10 @@ contract Resource is ERC1155, Ownable {
     /// @param chest Address to mint tokens to
     function initialMint(ChestSale chest) external onlyOwner {
         require(!_initialMintComplete, "initial mint is performed already");
-        _mint(address(chest), 1, 37500, "");
-        _mint(address(chest), 2, 37500, "");
-        _mint(address(chest), 3, 37500, "");
-        _mint(address(chest), 4, 37500, "");
+        _mint(address(chest), 1, 75000, "");
+        _mint(address(chest), 2, 75000, "");
+        _mint(address(chest), 3, 75000, "");
+        _mint(address(chest), 4, 75000, "");
         _initialMintComplete = true;
     }
 
@@ -97,7 +102,8 @@ contract Resource is ERC1155, Ownable {
 
     /// @notice Start crafting a token
     /// @param tokenId A token ID to craft
-    function craft(uint256 tokenId) external {
+    /// @param speedUp pay additional `craftWaitSkipPrice` CRAFT to remove delay
+    function craft(uint256 tokenId, bool speedUp) external {
         require(resourceTypes[tokenId].ingredients.length > 0, "No recipe for this resource");
         uint256[] memory ingredients = resourceTypes[tokenId].ingredients;
         Tier maxTier = Tier.None;
@@ -112,19 +118,23 @@ contract Resource is ERC1155, Ownable {
         uint256 price = 0;
         if (maxTier == Tier.Stone) {
             delay = 30 * 60;            // 30 min
-            price = 1 ether;            // 1 $PHI
+            price = 1 ether;            // 1 CRAFT
         } else if (maxTier == Tier.Iron) {
             delay = 2 * 60 * 60;        // 2 h
-            price = 2 ether;            // 2 $PHI
+            price = 2 ether;            // 2 CRAFT
         } else if (maxTier == Tier.Silver) {
             delay = 12 * 60 * 60;       // 12 h
-            price = 3 ether;            // 3 $PHI
+            price = 3 ether;            // 3 CRAFT
         } else if (maxTier == Tier.Gold) {
             delay = 24 * 60 * 60;       // 1 day
-            price = 4 ether;            // 4 $PHI
+            price = 4 ether;            // 4 CRAFT
         } else if (maxTier == Tier.PhiStone) {
             delay = 7 * 24 * 60 * 60;   // 1 week
-            price = 5 ether;            // 5 $PHI
+            price = 5 ether;            // 5 CRAFT
+        }
+        if (speedUp) {
+            delay = 0;
+            price += craftWaitSkipPrice;
         }
         if (price > 0) {
             _phi.safeTransferFrom(msg.sender, address(this), price);
@@ -134,6 +144,55 @@ contract Resource is ERC1155, Ownable {
         _pendingCrafts[craftId] = PendingCraft(tokenId, block.timestamp + delay, false);
         _pendingCraftsByUser[msg.sender].add(craftId);
         emit CraftStarted(msg.sender, craftId);
+    }
+
+    function craft(uint256 tokenId) external {
+        craft(tokenId, false);
+    }
+
+    /// @notice Start reverse crafting a token
+    /// @param tokenId A token ID to reverse craft
+    /// @param speedUp pay additional `craftWaitSkipPrice` CRAFT to remove delay
+    function reverseCraft(uint256 tokenId, bool speedUp) external {
+        require(reverseCraftActive, "reverse craft is not active");
+        require(balanceOf(msg.sender, tokenId) > 0, "you do not own this resource");
+        uint256[] memory ingredients = resourceTypes[tokenId].ingredients;
+        require(ingredients.length > 0, "you cannot reverse a base resource");
+        Tier tier = resourceTypes[tokenId].tier;
+        uint256 delay = 0;
+        uint256 price = 0;
+        if (tier == Tier.Stone) {
+            delay = 30 * 60;            // 30 min
+            price = 1 ether;            // 1 CRAFT
+        } else if (tier == Tier.Iron) {
+            delay = 2 * 60 * 60;        // 2 h
+            price = 2 ether;            // 2 CRAFT
+        } else if (tier == Tier.Silver) {
+            delay = 12 * 60 * 60;       // 12 h
+            price = 3 ether;            // 3 CRAFT
+        } else if (tier == Tier.Gold) {
+            delay = 24 * 60 * 60;       // 1 day
+            price = 4 ether;            // 4 CRAFT
+        } else if (tier == Tier.PhiStone) {
+            delay = 7 * 24 * 60 * 60;   // 1 week
+            price = 5 ether;            // 5 CRAFT
+        }
+        if (speedUp) {
+            delay = 0;
+            price += craftWaitSkipPrice;
+        }
+        _phi.safeTransferFrom(msg.sender, address(this), price);
+        for (uint256 i=0; i < ingredients.length; i++) {
+            _craftIds.increment();
+            uint256 craftId = _craftIds.current();
+            _pendingCrafts[craftId] = PendingCraft(ingredients[i], block.timestamp + delay, false);
+            _pendingCraftsByUser[msg.sender].add(craftId);
+            emit CraftStarted(msg.sender, craftId);
+        }
+    }
+
+    function reverseCraft(uint256 tokenId) external {
+        reverseCraft(tokenId, false);
     }
 
     /// @notice Claim result token from craft started using craft(tokenId) method
@@ -245,6 +304,18 @@ contract Resource is ERC1155, Ownable {
     /// @return Resource types count
     function resourceCount() external view returns (uint256) {
         return _tokenIds.current();
+    }
+
+    function setCraftSkipWaitPrice(uint256 newValue) external onlyOwner {
+        require(craftWaitSkipPrice != newValue, "no change");
+        craftWaitSkipPrice = newValue;
+        emit CraftWaitSkipPriceUpdated(newValue);
+    }
+
+    function setReverseCraftActive(bool newValue) external onlyOwner {
+        require(newValue != reverseCraftActive, "no change");
+        reverseCraftActive = newValue;
+        emit ReverseCraftStatusUpdated(newValue);
     }
 
     function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override {

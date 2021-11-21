@@ -63,6 +63,11 @@ def avascan_publish(c: Contract):
     print(result)
 
 
+SNOWTRACE_KEY = '8MSW7WG86KADW7CQDRAT9FM4422DFYB7GR'
+SNOWTRACE_TESTNET = False
+SNOWTRACE_API_URL = 'https://api-testnet.snowtrace.io/api' if SNOWTRACE_TESTNET else 'https://api.snowtrace.io/api'
+
+
 def snowtrace_publish(c: Contract):
     s = requests.Session()
     build_json = c._build
@@ -75,7 +80,7 @@ def snowtrace_publish(c: Contract):
             input_json['sources'][source_path] = {'content': source_f.read()}
 
     params_tx = {
-        "apikey": '8MSW7WG86KADW7CQDRAT9FM4422DFYB7GR',
+        "apikey": SNOWTRACE_KEY,
         "module": "account",
         "action": "txlist",
         "address": c.address,
@@ -85,10 +90,10 @@ def snowtrace_publish(c: Contract):
     }
     i = 0
     while True:
-        response = requests.get('https://api-testnet.snowtrace.io/api', params=params_tx)
+        response = requests.get(SNOWTRACE_API_URL, params=params_tx)
         if response.status_code != 200:
             raise ConnectionError(
-                f"Status {response.status_code} when querying https://api-testnet.snowtrace.io/api: {response.text}"
+                f"Status {response.status_code} when querying {SNOWTRACE_API_URL}: {response.text}"
             )
         data = response.json()
         if int(data["status"]) == 1:
@@ -101,7 +106,7 @@ def snowtrace_publish(c: Contract):
             if i >= 10:
                 raise ValueError(f"API request failed with: {data['result']}")
             elif i == 0:
-                print(f"Waiting for https://api-testnet.snowtrace.io/api to process contract...")
+                print(f"Waiting for {SNOWTRACE_API_URL} to process contract...")
             i += 1
             time.sleep(10)
 
@@ -111,7 +116,7 @@ def snowtrace_publish(c: Contract):
         constructor_arguments = ""
 
     params = {
-        'apikey': '8MSW7WG86KADW7CQDRAT9FM4422DFYB7GR',
+        'apikey': SNOWTRACE_KEY,
         'module': 'contract',
         'action': 'verifysourcecode',
         'contractaddress': c.address,
@@ -123,23 +128,23 @@ def snowtrace_publish(c: Contract):
         'evmversion': '',
         'licenseType': 1
     }
-    r = s.post('https://api-testnet.snowtrace.io/api', params)
+    r = s.post(SNOWTRACE_API_URL, params)
     print(r.json())
 
     guid = r.json()["result"]
     print("Verification submitted successfully. Waiting for result...")
     time.sleep(10)
     params_status = {
-        "apikey": '8MSW7WG86KADW7CQDRAT9FM4422DFYB7GR',
+        "apikey": SNOWTRACE_KEY,
         "module": "contract",
         "action": "checkverifystatus",
         "guid": guid,
     }
     while True:
-        response = requests.get('https://api-testnet.snowtrace.io/api', params=params_status)
+        response = requests.get(SNOWTRACE_API_URL, params=params_status)
         if response.status_code != 200:
             raise ConnectionError(
-                f"Status {response.status_code} when querying https://api-testnet.snowtrace.io/api: {response.text}"
+                f"Status {response.status_code} when querying {SNOWTRACE_API_URL}: {response.text}"
             )
         data = response.json()
         if data["result"] == "Pending in queue":
