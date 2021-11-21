@@ -51,6 +51,21 @@ const PendingCraft = ({ craft, craftId, callback, skipPrice }: { craft: Pendingc
         setClaimLoading(true);
         try {
             const contract = walletStore.resourceContract;
+            const phi = walletStore.phiContract;
+            if (toBN(await phi.methods.balanceOf(walletStore.address).call()).div('1e18').lt(skipPrice)) {
+                toast.error('Insufficient CRAFT');
+                return;
+            }
+            if (toBN(await phi.methods.allowance(walletStore.address, ADDRESSES.resource).call()).div('1e18').lt(skipPrice)) {
+                const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.chest, MAX_UINT256));
+                toast.success(
+                    <>
+                        CRAFT approved successfully<br />
+                        <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
+                    </>
+                );
+            }
+
             const tx = await walletStore.sendTransaction(contract.methods.skipCraftWait(craftId));
             await walletStore.waitForNextBlock();
             toast.success(

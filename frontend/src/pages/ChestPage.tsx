@@ -59,7 +59,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
                 const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.chest, MAX_UINT256));
                 toast.success(
                     <>
-                        $CRAFT approved successfully<br />
+                        CRAFT approved successfully<br />
                         <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                     </>
                 );
