@@ -57,6 +57,7 @@ contract Resource is ERC1155, Ownable {
     event ResourceTypeRegistered(uint256 indexed tokenId, string name, uint256 weight, string ipfsHash);
     event CraftStarted(address indexed player, uint256 craftId);
     event CraftClaimed(address indexed player, uint256 craftId);
+    event CraftWaitSkipped(uint256 craftId);
 
     event CraftWaitSkipPriceUpdated(uint256 newValue);
     event ReverseCraftStatusUpdated(bool newValue);
@@ -102,8 +103,7 @@ contract Resource is ERC1155, Ownable {
 
     /// @notice Start crafting a token
     /// @param tokenId A token ID to craft
-    /// @param speedUp pay additional `craftWaitSkipPrice` CRAFT to remove delay
-    function craft(uint256 tokenId, bool speedUp) external {
+    function craft(uint256 tokenId) external {
         require(resourceTypes[tokenId].ingredients.length > 0, "No recipe for this resource");
         uint256[] memory ingredients = resourceTypes[tokenId].ingredients;
         Tier maxTier = Tier.None;
@@ -132,10 +132,6 @@ contract Resource is ERC1155, Ownable {
             delay = 7 * 24 * 60 * 60;   // 1 week
             price = 5 ether;            // 5 CRAFT
         }
-        if (speedUp) {
-            delay = 0;
-            price += craftWaitSkipPrice;
-        }
         if (price > 0) {
             _phi.safeTransferFrom(msg.sender, address(this), price);
         }
@@ -146,14 +142,9 @@ contract Resource is ERC1155, Ownable {
         emit CraftStarted(msg.sender, craftId);
     }
 
-    function craft(uint256 tokenId) external {
-        craft(tokenId, false);
-    }
-
     /// @notice Start reverse crafting a token
     /// @param tokenId A token ID to reverse craft
-    /// @param speedUp pay additional `craftWaitSkipPrice` CRAFT to remove delay
-    function reverseCraft(uint256 tokenId, bool speedUp) external {
+    function reverseCraft(uint256 tokenId) external {
         require(reverseCraftActive, "reverse craft is not active");
         require(balanceOf(msg.sender, tokenId) > 0, "you do not own this resource");
         uint256[] memory ingredients = resourceTypes[tokenId].ingredients;
@@ -177,10 +168,6 @@ contract Resource is ERC1155, Ownable {
             delay = 7 * 24 * 60 * 60;   // 1 week
             price = 5 ether;            // 5 CRAFT
         }
-        if (speedUp) {
-            delay = 0;
-            price += craftWaitSkipPrice;
-        }
         _phi.safeTransferFrom(msg.sender, address(this), price);
         for (uint256 i=0; i < ingredients.length; i++) {
             _craftIds.increment();
@@ -191,8 +178,15 @@ contract Resource is ERC1155, Ownable {
         }
     }
 
-    function reverseCraft(uint256 tokenId) external {
-        reverseCraft(tokenId, false);
+    /// @notice Skip craft waiting for `craftWaitSkipPrice` CRAFT
+    /// @param craftId A craft ID to skip waiting for
+    function skipCraftWait(uint256 craftId) external {
+        require(_pendingCraftsByUser[msg.sender].contains(craftId), "this craft is not pending for you");
+        PendingCraft storage craft_ = _pendingCrafts[craftId];
+        require(craft_.finishTimestamp > block.timestamp, "this craft is not pending");
+        _phi.safeTransferFrom(msg.sender, address(this), craftWaitSkipPrice);
+        craft_.finishTimestamp = block.timestamp - 1;
+        emit CraftWaitSkipped(craftId);
     }
 
     /// @notice Claim result token from craft started using craft(tokenId) method
