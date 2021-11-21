@@ -3,7 +3,7 @@ import { useInjection } from "inversify-react";
 import WalletStore from "../../stores/WalletStore";
 import { ResourcetypeResponse } from "../../utils/contracts/resource";
 import useAsyncEffect from "use-async-effect";
-import _ from "lodash";
+import _, { parseInt } from "lodash";
 import { ADDRESSES } from "../../utils/contracts";
 import { ZERO_ADDRESS } from "../../utils/address";
 
@@ -17,6 +17,7 @@ const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
     const [ players, setPlayers ] = useState<string[]>([]);
     const [ balances, setBalances ] = useState<{ [address: string]: { [tokenId: string]: string } }>({});
     const [ playersWeight, setPlayersWeight ] = useState<{ [address: string]: number }>({});
+    const [ playersMaxTiers, setPlayersMaxTiers ] = useState<{ [address: string]: number }>({});
     const [ status, setStatus ] = useState('Initializing');
     const [ loading, setLoading ] = useState(true);
 
@@ -32,26 +33,31 @@ const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
         setStatus('Loading balances');
         const balancesResult = {};
         const playersWeight = {};
+        const playersMaxTiers = {};
         const promises = players.map(async address => {
             const playerBalancesList = await contract.methods.balanceOfBatch(_.range(resourceTypeIds.length).map(_ => address), resourceTypeIds).call();
             const playerBalancesObj = {};
             let playerWeight = 0;
+            let maxTier = 0;
             playerBalancesList.forEach((balance, i) => {
                 playerBalancesObj[resourceTypeIds[i]] = balance;
                 playerWeight += parseInt(balance) * parseInt(resourceTypes[i].weight);
+                maxTier = Math.max(maxTier, parseInt(resourceTypes[i].tier));
             });
             balancesResult[address] = playerBalancesObj;
             playersWeight[address] = playerWeight;
+            playersMaxTiers[address] = maxTier;
         });
         await Promise.all(promises);
         setPlayers(players);
         setBalances(balancesResult);
         setPlayersWeight(playersWeight);
+        setPlayersMaxTiers(playersMaxTiers);
         setStatus('Done');
         setLoading(false);
     }, []);
 
-    const result = !loading && players.map(p => `${p},${playersWeight[p]}`).join('\n');
+    const result = !loading && players.map(p => `${p},${playersWeight[p]},${playersMaxTiers[p]}`).join('\n');
     let downloadLink;
 
     if (result) {
