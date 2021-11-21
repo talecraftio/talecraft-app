@@ -19,7 +19,7 @@ contract ChestSale is Ownable, ERC1155Holder {
     }
 
     uint256 constant public TOTAL_CHESTS = 300000;  // must be a multiple of TOTAL_WEEKS * 4
-    uint256 constant public WEEK = 7 * 24 * 60 * 60;
+    uint256 constant public WEEK = 30 * 60;  // 7 * 24 * 60 * 60;
     uint256 constant public TOTAL_WEEKS = 30;
     uint256 constant public CHESTS_PER_WEEK = TOTAL_CHESTS / TOTAL_WEEKS;
     uint256 constant public WEEK_BALANCE = CHESTS_PER_WEEK / 4;

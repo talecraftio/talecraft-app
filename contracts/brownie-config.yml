@@ -2,7 +2,7 @@ dependencies:
   - OpenZeppelin/openzeppelin-contracts@4.3.2
 
 networks:
-  default: avax-fuji
+  default: avax-test
 
 compiler:
   solc:

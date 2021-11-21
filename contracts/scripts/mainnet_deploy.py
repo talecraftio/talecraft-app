@@ -2,7 +2,7 @@ import csv
 import json
 
 import requests
-from brownie import accounts, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenVestingFactory
+from brownie import accounts, network, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenVestingFactory
 from brownie.network import Chain
 
 from scripts._utils import snowtrace_publish
@@ -15,7 +15,7 @@ def main():
     except:
         addresses = {}
 
-    deployer = accounts.load('deployer')
+    deployer = accounts.load('talecraft-deployer')
 
     phi: Contract = PHI.deploy({'from': deployer})
     addresses['phi'] = phi.address

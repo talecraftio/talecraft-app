@@ -10,6 +10,8 @@ import { ZERO_ADDRESS } from "../../utils/address";
 interface IPlayerInfoPageProps {
 }
 
+const tierNames = ["none", "stone", "iron", 'silver', 'gold', 'phi'];
+
 const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
     const walletStore = useInjection(WalletStore);
 
@@ -39,9 +41,6 @@ const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
             const playerBalancesObj = {};
             let playerWeight = 0;
             let maxTier = 0;
-            if (address == '0x174d7BbF81820Ec9CCFed8c775AfA816f2cCCBc8') {
-                console.log(resourceTypeIds);
-            }
             playerBalancesList.forEach((balance, i) => {
                 playerBalancesObj[resourceTypeIds[i]] = balance;
                 playerWeight += parseInt(balance) * parseInt(resourceTypes[resourceTypeIds[i]].weight);
@@ -61,7 +60,7 @@ const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
         setLoading(false);
     }, []);
 
-    const result = !loading && players.map(p => `${p},${playersWeight[p]},${playersMaxTiers[p]}`).join('\n');
+    const result = !loading && players.map(p => `${p},${playersWeight[p]},${tierNames[playersMaxTiers[p]]}`).join('\n');
     let downloadLink;
 
     if (result) {

@@ -108,7 +108,7 @@ def snowtrace_publish(c: Contract):
             elif i == 0:
                 print(f"Waiting for {SNOWTRACE_API_URL} to process contract...")
             i += 1
-            time.sleep(10)
+            time.sleep(5)
 
     if data["message"] == "OK":
         constructor_arguments = data["result"][0]["input"][len(build_json['bytecode']) + 2:]
@@ -133,7 +133,7 @@ def snowtrace_publish(c: Contract):
 
     guid = r.json()["result"]
     print("Verification submitted successfully. Waiting for result...")
-    time.sleep(10)
+    time.sleep(5)
     params_status = {
         "apikey": SNOWTRACE_KEY,
         "module": "contract",
@@ -154,7 +154,7 @@ def snowtrace_publish(c: Contract):
             col = "bright green" if data["message"] == "OK" else "bright red"
             print(f"Verification complete. Result: {color(col)}{data['result']}{color}")
             return data["message"] == "OK"
-        time.sleep(10)
+        time.sleep(5)
 
 
 
