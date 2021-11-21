@@ -25,7 +25,7 @@ const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
         setStatus('Loading resource types');
         const contract = walletStore.resourceContract;
         const rtCount = await contract.methods.resourceCount().call();
-        const resourceTypeIds = _.range(1, parseInt(rtCount)).map(i => i.toString());
+        const resourceTypeIds = _.range(0, parseInt(rtCount)).map(i => i.toString());
         const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
         setResourceTypes(resourceTypes);
         setStatus('Loading players list');
@@ -39,10 +39,14 @@ const PlayerInfoPage = ({}: IPlayerInfoPageProps) => {
             const playerBalancesObj = {};
             let playerWeight = 0;
             let maxTier = 0;
+            if (address == '0x174d7BbF81820Ec9CCFed8c775AfA816f2cCCBc8') {
+                console.log(resourceTypeIds);
+            }
             playerBalancesList.forEach((balance, i) => {
                 playerBalancesObj[resourceTypeIds[i]] = balance;
-                playerWeight += parseInt(balance) * parseInt(resourceTypes[i].weight);
-                maxTier = Math.max(maxTier, parseInt(resourceTypes[i].tier));
+                playerWeight += parseInt(balance) * parseInt(resourceTypes[resourceTypeIds[i]].weight);
+                if (parseInt(balance) > 0)
+                    maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[i]].tier));
             });
             balancesResult[address] = playerBalancesObj;
             playersWeight[address] = playerWeight;
