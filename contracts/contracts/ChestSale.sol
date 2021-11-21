@@ -23,7 +23,7 @@ contract ChestSale is Ownable, ERC1155Holder {
     uint256 constant public TOTAL_WEEKS = 30;
     uint256 constant public CHESTS_PER_WEEK = TOTAL_CHESTS / TOTAL_WEEKS;
     uint256 constant public WEEK_BALANCE = CHESTS_PER_WEEK / 4;
-    uint256 constant public LIMIT_PER_USER = 250;
+    uint256 public limitPerUser = 250;
     uint256 public weekStart;
     uint256 public weeksLeft = TOTAL_WEEKS;
     uint256 public chestsLeft;
@@ -38,6 +38,7 @@ contract ChestSale is Ownable, ERC1155Holder {
     event ChestsOpened(address indexed player, uint256[] tokenIds);
     event ChestPricePhiUpdated(uint256 newValue);
     event ChestPriceEthUpdated(uint256 newValue);
+    event LimitPerUserUpdated(uint256 newValue);
 
     constructor(Resource resource_, IERC20 phi_, uint256 delayStart) {
         _resource = resource_;
@@ -67,21 +68,21 @@ contract ChestSale is Ownable, ERC1155Holder {
         require(msg.value == chestPriceEth * count, "incorrect value sent");
         require(_phi.balanceOf(msg.sender) >= phiFee, "insufficient PHI balance");
 
+        // start next week if needed
+        if (block.timestamp - weekStart >= WEEK)
+            _startWeek();
+
         // update user's weekly limit
         UserStats storage userStats = _userStats[msg.sender];
         if (userStats.weeksValue != weeksLeft) {
             userStats.chestsBought = 0;
             userStats.weeksValue = weeksLeft;
         }
-        require(userStats.chestsBought + count < LIMIT_PER_USER, "your weekly limit is exceeded");
+        require(userStats.chestsBought + count <= limitPerUser, "your weekly limit is exceeded");
         userStats.chestsBought += count;
 
         // take PHI fee
         _phi.safeTransferFrom(msg.sender, address(this), phiFee);
-
-        // start next week if needed
-        if (block.timestamp - weekStart >= WEEK)
-            _startWeek();
 
         // select tokens in opened chests
         uint256[] memory tokenIds = new uint256[](4);
@@ -91,7 +92,9 @@ contract ChestSale is Ownable, ERC1155Holder {
         tokenIds[3] = 4;
         uint256[] memory tokenAmounts = new uint256[](4);
         for (uint256 i=0; i<count; i++) {
+            // `i` is mixed into the hash data to add randomness for each opened chest
             uint256 tokenId = uint256(keccak256(abi.encodePacked(500 - i, block.timestamp, blockhash(block.number - 1), i))) % 4;
+            // move to the next tokenId if there is no selected on the contract balance, revert if none are available
             if (balances[tokenId] == 0) {
                 if (balances[(tokenId+1) % 4] != 0) {
                     tokenId = (tokenId+1) % 4;
@@ -126,6 +129,7 @@ contract ChestSale is Ownable, ERC1155Holder {
     /// @param newValue New AVAX fee value
     function updateChestPriceEth(uint256 newValue) external onlyOwner {
         require(newValue > 0, "must not be zero");
+        require(chestPriceEth != newValue, "no change");
         chestPriceEth = newValue;
         emit ChestPriceEthUpdated(newValue);
     }
@@ -134,7 +138,17 @@ contract ChestSale is Ownable, ERC1155Holder {
     /// @param newValue New AVAX fee value
     function updateChestPricePhi(uint256 newValue) external onlyOwner {
         require(newValue > 0, "must not be zero");
+        require(chestPricePhi != newValue, "no change");
         chestPricePhi = newValue;
         emit ChestPricePhiUpdated(newValue);
+    }
+
+    /// @notice Changes weekly limit per user
+    /// @param newValue New weekly limit per user value
+    function updateLimitPerUser(uint256 newValue) external onlyOwner {
+        require(newValue > 0, "must not be zero");
+        require(limitPerUser != newValue, "no change");
+        limitPerUser = newValue;
+        emit LimitPerUserUpdated(newValue);
     }
 }
