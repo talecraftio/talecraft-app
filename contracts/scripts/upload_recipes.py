@@ -7,7 +7,7 @@ BATCH_SIZE = 30
 
 
 def main():
-    deployer = accounts.load('talecraft-deployer')
+    deployer = accounts.load('deployer')
 
     with open('items.csv') as f:
         csv_reader = csv.reader(f, delimiter=',')
@@ -30,7 +30,7 @@ def main():
             }
 
     contract: Contract = Resource[-1]
-    for i in range(5*BATCH_SIZE, len(items), BATCH_SIZE):
+    for i in range(0*BATCH_SIZE, len(items), BATCH_SIZE):
         contract.registerResourceTypes([
             [
                 item['name'],

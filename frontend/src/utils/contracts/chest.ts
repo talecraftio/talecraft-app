@@ -63,6 +63,7 @@ export type ChestEvents =
   | 'ChestPriceEthUpdated'
   | 'ChestPricePhiUpdated'
   | 'ChestsOpened'
+  | 'LimitPerUserUpdated'
   | 'OwnershipTransferred';
 export interface ChestEventsContext {
   ChestPriceEthUpdated(
@@ -92,6 +93,15 @@ export interface ChestEventsContext {
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
+  LimitPerUserUpdated(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
   OwnershipTransferred(
     parameters: {
       filter?: {
@@ -108,7 +118,6 @@ export interface ChestEventsContext {
 export type ChestMethodNames =
   | 'new'
   | 'CHESTS_PER_WEEK'
-  | 'LIMIT_PER_USER'
   | 'TOTAL_CHESTS'
   | 'TOTAL_WEEKS'
   | 'WEEK'
@@ -117,6 +126,7 @@ export type ChestMethodNames =
   | 'chestPriceEth'
   | 'chestPricePhi'
   | 'chestsLeft'
+  | 'limitPerUser'
   | 'onERC1155BatchReceived'
   | 'onERC1155Received'
   | 'openChest'
@@ -126,6 +136,7 @@ export type ChestMethodNames =
   | 'transferOwnership'
   | 'updateChestPriceEth'
   | 'updateChestPricePhi'
+  | 'updateLimitPerUser'
   | 'weekStart'
   | 'weeksLeft'
   | 'withdrawFees';
@@ -137,8 +148,13 @@ export interface Chest {
    * Type: constructor
    * @param resource_ Type: address, Indexed: false
    * @param phi_ Type: address, Indexed: false
+   * @param delayStart Type: uint256, Indexed: false
    */
-  'new'(resource_: string, phi_: string): MethodReturnContext;
+  'new'(
+    resource_: string,
+    phi_: string,
+    delayStart: string
+  ): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
@@ -146,13 +162,6 @@ export interface Chest {
    * Type: function
    */
   CHESTS_PER_WEEK(): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  LIMIT_PER_USER(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -210,6 +219,13 @@ export interface Chest {
    * Type: function
    */
   chestsLeft(): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  limitPerUser(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: false
@@ -302,6 +318,14 @@ export interface Chest {
    * @param newValue Type: uint256, Indexed: false
    */
   updateChestPricePhi(newValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newValue Type: uint256, Indexed: false
+   */
+  updateLimitPerUser(newValue: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

@@ -63,8 +63,11 @@ export type ResourceEvents =
   | 'ApprovalForAll'
   | 'CraftClaimed'
   | 'CraftStarted'
+  | 'CraftWaitSkipPriceUpdated'
+  | 'CraftWaitSkipped'
   | 'OwnershipTransferred'
   | 'ResourceTypeRegistered'
+  | 'ReverseCraftStatusUpdated'
   | 'TransferBatch'
   | 'TransferSingle'
   | 'URI';
@@ -96,6 +99,24 @@ export interface ResourceEventsContext {
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
+  CraftWaitSkipPriceUpdated(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  CraftWaitSkipped(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
   OwnershipTransferred(
     parameters: {
       filter?: {
@@ -111,6 +132,15 @@ export interface ResourceEventsContext {
   ResourceTypeRegistered(
     parameters: {
       filter?: { tokenId?: string | string[] };
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  ReverseCraftStatusUpdated(
+    parameters: {
+      filter?: {};
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -159,6 +189,7 @@ export type ResourceMethodNames =
   | 'balanceOfBatch'
   | 'claimCraft'
   | 'craft'
+  | 'craftWaitSkipPrice'
   | 'getCraftingResult'
   | 'getCrafts'
   | 'getPlayers'
@@ -175,9 +206,14 @@ export type ResourceMethodNames =
   | 'renounceOwnership'
   | 'resourceCount'
   | 'resourceTypes'
+  | 'reverseCraft'
+  | 'reverseCraftActive'
   | 'safeBatchTransferFrom'
   | 'safeTransferFrom'
   | 'setApprovalForAll'
+  | 'setCraftSkipWaitPrice'
+  | 'setReverseCraftActive'
+  | 'skipCraftWait'
   | 'supportsInterface'
   | 'transferOwnership'
   | 'uri'
@@ -253,6 +289,13 @@ export interface Resource {
    * @param tokenId Type: uint256, Indexed: false
    */
   craft(tokenId: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  craftWaitSkipPrice(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -406,6 +449,21 @@ export interface Resource {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
+   * @param tokenId Type: uint256, Indexed: false
+   */
+  reverseCraft(tokenId: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  reverseCraftActive(): MethodConstantReturnContext<boolean>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
    * @param from Type: address, Indexed: false
    * @param to Type: address, Indexed: false
    * @param ids Type: uint256[], Indexed: false
@@ -446,6 +504,30 @@ export interface Resource {
    * @param approved Type: bool, Indexed: false
    */
   setApprovalForAll(operator: string, approved: boolean): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newValue Type: uint256, Indexed: false
+   */
+  setCraftSkipWaitPrice(newValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newValue Type: bool, Indexed: false
+   */
+  setReverseCraftActive(newValue: boolean): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param craftId Type: uint256, Indexed: false
+   */
+  skipCraftWait(craftId: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

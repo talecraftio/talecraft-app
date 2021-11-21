@@ -61,6 +61,7 @@ export type ContractContext = Web3ContractContext<
 >;
 export type GameEvents =
   | 'Approval'
+  | 'AvaxPerTokenUpdated'
   | 'CreatedNewGame'
   | 'GameFinished'
   | 'GameStarted'
@@ -74,6 +75,15 @@ export interface GameEventsContext {
   Approval(
     parameters: {
       filter?: { owner?: string | string[]; spender?: string | string[] };
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  AvaxPerTokenUpdated(
+    parameters: {
+      filter?: {};
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -184,10 +194,10 @@ export interface GameEventsContext {
 export type GameMethodNames =
   | 'new'
   | 'ABORT_TIMEOUT'
-  | 'AVAX_PER_TOKEN'
   | 'abortGame'
   | 'allowance'
   | 'approve'
+  | 'avaxPerToken'
   | 'balanceOf'
   | 'burn'
   | 'decimals'
@@ -212,7 +222,8 @@ export type GameMethodNames =
   | 'totalSupply'
   | 'transfer'
   | 'transferFrom'
-  | 'transferOwnership';
+  | 'transferOwnership'
+  | 'updateAvaxPerToken';
 export interface Player1Response {
   addr: string;
   placedCards: [string, string, string, string];
@@ -250,13 +261,6 @@ export interface Game {
   ABORT_TIMEOUT(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  AVAX_PER_TOKEN(): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
@@ -284,6 +288,13 @@ export interface Game {
    * @param amount Type: uint256, Indexed: false
    */
   approve(spender: string, amount: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  avaxPerToken(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -512,4 +523,12 @@ export interface Game {
    * @param newOwner Type: address, Indexed: false
    */
   transferOwnership(newOwner: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newValue Type: uint256, Indexed: false
+   */
+  updateAvaxPerToken(newValue: string): MethodReturnContext;
 }

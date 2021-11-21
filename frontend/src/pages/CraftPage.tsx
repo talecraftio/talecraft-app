@@ -15,11 +15,13 @@ import { toBN } from "../utils/number";
 import { ADDRESSES } from "../utils/contracts";
 import AnimatedCardsWrap from "../components/AnimatedCardsWrap";
 import { motion } from 'framer-motion';
+import { useAsyncMemo } from "use-async-memo";
+import BN from "bignumber.js";
 
 interface ICraftPageProps {
 }
 
-const PendingCraft = ({ craft, craftId, callback }: { craft: PendingcraftResponse, craftId: string, callback: () => any }) => {
+const PendingCraft = ({ craft, craftId, callback, skipPrice }: { craft: PendingcraftResponse, craftId: string, callback: () => any, skipPrice: BN }) => {
     const walletStore = useInjection(WalletStore);
 
     const [ resourceType, setResourceType ] = useState<ResourcetypeResponse>();
@@ -30,6 +32,26 @@ const PendingCraft = ({ craft, craftId, callback }: { craft: PendingcraftRespons
         try {
             const contract = walletStore.resourceContract;
             const tx = await walletStore.sendTransaction(contract.methods.claimCraft(craftId));
+            await walletStore.waitForNextBlock();
+            toast.success(
+                <>
+                    Craft was successfully claimed<br />
+                    <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
+                </>
+            );
+            callback();
+        } catch (e) {
+            toast.error('An error has occurred');
+        } finally {
+            setClaimLoading(false);
+        }
+    }
+
+    const onSkip = async () => {
+        setClaimLoading(true);
+        try {
+            const contract = walletStore.resourceContract;
+            const tx = await walletStore.sendTransaction(contract.methods.skipCraftWait(craftId));
             await walletStore.waitForNextBlock();
             toast.success(
                 <>
@@ -59,7 +81,11 @@ const PendingCraft = ({ craft, craftId, callback }: { craft: PendingcraftRespons
                     <div className="card__image">{resourceType && <img src={`${IMAGES_CDN}/${resourceType.ipfsHash}.webp`} alt="" />}</div>
                 </div>
                 <div className="card__btn">
-                    <button className="btn primary up" type="button" disabled={!claimable || claimLoading} onClick={onClaim}>Claim</button>
+                    {claimable ? (
+                        <button className="btn primary up" type="button" disabled={claimLoading} onClick={onClaim}>Claim</button>
+                    ) : (
+                        <button className="btn primary up" type="button" disabled={claimLoading} onClick={onSkip}>Claim now ({skipPrice.toString()} CRAFT)</button>
+                    )}
                 </div>
             </div>
             <div className={classNames('note active', claimable ? 'note_succcess' : 'note_error')}>
@@ -98,6 +124,8 @@ const CraftPage = observer(({}: ICraftPageProps) => {
     const [ craftLoading, setCraftLoading ] = useState(false);
     const [ pendingCraftsIds, setPendingCraftsIds ] = useState<string[]>([]);
     const [ pendingCrafts, setPendingCrafts ] = useState<PendingcraftResponse[]>([]);
+
+    const skipPrice = useAsyncMemo(async () => toBN(await walletStore.resourceContract.methods.craftWaitSkipPrice().call()).div('1e18'), []);
 
     const updateData = async () => {
         if (!walletStore.address)
@@ -245,7 +273,7 @@ const CraftPage = observer(({}: ICraftPageProps) => {
                     <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
                     <div className="cards-wrap">
                         {_.zip(pendingCraftsIds, pendingCrafts).map(([ craftId, craft ], i) => (
-                            <PendingCraft craft={craft} craftId={craftId} key={`${craftId}_${i}`} callback={() => updateData()} />
+                            <PendingCraft craft={craft} craftId={craftId} key={`${craftId}_${i}`} callback={() => updateData()} skipPrice={skipPrice} />
                         ))}
                     </div>
                 </div>

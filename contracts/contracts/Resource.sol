@@ -168,6 +168,7 @@ contract Resource is ERC1155, Ownable {
             delay = 7 * 24 * 60 * 60;   // 1 week
             price = 5 ether;            // 5 CRAFT
         }
+        _burn(msg.sender, tokenId, 1);
         _phi.safeTransferFrom(msg.sender, address(this), price);
         for (uint256 i=0; i < ingredients.length; i++) {
             _craftIds.increment();
@@ -176,6 +177,18 @@ contract Resource is ERC1155, Ownable {
             _pendingCraftsByUser[msg.sender].add(craftId);
             emit CraftStarted(msg.sender, craftId);
         }
+    }
+
+    /// @notice Claim result token from craft started using craft(tokenId) method
+    /// @param craftId Craft ID to claim result from
+    function claimCraft(uint256 craftId) public {
+        require(_pendingCraftsByUser[msg.sender].contains(craftId), "this craft is not pending for you");
+        PendingCraft storage craft_ = _pendingCrafts[craftId];
+        require(craft_.finishTimestamp <= block.timestamp, "this craft is still pending");
+        craft_.claimed = true;
+        _pendingCraftsByUser[msg.sender].remove(craftId);
+        _mint(msg.sender, craft_.tokenId, 1, "");
+        emit CraftClaimed(msg.sender, craftId);
     }
 
     /// @notice Skip craft waiting for `craftWaitSkipPrice` CRAFT
@@ -187,18 +200,7 @@ contract Resource is ERC1155, Ownable {
         _phi.safeTransferFrom(msg.sender, address(this), craftWaitSkipPrice);
         craft_.finishTimestamp = block.timestamp - 1;
         emit CraftWaitSkipped(craftId);
-    }
-
-    /// @notice Claim result token from craft started using craft(tokenId) method
-    /// @param craftId Craft ID to claim result from
-    function claimCraft(uint256 craftId) external {
-        require(_pendingCraftsByUser[msg.sender].contains(craftId), "this craft is not pending for you");
-        PendingCraft storage craft_ = _pendingCrafts[craftId];
-        require(craft_.finishTimestamp <= block.timestamp, "this craft is still pending");
-        craft_.claimed = true;
-        _pendingCraftsByUser[msg.sender].remove(craftId);
-        _mint(msg.sender, craft_.tokenId, 1, "");
-        emit CraftClaimed(msg.sender, craftId);
+        claimCraft(craftId);
     }
 
     /// @notice Withdraw PHI fees
