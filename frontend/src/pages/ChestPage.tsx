@@ -37,7 +37,9 @@ const ChestPage = observer(({}: IChestPageProps) => {
 
     useAsyncEffect(updateInfo, [walletStore.lastBlock]);
 
-    const onBuy = async () => {
+    const onBuy = async (e: React.FormEvent) => {
+        e.preventDefault();
+
         setLoading(true);
         try {
             const chest = walletStore.chestContract;
@@ -98,7 +100,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
                         <div className="chest">
                             <div className="chest__wrap">
                                 <div className="chest__img"><img src={require('url:../images/box-img.webp')} alt="" /></div>
-                                <form className="chest-form" action="#" name="#" method="#" id="#">
+                                <form className="chest-form" onSubmit={onBuy}>
                                     <div className="chest-form__wrap">
                                         <button
                                             className="chest-form__btn minus"
@@ -131,8 +133,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
                                     <button
                                         className="btn primary up"
                                         disabled={loading}
-                                        type="button"
-                                        onClick={onBuy}
+                                        type="submit"
                                     >
                                         BUY CHESTS
                                     </button>

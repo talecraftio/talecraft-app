@@ -99,7 +99,10 @@ const PendingCraft = ({ craft, craftId, callback, skipPrice }: { craft: Pendingc
                     {claimable ? (
                         <button className="btn primary up" type="button" disabled={claimLoading} onClick={onClaim}>Claim</button>
                     ) : (
-                        <button className="btn primary up" type="button" disabled={claimLoading} onClick={onSkip}>Claim now ({skipPrice.toString()} CRAFT)</button>
+                        <>
+                            <button className="btn primary" type="button" disabled={claimLoading} onClick={onSkip} style={{ flexShrink: 1, whiteSpace: 'normal' }}>Skip time & claim ({skipPrice?.toString()} CRAFT)</button>
+                            <button className="btn primary up" type="button" disabled onClick={onSkip} style={{ flexShrink: 1, minWidth: 0 }}>Claim</button>
+                        </>
                     )}
                 </div>
             </div>
