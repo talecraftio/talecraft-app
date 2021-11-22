@@ -33,7 +33,9 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     mapping (uint256 => GameInfo) _games;
     mapping (uint256 => uint256) internal _pools;
     uint256 public avaxPerToken = .5 ether;
-    uint256 public constant ABORT_TIMEOUT = 5 * 60;  // seconds
+    uint256 public abortTimeout = 5 * 60;  // seconds
+    uint256 public minWeight = 5;
+    uint256 public minCardsCount = 3;
     uint256 public maxSlotId = 49;
 
     Resource internal _resource;
@@ -47,6 +49,8 @@ contract Game is ERC20, Ownable, ERC1155Holder {
 
     event TokensExchanged(address indexed player, uint256 tokensSpent);
     event AvaxPerTokenUpdated(uint256 newValue);
+    event MinWeightUpdated(uint256 newValue);
+    event MinCardsCountUpdated(uint256 newValue);
 
     constructor(Resource resource) ERC20("Loyalty Point", "LP") {
         _resource = resource;
@@ -54,6 +58,8 @@ contract Game is ERC20, Ownable, ERC1155Holder {
             _createNewGame(i);
         }
         emit AvaxPerTokenUpdated(avaxPerToken);
+        emit MinWeightUpdated(minWeight);
+        emit MinCardsCountUpdated(minCardsCount);
     }
 
     function decimals() public view override returns (uint8) {
@@ -96,14 +102,14 @@ contract Game is ERC20, Ownable, ERC1155Holder {
             require(_games[_pools[i]].finished || _games[_pools[i]].player1.addr != msg.sender && _games[_pools[i]].player2.addr != msg.sender, "You are already playing in some other pool");
         }
         uint256[] memory ownedTokens = _resource.ownedTokens(msg.sender);
-        require(ownedTokens.length >= 3, "You do not have enough cards to play");
+        require(ownedTokens.length >= minCardsCount, "You do not have enough cards to play");
         uint256 accumulatedWeight = 0;
         for (uint8 i=0; i < ownedTokens.length; i++) {
             accumulatedWeight += _resource.getResourceWeight(ownedTokens[i]);
-            if (accumulatedWeight >= 5)
+            if (accumulatedWeight >= minWeight)
                 break;
         }
-        require(accumulatedWeight >= 5, "You must have more than 5 total weight to play");
+        require(accumulatedWeight >= minWeight, "You must have more than 5 total weight to play");
 
         if (game.player1.addr == address(0)) {
             game.player1.addr = msg.sender;
@@ -192,7 +198,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         bool isPlayer2 = game.player2.addr == msg.sender;
         require(isPlayer1 || isPlayer2, "You are not playing in this pool");
         require(game.started && !game.finished, "Game should be running");
-        require(block.timestamp - game.lastAction >= ABORT_TIMEOUT, "Timeout has not passed");
+        require(block.timestamp - game.lastAction >= abortTimeout, "Timeout has not passed");
         require(isPlayer1 && game.turn != 1 || isPlayer2 && game.turn != 2, "You can't abort game at your turn");
 
         game.finished = true;
@@ -227,8 +233,22 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     }
 
     function updateAvaxPerToken(uint256 newValue) external onlyOwner {
+        require(newValue > 0, "cannot be 0");
+        require(newValue != avaxPerToken, "no change");
         avaxPerToken = newValue;
         emit AvaxPerTokenUpdated(newValue);
+    }
+
+    function updateMinWeight(uint256 newValue) external onlyOwner {
+        require(newValue != minWeight, "no change");
+        minWeight = newValue;
+        emit MinWeightUpdated(newValue);
+    }
+
+    function updateMinCardsCount(uint256 newValue) external onlyOwner {
+        require(newValue != minCardsCount, "no change");
+        minCardsCount = newValue;
+        emit MinCardsCountUpdated(newValue);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {

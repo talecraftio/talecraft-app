@@ -39,6 +39,7 @@ contract ChestSale is Ownable, ERC1155Holder {
     event ChestPricePhiUpdated(uint256 newValue);
     event ChestPriceEthUpdated(uint256 newValue);
     event LimitPerUserUpdated(uint256 newValue);
+    event StartTimeUpdated(uint256 newValue);
 
     constructor(Resource resource_, IERC20 phi_, uint256 delayStart) {
         _resource = resource_;
@@ -46,6 +47,11 @@ contract ChestSale is Ownable, ERC1155Holder {
         _startWeek();
         if (delayStart > 0)
             weekStart = delayStart;
+
+        emit ChestPricePhiUpdated(chestPricePhi);
+        emit ChestPriceEthUpdated(chestPriceEth);
+        emit LimitPerUserUpdated(limitPerUser);
+        emit StartTimeUpdated(weekStart);
     }
 
     function _startWeek() private {
@@ -150,5 +156,15 @@ contract ChestSale is Ownable, ERC1155Holder {
         require(limitPerUser != newValue, "no change");
         limitPerUser = newValue;
         emit LimitPerUserUpdated(newValue);
+    }
+
+    /// @notice Changes sale start time
+    /// @param newTime New sale start time
+    function updateStartTime(uint256 newTime) external onlyOwner {
+        require(weekStart > block.timestamp, "sale has already started");
+        require(weekStart != newTime, "no change");
+        require(newTime >= block.timestamp, "cannot set start time in past");
+        weekStart = newTime;
+        emit StartTimeUpdated(newTime);
     }
 }
