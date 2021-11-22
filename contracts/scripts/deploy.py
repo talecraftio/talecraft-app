@@ -15,7 +15,7 @@ def main():
     except:
         addresses = {}
 
-    deployer = accounts.load('deployer')
+    deployer = accounts.load('deployer', '')
 
     phi: Contract = PHI.deploy({'from': deployer})
     addresses['phi'] = phi.address

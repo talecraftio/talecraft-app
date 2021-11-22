@@ -7,7 +7,7 @@ BATCH_SIZE = 30
 
 
 def main():
-    deployer = accounts.load('talecraft-deployer')
+    deployer = accounts.load('talecraft-deployer', '')
 
     with open('items.csv') as f:
         csv_reader = csv.reader(f, delimiter=',')

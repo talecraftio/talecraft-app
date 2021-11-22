@@ -15,7 +15,7 @@ def main():
     except:
         addresses = {}
 
-    deployer = accounts.load('talecraft-deployer')
+    deployer = accounts.load('talecraft-deployer', '')
 
     phi: Contract = PHI.deploy({'from': deployer})
     addresses['phi'] = phi.address

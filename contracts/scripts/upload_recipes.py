@@ -7,7 +7,7 @@ BATCH_SIZE = 30
 
 
 def main():
-    deployer = accounts.load('deployer')
+    deployer = accounts.load('deployer', '')
 
     with open('items.csv') as f:
         csv_reader = csv.reader(f, delimiter=',')

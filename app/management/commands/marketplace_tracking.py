@@ -39,7 +39,9 @@ class Command(BaseCommand):
 
                         evts = contract.events.NewListing().getLogs(fromBlock=from_block, toBlock=to_block)
                         for evt in evts:
+                            logging.warning(f'    NewListing(seller={evt.args.seller}, listingId={evt.args.listingId})')
                             listing = contract.functions.getListing(evt.args.listingId).call()
+                            logging.warning(f'      listing={repr(listing)}')
                             MarketplaceListing.objects.create(listing_id=evt.args.listingId,
                                                               resource=Resource.objects.get(token_id=listing[0]),
                                                               amount=listing[1],
@@ -49,6 +51,7 @@ class Command(BaseCommand):
 
                         evts = contract.events.ListingCancelled().getLogs(fromBlock=from_block, toBlock=to_block)
                         for evt in evts:
+                            logging.warning(f'    ListingCancelled(listingId={evt.args.listingId})')
                             listing = MarketplaceListing.objects.filter(listing_id=evt.args.listingId).first()
                             if listing:
                                 listing.closed = True
@@ -60,6 +63,7 @@ class Command(BaseCommand):
 
                         evts = contract.events.Trade().getLogs(fromBlock=from_block, toBlock=to_block)
                         for evt in evts:
+                            logging.warning(f'    Trade(seller={evt.args.seller}, buyer={evt.args.buyer}, listingId={evt.args.listingId})')
                             listing = MarketplaceListing.objects.filter(listing_id=evt.args.listingId).first()
                             if listing:
                                 listing.buyer = evt.args.buyer

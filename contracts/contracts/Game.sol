@@ -211,8 +211,10 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     function startGames(uint256[] calldata poolSlots) external onlyOwner {
         for (uint8 i=0; i < poolSlots.length; i++) {
             _createNewGame(poolSlots[i]);
-            if (poolSlots[i] > maxSlotId)
+            if (poolSlots[i] > maxSlotId) {
+                require(maxSlotId + 1 == poolSlots[i], "cannot add slots not following existing");
                 maxSlotId = poolSlots[i];
+            }
         }
     }
 
