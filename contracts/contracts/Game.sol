@@ -51,6 +51,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     event AvaxPerTokenUpdated(uint256 newValue);
     event MinWeightUpdated(uint256 newValue);
     event MinCardsCountUpdated(uint256 newValue);
+    event AbortTimeoutUpdated(uint256 newValue);
 
     constructor(Resource resource) ERC20("Loyalty Point", "LP") {
         _resource = resource;
@@ -60,6 +61,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         emit AvaxPerTokenUpdated(avaxPerToken);
         emit MinWeightUpdated(minWeight);
         emit MinCardsCountUpdated(minCardsCount);
+        emit AbortTimeoutUpdated(abortTimeout);
     }
 
     function decimals() public view override returns (uint8) {
@@ -102,13 +104,16 @@ contract Game is ERC20, Ownable, ERC1155Holder {
             require(_games[_pools[i]].finished || _games[_pools[i]].player1.addr != msg.sender && _games[_pools[i]].player2.addr != msg.sender, "You are already playing in some other pool");
         }
         uint256[] memory ownedTokens = _resource.ownedTokens(msg.sender);
-        require(ownedTokens.length >= minCardsCount, "You do not have enough cards to play");
         uint256 accumulatedWeight = 0;
+        uint256 cardsCount = 0;
         for (uint8 i=0; i < ownedTokens.length; i++) {
-            accumulatedWeight += _resource.getResourceWeight(ownedTokens[i]);
-            if (accumulatedWeight >= minWeight)
+            uint256 balance = _resource.balanceOf(msg.sender, ownedTokens[i]);
+            accumulatedWeight += _resource.getResourceWeight(ownedTokens[i]) * balance;
+            cardsCount += balance;
+            if (accumulatedWeight >= minWeight && cardsCount >= minCardsCount)
                 break;
         }
+        require(cardsCount >= minCardsCount, "You do not have enough cards to play");
         require(accumulatedWeight >= minWeight, "You must have more than 5 total weight to play");
 
         if (game.player1.addr == address(0)) {
@@ -249,6 +254,12 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         require(newValue != minCardsCount, "no change");
         minCardsCount = newValue;
         emit MinCardsCountUpdated(newValue);
+    }
+
+    function updateAbortTimeout(uint256 newValue) external onlyOwner {
+        require(newValue != abortTimeout, "no change");
+        abortTimeout = newValue;
+        emit AbortTimeoutUpdated(newValue);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {

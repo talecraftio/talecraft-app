@@ -26,7 +26,7 @@ def main():
     addresses['resource'] = resource.address
     snowtrace_publish(resource)
 
-    chest = ChestSale.deploy(resource.address, phi.address, 0, {'from': deployer})
+    chest = ChestSale.deploy(resource.address, phi.address, 1638550800, {'from': deployer})
     addresses['chest'] = chest.address
     snowtrace_publish(chest)
     chest.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
