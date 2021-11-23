@@ -21,7 +21,7 @@ contract Marketplace is ERC1155Holder {
         bool closed;
     }
 
-    Resource internal _resource;
+    Resource internal immutable _resource;
     Counters.Counter internal _listingIds;
     mapping (uint256 => Listing) internal _listings;
     mapping (address => EnumerableSet.UintSet) internal _listingsBySeller;
@@ -78,7 +78,11 @@ contract Marketplace is ERC1155Holder {
         listing.buyer = msg.sender;
         listing.closed = true;
         _resource.safeTransferFrom(address(this), msg.sender, listing.tokenId, listing.amount, "");
-        payable(listing.seller).transfer(msg.value);
+
+
+        (bool sent, bytes memory data) = msg.sender.call{value: msg.value}("");
+        require(sent, "an error occurred while sending avax");
+
         _activeListings.remove(listingId);
         _activeListingsBySeller[listing.seller].remove(listingId);
 

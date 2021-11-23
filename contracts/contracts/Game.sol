@@ -37,8 +37,9 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     uint256 public minWeight = 5;
     uint256 public minCardsCount = 3;
     uint256 public maxSlotId = 49;
+    mapping (address => bool) _isPlaying;
 
-    Resource internal _resource;
+    Resource internal immutable _resource;
 
     event PlayerEntered(uint256 indexed gameId, uint256 indexed poolSlot, address indexed player);
     event PlayerExited(uint256 indexed gameId, uint256 indexed poolSlot, address indexed player);
@@ -93,6 +94,14 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         return games;
     }
 
+    function getAllGamesPaginated(uint256 offset, uint256 count) external view returns (GameInfo[] memory) {
+        GameInfo[] memory games = new GameInfo[](count);
+        for (uint8 i=0; i < count && i <= maxSlotId; i++) {
+            games[i] = _games[_pools[offset + i]];
+        }
+        return games;
+    }
+
     function getLastGameId() external view returns (uint256) {
         return _gameIds.current();
     }
@@ -100,9 +109,8 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     function enterGame(uint256 poolSlot) external {
         GameInfo storage game = _games[_pools[poolSlot]];
         require(!game.started, "Game has already started");
-        for (uint8 i=0; i <= maxSlotId; i++) {
-            require(_games[_pools[i]].finished || _games[_pools[i]].player1.addr != msg.sender && _games[_pools[i]].player2.addr != msg.sender, "You are already playing in some other pool");
-        }
+        require(!_isPlaying[msg.sender], "You are already playing in another pool");
+        _isPlaying[msg.sender] = true;
         uint256[] memory ownedTokens = _resource.ownedTokens(msg.sender);
         uint256 accumulatedWeight = 0;
         uint256 cardsCount = 0;
@@ -141,6 +149,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         } else {
             revert("You are not in this pool");
         }
+        _isPlaying[msg.sender] = false;
         emit PlayerExited(game.gameId, poolSlot, msg.sender);
     }
 
@@ -192,6 +201,8 @@ contract Game is ERC20, Ownable, ERC1155Holder {
             }
             _resource.safeBatchTransferFrom(address(this), game.player1.addr, placedCards1, amounts, "");
             _resource.safeBatchTransferFrom(address(this), game.player2.addr, placedCards2, amounts, "");
+            _isPlaying[game.player1.addr] = false;
+            _isPlaying[game.player2.addr] = false;
         }
 
         game.lastAction = block.timestamp;
@@ -217,10 +228,13 @@ contract Game is ERC20, Ownable, ERC1155Holder {
             if (game.player2.placedCards[i] != 0)
                 _resource.safeTransferFrom(address(this), game.player2.addr, game.player2.placedCards[i], 1, "");
         }
+        _isPlaying[game.player1.addr] = false;
+        _isPlaying[game.player2.addr] = false;
     }
 
     function startGames(uint256[] calldata poolSlots) external onlyOwner {
         for (uint8 i=0; i < poolSlots.length; i++) {
+            GameInfo memory game = _games[poolSlots[i]];
             _createNewGame(poolSlots[i]);
             if (poolSlots[i] > maxSlotId) {
                 require(maxSlotId + 1 == poolSlots[i], "cannot add slots not following existing");
@@ -232,7 +246,10 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     function burn(uint256 amount) external {
         uint256 sum = amount * avaxPerToken;
         require(address(this).balance >= sum, "Not enough balance on contract");
-        payable(msg.sender).transfer(sum);
+
+        (bool sent, bytes memory data) = msg.sender.call{value: sum}("");
+        require(sent, "an error occurred while sending avax");
+
         emit TokensExchanged(msg.sender, amount);
         _burn(msg.sender, amount);
     }

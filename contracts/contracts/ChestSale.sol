@@ -19,7 +19,7 @@ contract ChestSale is Ownable, ERC1155Holder {
     }
 
     uint256 constant public TOTAL_CHESTS = 300000;  // must be a multiple of TOTAL_WEEKS * 4
-    uint256 constant public WEEK = 30 * 60;  // 7 * 24 * 60 * 60;
+    uint256 constant public WEEK = 7 * 24 * 60 * 60;
     uint256 constant public TOTAL_WEEKS = 30;
     uint256 constant public CHESTS_PER_WEEK = TOTAL_CHESTS / TOTAL_WEEKS;
     uint256 constant public WEEK_BALANCE = CHESTS_PER_WEEK / 4;
@@ -55,8 +55,9 @@ contract ChestSale is Ownable, ERC1155Holder {
     }
 
     function _startWeek() private {
-        require(weeksLeft > 0, "chest sale is over");
-        weeksLeft--;
+        uint256 weeksLeft_ = weeksLeft;
+        require(weeksLeft_ > 0, "chest sale is over");
+        weeksLeft = weeksLeft_ - 1;
         weekStart = block.timestamp;
         chestsLeft = CHESTS_PER_WEEK;
         balances[0] = balances[1] = balances[2] = balances[3] = WEEK_BALANCE;
@@ -67,12 +68,14 @@ contract ChestSale is Ownable, ERC1155Holder {
     /// @param count The number of chests to open
     function openChest(uint256 count) external payable {
         uint256 phiFee = chestPricePhi * count;
+        uint256 chestsLeft_ = chestsLeft;
+        IERC20 phi = _phi;
 
         require(block.timestamp >= weekStart, "chest sale is not started yet");
         require(count > 0 && count <= 500, "invalid count");
-        require(chestsLeft >= count, "not enough available chests");
+        require(chestsLeft_ >= count, "not enough available chests");
         require(msg.value == chestPriceEth * count, "incorrect value sent");
-        require(_phi.balanceOf(msg.sender) >= phiFee, "insufficient PHI balance");
+        require(phi.balanceOf(msg.sender) >= phiFee, "insufficient PHI balance");
 
         // start next week if needed
         if (block.timestamp - weekStart >= WEEK)
@@ -88,7 +91,7 @@ contract ChestSale is Ownable, ERC1155Holder {
         userStats.chestsBought += count;
 
         // take PHI fee
-        _phi.safeTransferFrom(msg.sender, address(this), phiFee);
+        phi.safeTransferFrom(msg.sender, address(this), phiFee);
 
         // select tokens in opened chests
         uint256[] memory tokenIds = new uint256[](4);
@@ -119,7 +122,7 @@ contract ChestSale is Ownable, ERC1155Holder {
         // send tokens
         _resource.safeBatchTransferFrom(address(this), msg.sender, tokenIds, tokenAmounts, "");
 
-        chestsLeft -= count;
+        chestsLeft = chestsLeft_ - count;
         emit ChestsOpened(msg.sender, tokenIds);
     }
 
