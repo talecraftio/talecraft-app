@@ -12,7 +12,7 @@ const GameInfoPage = ({}: IGameInfoPageProps) => {
 
     const [ gameId, setGameId ] = useState('');
     const [ gameInfo, setGameInfo ] = useState<GameinfoResponse>();
-    const [ staleSlots, setStaleSlots ] = useState<number[]>([]);
+    const [ staleSlots, setStaleSlots ] = useState<[GameinfoResponse, number][]>([]);
 
     useAsyncEffect(async () => {
         const games = await walletStore.gameContract.methods.getAllGames().call();
@@ -20,7 +20,7 @@ const GameInfoPage = ({}: IGameInfoPageProps) => {
 
         games.forEach((g, i) => {
             if (g.started && !g.finished && (+new Date() / 1000) - parseInt(g.lastAction) >= 300) {
-                staleSlots.push(i);
+                staleSlots.push([g, i]);
             }
         });
 
@@ -31,7 +31,7 @@ const GameInfoPage = ({}: IGameInfoPageProps) => {
         <main className="main" style={{ fontSize: 14, color: 'white' }}>
             <div className="container" style={{ marginTop: 150 }}>
                 <h2>Stale game slots</h2>
-                <pre>[{staleSlots.join(', ')}]</pre>
+                <pre>{staleSlots.map(([g, i]) => `Slot ${i}: no actions since ${new Date(g.lastAction).toLocaleString()}\n`)}</pre>
             </div>
         </main>
     )
