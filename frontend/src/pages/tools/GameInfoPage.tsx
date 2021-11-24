@@ -31,7 +31,7 @@ const GameInfoPage = ({}: IGameInfoPageProps) => {
         <main className="main" style={{ fontSize: 14, color: 'white' }}>
             <div className="container" style={{ marginTop: 150 }}>
                 <h2>Stale game slots</h2>
-                <pre>{staleSlots.map(([g, i]) => `Slot ${i}: no actions since ${new Date(parseInt(g.lastAction)).toLocaleString()}\n`)}</pre>
+                <pre>{staleSlots.map(([g, i]) => `Slot ${i}: no actions since ${new Date(parseInt(g.lastAction) * 1000).toLocaleString()}\n`)}</pre>
             </div>
         </main>
     )
