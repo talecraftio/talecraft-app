@@ -212,14 +212,17 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         GameInfo storage game = _games[_pools[poolSlot]];
         bool isPlayer1 = game.player1.addr == msg.sender;
         bool isPlayer2 = game.player2.addr == msg.sender;
-        require(isPlayer1 || isPlayer2, "You are not playing in this pool");
-        require(game.started && !game.finished, "Game should be running");
-        require(block.timestamp - game.lastAction >= abortTimeout, "Timeout has not passed");
-        require(isPlayer1 && game.turn != 1 || isPlayer2 && game.turn != 2, "You can't abort game at your turn");
+        bool owner = owner() == msg.sender;
+        require(owner || isPlayer1 || isPlayer2, "You are not playing in this pool");
+        require(game.started && !game.finished, "game should be running");
+        require(owner || block.timestamp - game.lastAction >= abortTimeout, "timeout has not passed");
+        require(owner || isPlayer1 && game.turn != 1 || isPlayer2 && game.turn != 2, "you can't abort game at your turn");
 
         game.finished = true;
-        game.winner = msg.sender;
-        _mint(game.winner, 1);
+        if (!owner) {
+            game.winner = msg.sender;
+            _mint(game.winner, 1);
+        }
         emit GameFinished(game.gameId, poolSlot, game.winner);
 
         for (uint8 i=0; i < 3; i++) {
@@ -235,6 +238,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     function startGames(uint256[] calldata poolSlots) external onlyOwner {
         for (uint8 i=0; i < poolSlots.length; i++) {
             GameInfo memory game = _games[poolSlots[i]];
+            require(!game.started || game.finished, "cannot replace running games");
             _createNewGame(poolSlots[i]);
             if (poolSlots[i] > maxSlotId) {
                 require(maxSlotId + 1 == poolSlots[i], "cannot add slots not following existing");
