@@ -22,16 +22,16 @@ def main():
     # snowtrace_publish(phi)
     # phi.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    phi = PHI.at('0x8aE8be25C23833e0A01Aa200403e826F611f9CD2')
-
-    resource = Resource.deploy(phi.address, {'from': deployer})
-    addresses['resource'] = resource.address
-    snowtrace_publish(resource)
-
-    chest = ChestSale.deploy(resource.address, phi.address, 1638550800, {'from': deployer})
-    addresses['chest'] = chest.address
-    snowtrace_publish(chest)
-    chest.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    # phi = PHI.at('0x8aE8be25C23833e0A01Aa200403e826F611f9CD2')
+    #
+    # resource = Resource.deploy(phi.address, {'from': deployer})
+    # addresses['resource'] = resource.address
+    # snowtrace_publish(resource)
+    #
+    # chest = ChestSale.deploy(resource.address, phi.address, 1638550800, {'from': deployer})
+    # addresses['chest'] = chest.address
+    # snowtrace_publish(chest)
+    # chest.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     # staking = CraftStaking.deploy(
     #     phi.address,
@@ -48,20 +48,20 @@ def main():
     # snowtrace_publish(staking)
     # staking.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    marketplace = Marketplace.deploy(resource.address, {'from': deployer})
+    marketplace = Marketplace.deploy(Resource[-1].address, {'from': deployer})
     addresses['marketplace'] = marketplace.address
     snowtrace_publish(marketplace)
 
-    game = Game.deploy(resource.address, {'from': deployer})
-    addresses['game'] = game.address
-    snowtrace_publish(game)
-    game.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    # game = Game.deploy(resource.address, {'from': deployer})
+    # addresses['game'] = game.address
+    # snowtrace_publish(game)
+    # game.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     # factory = TokenVestingFactory.deploy(deployer.address, {'from': deployer})
     # addresses['vestingFactory'] = factory.address
     # snowtrace_publish(factory)
 
-    resource.initialMint(chest.address, {'from': deployer})
+    # resource.initialMint(chest.address, {'from': deployer})
 
     # phi.transfer('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', 30_000_000e18, {'from': deployer})
 

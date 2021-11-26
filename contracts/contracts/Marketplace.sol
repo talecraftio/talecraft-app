@@ -80,7 +80,7 @@ contract Marketplace is ERC1155Holder {
         _resource.safeTransferFrom(address(this), msg.sender, listing.tokenId, listing.amount, "");
 
 
-        (bool sent, bytes memory data) = msg.sender.call{value: msg.value}("");
+        (bool sent, bytes memory data) = listing.seller.call{value: msg.value}("");
         require(sent, "an error occurred while sending avax");
 
         _activeListings.remove(listingId);
