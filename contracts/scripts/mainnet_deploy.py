@@ -22,7 +22,7 @@ def main():
     # snowtrace_publish(phi)
     # phi.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    phi = PHI[-1]
+    phi = PHI.at('0x8aE8be25C23833e0A01Aa200403e826F611f9CD2')
 
     resource = Resource.deploy(phi.address, {'from': deployer})
     addresses['resource'] = resource.address

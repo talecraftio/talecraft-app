@@ -21,14 +21,16 @@ import _ from "lodash";
 
 import JOE_PAIR_ABI from '../utils/contracts/joePair.abi.json';
 
-export const CHAIN_ID = 43113;
-export const DEFAULT_RPC_WS = 'wss://api.avax-test.network/ext/bc/C/ws';
-export const DEFAULT_RPC = 'https://api.avax-test.network/ext/bc/C/rpc';
-export const BLOCK_EXPLORER = 'https://cchain.explorer.avax-test.network';
+const TESTNET = false;
+
+export const CHAIN_ID = TESTNET ? 43113 : 43114;
+export const DEFAULT_RPC_WS = TESTNET ? 'wss://api.avax-test.network/ext/bc/C/ws' : 'wss://api.avax.network/ext/bc/C/ws';
+export const DEFAULT_RPC = TESTNET ? 'https://api.avax-test.network/ext/bc/C/rpc' : 'https://api.avax.network/ext/bc/C/rpc';
+export const BLOCK_EXPLORER = TESTNET ? 'https://testnet.snowtrace.io' : 'https://snowtrace.io';
 
 const chainParameters = {
     chainId: `0x${CHAIN_ID.toString(16).padStart(4, '0')}`,
-    chainName: 'Avalanche FUJI C-Chain',
+    chainName: `Avalanche ${TESTNET ? 'Fuji' : 'Mainnet'} C-Chain`,
     nativeCurrency: {
         name: 'AVAX',
         symbol: 'AVAX',

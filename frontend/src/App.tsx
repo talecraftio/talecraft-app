@@ -37,12 +37,12 @@ const App = observer(() => {
                     <Route path='/chest' component={ChestPage} />
                     <Route exact path='/marketplace' component={MarketPage} />
                     <Route path='/marketplace/:listingId' component={MarketListingPage} />
-                    <Route path='/staking' component={StakingPage} />
+                    {/*<Route path='/staking' component={StakingPage} />*/}
                     <Route path='/wallet' component={WalletPage} />
                     <Route path='/craft' component={CraftPage} />
                     <Route path='/_playerWeights' component={PlayerInfoPage} />
                     <Route path='/_gameInfo' component={GameInfoPage} />
-                    <Route path='/game' component={GamePage} />
+                    {/*<Route path='/game' component={GamePage} />*/}
                     <Route path='/loyalty' component={LoyaltyPage} />
                     <Route path='/_vesting' component={VestingPage} />
                 </Switch>

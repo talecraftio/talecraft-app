@@ -30,7 +30,7 @@ const Header = observer(({}: IHeaderProps) => {
                                 <>
                                     <li className="nav__items"><NavLink className="nav__link" to="/chest" onClick={() => setBurger(false)}>Chest</NavLink></li>
                                     <li className="nav__items"><NavLink className="nav__link" to="/craft" onClick={() => setBurger(false)}>Craft</NavLink></li>
-                                    <li className="nav__items"><NavLink className="nav__link" to="/staking" onClick={() => setBurger(false)}>Staking</NavLink></li>
+                                    {/*<li className="nav__items"><NavLink className="nav__link" to="/staking" onClick={() => setBurger(false)}>Staking</NavLink></li>*/}
                                 </>
                             )}
                             <li className="nav__items"><NavLink className="nav__link" to="/marketplace" onClick={() => setBurger(false)}>MarketPlace</NavLink></li>
@@ -41,7 +41,7 @@ const Header = observer(({}: IHeaderProps) => {
                     </div>
                     <div className="nav__wrap">
                         <ul className="nav__list">
-                            {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/game" onClick={() => setBurger(false)}>PLAY GAME</NavLink></li>}
+                            {/*{walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/game" onClick={() => setBurger(false)}>PLAY GAME</NavLink></li>}*/}
                             <li className="nav__items">
                                 {walletStore.connected ? (
                                     <a className='nav__link desctop' onClick={() => walletStore.resetWallet()}>{trimAddress(walletStore.address)}</a>

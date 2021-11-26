@@ -1,6 +1,7 @@
 import json
 
 from brownie import accounts, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenTimelock, TokenVesting, TokenVestingFactory
+from scripts._utils import snowtrace_publish
 
 
 def main():
