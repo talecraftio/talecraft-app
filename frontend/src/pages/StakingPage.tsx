@@ -187,6 +187,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                                         required
                                         min={0}
                                         max={balance.toString()}
+                                        step='1e-18'
                                         placeholder="Amount"
                                         disabled={loading}
                                         value={amount}
