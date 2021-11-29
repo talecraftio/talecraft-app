@@ -37,10 +37,11 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         const poolInfo = await contract.methods.poolInfo('0').call();
         const totalStakedAmount = toBN(poolInfo.supply);
 
+        const userInfo = await contract.methods.userInfo('0', walletStore.address).call();
         const govTokenWETHPrice = toBN(await walletStore.getTokenPrice());
-        const baseBlockRewards = toBN(await contract.methods.tokenPerBlock().call());
-        const blocksPerYear = 60 * 60 * 24 * 365 / 2;
-        const poolShare = 1;
+        const baseBlockRewards = toBN(await contract.methods.tokenPerSecond().call());
+        const blocksPerYear = 60 * 60 * 24 * 365;
+        const poolShare = toBN(userInfo.amount).div(totalStakedAmount);
         const totalStakedAmountWETH = totalStakedAmount.times(govTokenWETHPrice);
 
         const multiplied = govTokenWETHPrice.times(baseBlockRewards).times(blocksPerYear).times(poolShare);
@@ -113,14 +114,8 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         try {
             const contract = walletStore.stakingContract;
 
-            let tx = await walletStore.sendTransaction(contract.methods.withdraw('0', '0'));
-            toast.success(
-                <>
-                    Tokens were successfully harvested<br />
-                    <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
-                </>
-            );
-            tx = await walletStore.sendTransaction(contract.methods.emergencyWithdraw('0'));
+            const userInfo = await contract.methods.userInfo('0', walletStore.address).call();
+            let tx = await walletStore.sendTransaction(contract.methods.withdraw('0', userInfo.amount));
             toast.success(
                 <>
                     Stake was successfully withdrawn<br />
