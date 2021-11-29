@@ -209,7 +209,7 @@ class WalletStore {
     }
 
     getTokenPrice = async () => {
-        const contract = new mainWeb3.eth.Contract(JOE_PAIR_ABI as any, '0xFE15c2695F1F920da45C30AAE47d11dE51007AF9');
+        const contract = new mainWeb3.eth.Contract(JOE_PAIR_ABI as any, '0x86D1b1Ab4812a104BC1Ea1FbD07809DE636E6C6b');
         const token0 = await contract.methods.token0().call();
         const token1 = await contract.methods.token1().call();
         let avaxBalance, tokenBalance;

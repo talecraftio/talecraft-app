@@ -22,6 +22,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
     const [ allowance, setAllowance ] = useState<BN>(toBN(0));
     const [ earned, setEarned ] = useState<BN>(toBN(0));
     const [ apr, setApr ] = useState<BN>(toBN(0));
+    const [ totalStakedAmount, setTotalStakedAmount ] = useState<BN>(toBN(0));
 
     useAsyncEffect(async () => {
         if (!walletStore.address) return;
@@ -35,20 +36,10 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         setStaked(toBN((await contract.methods.userInfo('0', walletStore.address).call()).amount).div('1e18'));
 
         const poolInfo = await contract.methods.poolInfo('0').call();
-        const totalStakedAmount = toBN(poolInfo.supply);
+        const totalStakedAmount = toBN(poolInfo.supply).div('1e18');
+        setTotalStakedAmount(totalStakedAmount);
 
-        const userInfo = await contract.methods.userInfo('0', walletStore.address).call();
-        const govTokenWETHPrice = toBN(await walletStore.getTokenPrice());
-        const baseBlockRewards = toBN(await contract.methods.tokenPerSecond().call());
-        const blocksPerYear = 60 * 60 * 24 * 365;
-        const poolShare = toBN(userInfo.amount).div(totalStakedAmount);
-        const totalStakedAmountWETH = totalStakedAmount.times(govTokenWETHPrice);
-
-        const multiplied = govTokenWETHPrice.times(baseBlockRewards).times(blocksPerYear).times(poolShare);
-        let apr;
-        if (multiplied.isPositive() && totalStakedAmountWETH.gt(0)) {
-            apr = multiplied.div(totalStakedAmountWETH);
-        }
+        const apr = toBN('47414').div(totalStakedAmount).times(100);
         setApr(apr);
     }, [walletStore.lastBlock, walletStore.address]);
 
@@ -167,17 +158,23 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                                 </div>
                                 <div className="staking__row">
                                     <p className="staking__count">
-                                        <span>$CRAFT staked</span>
-                                        {staked.toFixed(6)} $CRAFT
+                                        <span>CRAFT staked</span>
+                                        {staked.toFixed(6)} CRAFT
                                     </p>
                                     <button className="btn up" type="button" disabled={loading || staked.isZero()} onClick={onWithdraw}>WITHDRAW</button>
                                 </div>
                                 <div className="staking__row">
                                     <p className="staking__count">
-                                        <span>$CRAFT earned</span>
-                                        {earned.toFixed(6)} $CRAFT
+                                        <span>CRAFT earned</span>
+                                        {earned.toFixed(6)} CRAFT
                                     </p>
                                     <button className="btn up" type="button" disabled={loading || earned.isZero()} onClick={onHarvest}>HARVEST</button>
+                                </div>
+                                <div className="staking__row">
+                                    <p className="staking__count">
+                                        <span>Total staked</span>
+                                        {totalStakedAmount.toFixed(6)} CRAFT
+                                    </p>
                                 </div>
                                 <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
                                 <div className="form__field">
