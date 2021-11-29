@@ -192,6 +192,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                                         value={amount}
                                         onChange={e => setAmount(e.target.value)}
                                     />
+                                    <button type='button' className='btn primary' style={{ fontSize: 16, minHeight: 0, minWidth: 0 }} onClick={() => setAmount(balance.toString())} disabled={loading}>MAX</button>
                                 </div>
                                 <div className="staking__btn">
                                     <button className="btn primary up" type="submit" disabled={loading || toBN(amount).gt(balance) || toBN(amount).isZero()}>
