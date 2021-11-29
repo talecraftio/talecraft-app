@@ -34,9 +34,6 @@ const Footer = ({}: IFooterProps) => {
                             <li><a href="https://medium.com/@talecraft" target='_blank'>Medium</a></li>
                         </ul>
                     </div>
-                    <div className="footer__col">
-                        <BackgroundAudio />
-                    </div>
                 </div>
             </div>
         </footer>

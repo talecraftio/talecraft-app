@@ -5,6 +5,7 @@ import { useInjection } from "inversify-react";
 import WalletStore from "../stores/WalletStore";
 import { observer } from "mobx-react";
 import { trimAddress } from "../utils/address";
+import BackgroundAudio from "./BackgroundAudio";
 
 interface IHeaderProps {
 }
@@ -49,6 +50,7 @@ const Header = observer(({}: IHeaderProps) => {
                                     <a className="nav__link desctop" onClick={() => walletStore.connect()}>Connect wallet</a>
                                 )}
                             </li>
+                            <li className="nav__items"><BackgroundAudio /></li>
                         </ul>
                     </div>
                 </nav>
