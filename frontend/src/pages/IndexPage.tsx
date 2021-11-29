@@ -32,7 +32,7 @@ const IndexPage = ({}: IIndexPageProps) => {
                             <div className="intro__baner">
                                 <span className="intro__text">The Middle Age</span>
                             </div>
-                            <a className="btn primary up intro-btn" href={`https://app.pangolin.exchange/#/swap?outputCurrency=${ADDRESSES.phi}`} target='_blank'>Buy CRAFT</a>
+                            <a className="btn primary up intro-btn" href={`https://traderjoexyz.com/#/trade?outputCurrency=${ADDRESSES.phi}`} target='_blank'>Buy CRAFT</a>
                             <div className="intro__baner">
                                 <span className="intro__text">Metaverse</span>
                             </div>
@@ -341,21 +341,7 @@ const IndexPage = ({}: IIndexPageProps) => {
                 <div className="container">
                     <h2 className="section-title text-center">Backed By</h2>
                     <div className="cards-wrap">
-                        <div className="card">
-                            <div className="card__wrap">
-                                <div className="card__image"><img src={require('url:../images/chainlink.png')} alt=""/></div>
-                            </div>
-                        </div>
-                        <div className="card">
-                            <div className="card__wrap">
-                                <div className="card__image"><img src={require('url:../images/tape.png')} alt=""/></div>
-                            </div>
-                        </div>
-                        <div className="card">
-                            <div className="card__wrap">
-                                <div className="card__image"><img src={require('url:../images/lydia.png')} alt=""/></div>
-                            </div>
-                        </div>
+                        <div className="card__image"><img src={require('url:../images/partners.png')} alt=""/></div>
                     </div>
                 </div>
             </section>

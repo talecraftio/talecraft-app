@@ -30,7 +30,7 @@ const Header = observer(({}: IHeaderProps) => {
                                 <>
                                     <li className="nav__items"><NavLink className="nav__link" to="/chest" onClick={() => setBurger(false)}>Chest</NavLink></li>
                                     <li className="nav__items"><NavLink className="nav__link" to="/craft" onClick={() => setBurger(false)}>Craft</NavLink></li>
-                                    {/*<li className="nav__items"><NavLink className="nav__link" to="/staking" onClick={() => setBurger(false)}>Staking</NavLink></li>*/}
+                                    <li className="nav__items"><NavLink className="nav__link" to="/staking" onClick={() => setBurger(false)}>Staking</NavLink></li>
                                 </>
                             )}
                             <li className="nav__items"><NavLink className="nav__link" to="/marketplace" onClick={() => setBurger(false)}>MarketPlace</NavLink></li>
