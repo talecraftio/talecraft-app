@@ -5,5 +5,5 @@ export default {
     "staking": "0x4B0E5DA80DeB8DC354622625360CcaA35248D156",
     "marketplace": "0x23BBba252DA45fEac8A22F0497bD2954D67b3cD0",
     "game": "0xB5F94C48baf9d82D2413b067223e2dd0aFAAC55f",
-    "vestingFactory": "0x5e264167D63afb65672fEc2F216c45b72C23Daa9"
+    "vestingFactory": "0x2DAB3390adf79237aF1331bb7Eb4295defE6DA30"
 }
