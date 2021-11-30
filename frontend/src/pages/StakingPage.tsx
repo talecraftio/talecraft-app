@@ -23,6 +23,8 @@ const StakingPage = observer(({}: IStakingPageProps) => {
     const [ earned, setEarned ] = useState<BN>(toBN(0));
     const [ apr, setApr ] = useState<BN>(toBN(0));
     const [ totalStakedAmount, setTotalStakedAmount ] = useState<BN>(toBN(0));
+    const [ craftPrice, setCraftPrice ] = useState<BN>(toBN(0));
+    const [ avaxPrice, setAvaxPrice ] = useState<BN>(toBN(0));
 
     useAsyncEffect(async () => {
         if (!walletStore.address) return;
@@ -38,6 +40,9 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         const poolInfo = await contract.methods.poolInfo('0').call();
         const totalStakedAmount = toBN(poolInfo.supply).div('1e18');
         setTotalStakedAmount(totalStakedAmount);
+
+        setCraftPrice(toBN(await walletStore.getTokenPrice()));
+        setAvaxPrice(toBN(await walletStore.getAvaxPrice()));
 
         const apr = toBN('47414').div(totalStakedAmount).times(100);
         setApr(apr);
@@ -174,6 +179,10 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                                     <p className="staking__count">
                                         <span>Total staked</span>
                                         {totalStakedAmount.toFixed(6)} CRAFT
+                                    </p>
+                                    <p className="staking__count">
+                                        <span>TVL</span>
+                                        ${totalStakedAmount.times(craftPrice).times(avaxPrice).toFixed(2)}
                                     </p>
                                 </div>
                                 <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>

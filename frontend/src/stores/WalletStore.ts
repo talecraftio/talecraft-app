@@ -40,7 +40,7 @@ const chainParameters = {
     blockExplorerUrls: [BLOCK_EXPLORER],
 }
 
-const mainWeb3 = new Web3(new Web3.providers.WebsocketProvider('wss://api.avax.network/ext/bc/C/ws'))
+const mainWeb3 = new Web3(new Web3.providers.HttpProvider('https://api.avax.network/ext/bc/C/rpc'))
 
 class WalletStore {
     @observable initialized: boolean = false;
@@ -49,7 +49,7 @@ class WalletStore {
     @observable lastBlock: number;
     // @observable profile: Profile;
 
-    private rawProvider: any = new Web3.providers.WebsocketProvider(DEFAULT_RPC_WS);
+    private rawProvider: any = new Web3.providers.HttpProvider(DEFAULT_RPC);
     private newBlockSubscription: Subscription<BlockHeader>;
 
     constructor(private rootStore: RootStore) {
@@ -211,7 +211,6 @@ class WalletStore {
     getTokenPrice = async () => {
         const contract = new mainWeb3.eth.Contract(JOE_PAIR_ABI as any, '0x86D1b1Ab4812a104BC1Ea1FbD07809DE636E6C6b');
         const token0 = await contract.methods.token0().call();
-        const token1 = await contract.methods.token1().call();
         let avaxBalance, tokenBalance;
         const reserves = await contract.methods.getReserves().call();
         if (token0.toLowerCase() == '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7'.toLowerCase()) {
@@ -222,6 +221,21 @@ class WalletStore {
             tokenBalance = reserves[0];
         }
         return parseInt(avaxBalance) / parseInt(tokenBalance)
+    }
+
+    getAvaxPrice = async () => {
+        const contract = new mainWeb3.eth.Contract(JOE_PAIR_ABI as any, '0xeD8CBD9F0cE3C6986b22002F03c6475CEb7a6256');
+        const token0 = await contract.methods.token0().call();
+        let avaxBalance, usdtBalance;
+        const reserves = await contract.methods.getReserves().call();
+        if (token0.toLowerCase() == '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7'.toLowerCase()) {
+            avaxBalance = reserves[0];
+            usdtBalance = reserves[1];
+        } else {
+            avaxBalance = reserves[1];
+            usdtBalance = reserves[0];
+        }
+        return (parseInt(usdtBalance) / 1e6) / (parseInt(avaxBalance) / 1e18)
     }
 }
 
