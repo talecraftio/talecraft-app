@@ -40,7 +40,7 @@ class RootStore {
     }
 
     get api() {
-        return new Api(process.env.ENVIRONMENT === 'build' ? 'https://testnet.talecraft.io/graphql' : 'http://dev.bennnnsss.com:39100/graphql');
+        return new Api(process.env.ENVIRONMENT === 'build' ? '/graphql' : 'http://dev.bennnnsss.com:39100/graphql');
     }
 }
 
