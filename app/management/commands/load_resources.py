@@ -15,7 +15,7 @@ class Command(BaseCommand):
         with open(BASE_DIR / 'frontend/src/utils/contracts/resource.abi.json') as f:
             resource_abi = json.load(f)
 
-        web3 = Web3(HTTPProvider('https://api.avax-test.network/ext/bc/C/rpc'))
+        web3 = Web3(HTTPProvider('https://api.avax.network/ext/bc/C/rpc'))
 
         contract = web3.eth.contract(address=addresses['resource'], abi=resource_abi)
 

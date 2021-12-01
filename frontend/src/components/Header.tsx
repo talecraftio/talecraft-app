@@ -37,6 +37,7 @@ const Header = observer(({}: IHeaderProps) => {
                             <li className="nav__items"><NavLink className="nav__link" to="/marketplace" onClick={() => setBurger(false)}>MarketPlace</NavLink></li>
                             {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/wallet" onClick={() => setBurger(false)}>My Collection</NavLink></li>}
                             {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/loyalty" onClick={() => setBurger(false)}>Loyalty</NavLink></li>}
+                            <li className="nav__items"><NavLink className="nav__link" to="/recipes" onClick={() => setBurger(false)}>Tree</NavLink></li>
                             <li className="nav__items"><a className="nav__link" target="_blank" href="https://docs.talecraft.io/crafting-guideline" onClick={() => setBurger(false)}>Guideline</a></li>
                         </ul>
                     </div>

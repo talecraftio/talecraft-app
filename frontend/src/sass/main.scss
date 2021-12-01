@@ -19,6 +19,7 @@
 @import "components/toast";
 @import "pages/index";
 @import "pages/staking";
+@import "pages/recipe";
 @import "sections/backed-section";
 @import "sections/buy-section";
 @import "sections/card-section";
@@ -37,3 +38,5 @@
 @import "sections/wallet-section";
 @import "sections/game-section";
 @import "sections/table-section";
+
+@import "components/select-search";

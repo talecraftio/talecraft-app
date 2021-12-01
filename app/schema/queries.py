@@ -3,9 +3,11 @@ from decimal import Decimal
 import graphene
 from django.db.models import Q
 from graphene_django import DjangoListField
+from graphql import GraphQLError
 
 from app.models import MarketplaceListing, Resource
-from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType
+from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType, ChartNodeType, \
+    ResourceListType
 
 
 class Query(graphene.ObjectType):
@@ -18,6 +20,8 @@ class Query(graphene.ObjectType):
                               page=graphene.Int())
     marketplace_stats = graphene.Field(MarketplaceStatsType)
     resource = graphene.Field(ResourceType, token_id=graphene.ID())
+    tree_chart = graphene.List(ChartNodeType, token_id=graphene.ID())
+    resource_list = graphene.List(ResourceListType)
 
     @classmethod
     def resolve_listings(cls, root, info, tiers=None, weights=None, q='', seller='', order='price', page=0):
@@ -67,3 +71,22 @@ class Query(graphene.ObjectType):
     @classmethod
     def resolve_resource(cls, root, info, token_id):
         return Resource.objects.filter(token_id=token_id).first()
+
+    @classmethod
+    def resolve_tree_chart(cls, root, info, token_id):
+        res = Resource.objects.filter(token_id=token_id).first()
+        if not res:
+            raise GraphQLError('not found')
+
+        return res.as_tree_json()
+
+    @classmethod
+    def resolve_resource_list(cls, root, info):
+        return [
+            {
+                'name': r.name,
+                'value': r.token_id,
+                'tier': r.tier,
+                'ipfs': r.ipfs_hash,
+            } for r in Resource.objects.filter(token_id__gt=0)
+        ]

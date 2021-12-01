@@ -1,0 +1,170 @@
+.select-search
+  width: 300px
+  position: relative
+  font-family: 'Nunito Sans', sans-serif
+  box-sizing: border-box
+
+  *,
+  *::after,
+  *::before
+    box-sizing: inherit
+
+  &__value
+    position: relative
+    z-index: 1
+
+    &::after
+      content: ''
+      display: inline-block
+      position: absolute
+      top: calc(50% - 5px)
+      right: 19px
+      background-image: url("data:image/svg+xml,%3Csvg width='17' height='8' viewBox='0 0 17 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.5 8L0.272759 0.5L16.7272 0.500001L8.5 8Z' fill='%236D7E8A'/%3E%3C/svg%3E%0A")
+      background-size: cover
+      width: 19px
+      height: 10px
+
+  &__input
+    display: block
+    width: 100%
+    border: 2px solid #6D7E8A
+    box-shadow: inset 4px 4px 15px rgba(0, 0, 0, 0.25)
+    padding: 1rem
+    background: #292F36
+    outline: none
+    font-family: "Enchanted Land"
+    font-size: 24px
+    font-weight: 400
+    text-align: left
+    text-overflow: ellipsis
+    line-height: 36px
+    -webkit-appearance: none
+    color: white
+    //height: 68px
+
+
+    &::-webkit-search-decoration,
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-results-button,
+    &::-webkit-search-results-decoration
+      -webkit-appearance: none
+
+    &:not([readonly]):focus
+      cursor: initial
+
+  &__select
+    background: #fff
+    box-shadow: 0 .0625rem .125rem rgba(0, 0, 0, 0.15)
+
+  &__options
+    list-style: none
+
+  &__row:not(:first-child)
+    border-top: 1px solid #eee
+
+  &__option,
+  &__not-found
+    display: flex
+    align-items: center
+    height: 36px
+    width: 100%
+    padding: 0 16px
+    background: #fff
+    border: none
+    outline: none
+    font-family: 'Noto Sans', sans-serif
+    font-size: 14px
+    text-align: left
+    cursor: pointer
+
+    img
+      margin-right: 5px
+
+  &--multiple,
+  &__option
+    height: 48px
+
+  &__option
+    &.is-selected
+      background: #2FCC8B
+      color: #fff
+
+
+    &.is-highlighted,
+    &:not(.is-selected):hover
+      background: rgba(47, 204, 139, 0.1)
+
+
+    &.is-highlighted.is-selected,
+    &.is-selected:hover
+      background: #2eb378
+      color: #fff
+
+
+  &__group-header
+    font-size: 10px
+    text-transform: uppercase
+    background: #eee
+    padding: 8px 16px
+    color: black
+
+
+  &.is-disabled
+    opacity: 0.5
+
+
+  &.is-loading &__value::after
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cpath fill='%232F2D37' d='M25,5A20.14,20.14,0,0,1,45,22.88a2.51,2.51,0,0,0,2.49,2.26h0A2.52,2.52,0,0,0,50,22.33a25.14,25.14,0,0,0-50,0,2.52,2.52,0,0,0,2.5,2.81h0A2.51,2.51,0,0,0,5,22.88,20.14,20.14,0,0,1,25,5Z'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='0.6s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E")
+    background-size: 11px
+
+
+  &:not(.is-disabled) &__input
+    cursor: pointer
+
+
+  &--multiple
+    border-radius: 3px
+    overflow: hidden
+
+
+  &:not(.is-loading):not(&--multiple) &__value::after
+    pointer-events: none
+
+
+  &--multiple &__input
+    cursor: initial
+    border-radius: 3px 3px 0 0
+
+
+  &--multiple:not(&--search) &__input
+    cursor: default
+
+
+  &:not(&--multiple)
+    .select-search__input:hover
+      border-color: #2FCC8B
+
+    .select-search__select
+      position: absolute
+      z-index: 2
+      top: 70px
+      right: 0
+      left: 0
+      border-radius: 3px
+      overflow: auto
+      max-height: 360px
+
+
+  &--multiple &__select
+    position: relative
+    overflow: auto
+    max-height: 260px
+    border-top: 1px solid #eee
+    border-radius: 0 0 3px 3px
+
+
+  &__not-found
+    height: auto
+    padding: 16px
+    text-align: center
+    color: #888

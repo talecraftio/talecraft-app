@@ -14,6 +14,25 @@ class Resource(models.Model):
     ingredients = models.ManyToManyField('self')
     weight = models.PositiveIntegerField()
 
+    def as_tree_json(self, parent=None):
+        res = [
+            {
+                'name': self.name,
+                'id': f'{parent}_{self.token_id}',
+                'parent_id': parent,
+                'attributes': {
+                    'ipfs': self.ipfs_hash,
+                    'weight': self.weight,
+                    'tier': self.tier,
+                    'token_id': self.token_id,
+                },
+            },
+        ]
+        for ingredient in self.ingredients.filter(token_id__lt=self.token_id):
+            res.extend(ingredient.as_tree_json(f'{parent}_{self.token_id}'))
+        return res
+
+
     def __str__(self):
         return self.name
 

@@ -50,3 +50,24 @@ MarketplaceListingResponseType = paginated_type('MarketplaceListingResponseType'
 
 class MarketplaceStatsType(graphene.ObjectType):
     min_element_price = graphene.Decimal()
+
+
+class ChartNodeAttributesType(graphene.ObjectType):
+    ipfs = graphene.String()
+    weight = graphene.Int()
+    tier = graphene.Int()
+    token_id = graphene.Int()
+
+
+class ChartNodeType(graphene.ObjectType):
+    name = graphene.String()
+    id = graphene.String()
+    parent_id = graphene.String()
+    attributes = graphene.Field(ChartNodeAttributesType)
+
+
+class ResourceListType(graphene.ObjectType):
+    name = graphene.String()
+    value = graphene.Int()
+    tier = graphene.Int()
+    ipfs = graphene.String()

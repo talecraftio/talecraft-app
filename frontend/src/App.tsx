@@ -23,6 +23,7 @@ import GamePage from "./pages/GamePage";
 import LoyaltyPage from "./pages/LoyaltyPage";
 import VestingPage from "./pages/VestingPage";
 import GameInfoPage from "./pages/tools/GameInfoPage";
+import RecipeTreePage from "./pages/RecipeTreePage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -45,6 +46,7 @@ const App = observer(() => {
                     {/*<Route path='/game' component={GamePage} />*/}
                     <Route path='/loyalty' component={LoyaltyPage} />
                     <Route path='/_vesting' component={VestingPage} />
+                    <Route path='/recipes' component={RecipeTreePage} />
                 </Switch>
                 <div style={{ flex: 1 }} />
                 <Footer />

@@ -1,0 +1,40 @@
+.recipe-tree
+  height: 1000px
+  border: #f8b32d 2px solid
+  background: #A8171B
+  margin-top: 20px
+
+  .rd3t-link
+    stroke: #f8b32d
+    stroke-width: 2px
+
+  .node-wrapper
+    position: relative
+
+    foreignObject
+      position: relative
+      z-index: 2
+
+    .node-image
+      position: relative
+
+    &:hover .node-info
+      display: block
+
+  .node-info
+    display: block
+    opacity: 0
+    transition: .3s ease opacity
+    pointer-events: none
+    position: absolute
+    z-index: 2
+    background: #292F36
+    color: white
+    border: 2px solid #6D7E8A
+    font-size: 30px
+    padding: 1rem
+
+    .more
+      margin-top: 5px
+      color: #888
+      font-size: 15px
