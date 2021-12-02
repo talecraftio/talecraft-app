@@ -23,6 +23,7 @@ import VestingPage from "./pages/VestingPage";
 import GameInfoPage from "./pages/tools/GameInfoPage";
 import CodexIndexPage from "./pages/codex/CodexIndexPage";
 import CodexCardPage from "./pages/codex/CodexCardPage";
+import LottieTest from "./pages/tools/LottieTest";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -47,6 +48,7 @@ const App = observer(() => {
                     <Route path='/_vesting' component={VestingPage} />
                     <Route exact path='/codex' component={CodexIndexPage} />
                     <Route exact path='/codex/:tokenId' component={CodexCardPage} />
+                    <Route path='/_lottieTest' component={LottieTest} />
                 </Switch>
                 <div style={{ flex: 1 }} />
                 <Footer />
