@@ -1,5 +1,4 @@
 import React from 'react';
-import Web3 from "web3";
 import { Route, Switch } from "react-router-dom";
 import IndexPage from "./pages/IndexPage";
 import Header from "./components/Header";
@@ -19,11 +18,9 @@ import WalletPage from "./pages/WalletPage";
 import CraftPage from "./pages/CraftPage";
 import PlayerInfoPage from "./pages/tools/PlayerInfoPage";
 import MarketListingPage from "./pages/MarketListingPage";
-import GamePage from "./pages/GamePage";
 import LoyaltyPage from "./pages/LoyaltyPage";
 import VestingPage from "./pages/VestingPage";
 import GameInfoPage from "./pages/tools/GameInfoPage";
-import RecipeTreePage from "./pages/RecipeTreePage";
 import CodexIndexPage from "./pages/codex/CodexIndexPage";
 import CodexCardPage from "./pages/codex/CodexCardPage";
 
@@ -48,7 +45,6 @@ const App = observer(() => {
                     {/*<Route path='/game' component={GamePage} />*/}
                     <Route path='/loyalty' component={LoyaltyPage} />
                     <Route path='/_vesting' component={VestingPage} />
-                    <Route path='/recipes' component={RecipeTreePage} />
                     <Route exact path='/codex' component={CodexIndexPage} />
                     <Route exact path='/codex/:tokenId' component={CodexCardPage} />
                 </Switch>
