@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties, useRef, useState } from 'react';
 import { ResourceListItem } from "../graphql/sdk";
 import useAsyncEffect from "use-async-effect";
 import { useInjection } from "inversify-react";
@@ -18,6 +18,9 @@ const RecipeTreePage = ({}: IRecipeTreePageProps) => {
     const [ treeData, setTreeData ] = useState<any>();
     const [ nodeInfoStyle, setNodeInfoStyle ] = useState<CSSProperties>({});
     const [ nodeInfoChildren, setNodeInfoChildren ] = useState<React.ReactNode>();
+
+    const tree = useRef<Tree>();
+    const treeWrapper = useRef<HTMLDivElement>();
 
     useAsyncEffect(async () => {
         if (!selectedResource)
@@ -84,7 +87,7 @@ const RecipeTreePage = ({}: IRecipeTreePageProps) => {
     }, []);
 
     return (
-        <main className="main" style={{ fontSize: 14, color: 'white' }}>
+        <main className="main" style={{ color: 'white' }}>
             <div className='container' style={{ marginTop: 150, color: 'white' }}>
                 <h1 style={{ marginBottom: 20 }}>Recipe search</h1>
                 <SelectSearch
@@ -106,7 +109,7 @@ const RecipeTreePage = ({}: IRecipeTreePageProps) => {
                     onChange={value => setSelectedResource(value)}
                 />
                 {treeData && (
-                    <div className='recipe-tree'>
+                    <div className='recipe-tree' ref={treeWrapper}>
                         <Tree
                             data={treeData}
                             orientation='vertical'
@@ -115,7 +118,7 @@ const RecipeTreePage = ({}: IRecipeTreePageProps) => {
                                 <g
                                     className='node-wrapper'
                                     onMouseEnter={e => {
-                                        setNodeInfoStyle({ opacity: 1, left: e.clientX + 20, top: e.clientY });
+                                        setNodeInfoStyle({ opacity: 1, left: e.clientX - treeWrapper.current.getBoundingClientRect().left + 20, top: e.clientY - treeWrapper.current.getBoundingClientRect().top });
                                         setNodeInfoChildren(<>
                                             #{nodeDatum.attributes.tokenId} {nodeDatum.name}
                                             <div className="more">
@@ -124,8 +127,8 @@ const RecipeTreePage = ({}: IRecipeTreePageProps) => {
                                             </div>
                                         </>)
                                     }}
-                                    onMouseMove={e => setNodeInfoStyle({ opacity: 1, left: e.pageX + 20, top: e.pageY })}
-                                    onMouseLeave={e => setNodeInfoStyle({ opacity: 0, left: e.pageX + 20, top: e.pageY })}
+                                    onMouseMove={e => setNodeInfoStyle({ opacity: 1, left: e.pageX - treeWrapper.current.getBoundingClientRect().left + 20, top: e.pageY - treeWrapper.current.getBoundingClientRect().top })}
+                                    onMouseLeave={e => setNodeInfoStyle({ opacity: 0, left: e.pageX - treeWrapper.current.getBoundingClientRect().left + 20, top: e.pageY - treeWrapper.current.getBoundingClientRect().top })}
                                 >
                                     <image
                                         className='node-image'
@@ -136,8 +139,9 @@ const RecipeTreePage = ({}: IRecipeTreePageProps) => {
                                     />
                                 </g>
                             )}
-
+                            ref={tree}
                         />
+                        <button onClick={() => console.log(tree.current.state)}>+</button>
                         <div className='node-info' style={nodeInfoStyle}>
                             {nodeInfoChildren}
                         </div>

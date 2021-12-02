@@ -4,20 +4,6 @@ schema {
     query: Query
 }
 
-type ChartNodeAttributesType {
-    ipfs: String
-    tier: Int
-    tokenId: Int
-    weight: Int
-}
-
-type ChartNodeType {
-    attributes: ChartNodeAttributesType
-    id: Int
-    name: String
-    parentId: Int
-}
-
 type MarketplaceListingResponseType {
     items: [MarketplaceListingType!]
     totalItems: Int
@@ -41,15 +27,6 @@ type Query {
     listings(order: String, page: Int, q: String, seller: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType
     resource(tokenId: ID): ResourceType
-    resourceList: [ResourceListType]
-    treeChart(tokenId: ID): [ChartNodeType]
-}
-
-type ResourceListType {
-    ipfs: String
-    name: String
-    tier: Int
-    value: Int
 }
 
 type ResourceSaleEntry {
@@ -59,6 +36,7 @@ type ResourceSaleEntry {
 }
 
 type ResourceType {
+    currentSales: [ResourceSaleEntry]
     ipfsHash: String!
     name: String!
     sales: [ResourceSaleEntry]

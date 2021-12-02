@@ -9,25 +9,11 @@ fragment resource on ResourceType {
     amount
     price
   }
-}
-
-fragment treeChartData on ChartNodeType {
-  name
-  id
-  parentId
-  attributes {
-    ipfs
-    weight
-    tier
-    tokenId
+  currentSales {
+    datetime
+    amount
+    price
   }
-}
-
-fragment resourceListItem on ResourceListType {
-    name
-    value
-    tier
-    ipfs
 }
 
 query getListings($tiers: [String], $weights: [String], $q: String, $seller: String, $order: String, $page: Int) {
@@ -60,17 +46,5 @@ query getMarketplaceStats {
 query getResource($tokenId: ID!) {
   resource(tokenId: $tokenId) {
     ...resource
-  }
-}
-
-query getRecipeTree($tokenId: ID!) {
-  treeChart(tokenId: $tokenId) {
-    ...treeChartData
-  }
-}
-
-query getResourceList {
-  resourceList {
-    ...resourceListItem
   }
 }

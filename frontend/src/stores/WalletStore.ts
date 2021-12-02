@@ -17,9 +17,10 @@ import { SendOptions } from "ethereum-abi-types-generator";
 import { Subscription } from 'web3-core-subscriptions';
 import { BlockHeader } from "web3-eth";
 import { InventoryItem } from "../../types";
-import _ from "lodash";
+import _, { parseInt } from "lodash";
 
 import JOE_PAIR_ABI from '../utils/contracts/joePair.abi.json';
+import { ResourcetypeResponse } from "../utils/contracts/resource";
 
 const TESTNET = false;
 
@@ -47,6 +48,7 @@ class WalletStore {
     @observable address: string;
     @observable connected: boolean = false;
     @observable lastBlock: number;
+    @observable resourceTypes: (ResourcetypeResponse & { id: number })[] = [];
     // @observable profile: Profile;
 
     private rawProvider: any = new Web3.providers.HttpProvider(DEFAULT_RPC);
@@ -68,6 +70,7 @@ class WalletStore {
         if (store.get('connected')) {
             await this.connect();
         }
+        await this.loadResourceTypes();
         runInAction(() => this.initialized = true);
     }
 
@@ -236,6 +239,15 @@ class WalletStore {
             usdtBalance = reserves[0];
         }
         return (parseInt(usdtBalance) / 1e6) / (parseInt(avaxBalance) / 1e18)
+    }
+
+    loadResourceTypes = async () => {
+        const contract = this.resourceContract;
+        const rtCount = await contract.methods.resourceCount().call();
+        const resourceTypeIds = _.range(0, parseInt(rtCount)).map(i => i.toString());
+        const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
+        // @ts-ignore
+        runInAction(() => this.resourceTypes = resourceTypes.map(([ name, weight, tier, ingredients, ipfsHash ], i) => ({ name, weight, tier, ingredients, ipfsHash, id: i })));
     }
 }
 

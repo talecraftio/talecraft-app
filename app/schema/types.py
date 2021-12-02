@@ -22,6 +22,7 @@ class ResourceSaleEntry(graphene.ObjectType):
 
 class ResourceType(DjangoObjectType):
     sales = graphene.List(ResourceSaleEntry)
+    current_sales = graphene.List(ResourceSaleEntry)
 
     @staticmethod
     def resolve_sales(resource: Resource, info):
@@ -30,11 +31,20 @@ class ResourceType(DjangoObjectType):
             'datetime': l.closed_at,
             'amount': Decimal(l.amount),
             'price': Decimal(l.price),
-        } for l in sales[:10]]
+        } for l in sales]
+
+    @staticmethod
+    def resolve_current_sales(resource: Resource, info):
+        sales = MarketplaceListing.objects.filter(resource=resource, closed=False).order_by('-pk')
+        return [{
+            'datetime': l.closed_at,
+            'amount': Decimal(l.amount),
+            'price': Decimal(l.price),
+        } for l in sales]
 
     class Meta:
         model = Resource
-        fields = 'token_id', 'name', 'tier', 'ipfs_hash', 'weight', 'sales',
+        fields = 'token_id', 'name', 'tier', 'ipfs_hash', 'weight', 'sales', 'current_sales',
 
 
 class MarketplaceListingType(DjangoObjectType):
@@ -50,24 +60,3 @@ MarketplaceListingResponseType = paginated_type('MarketplaceListingResponseType'
 
 class MarketplaceStatsType(graphene.ObjectType):
     min_element_price = graphene.Decimal()
-
-
-class ChartNodeAttributesType(graphene.ObjectType):
-    ipfs = graphene.String()
-    weight = graphene.Int()
-    tier = graphene.Int()
-    token_id = graphene.Int()
-
-
-class ChartNodeType(graphene.ObjectType):
-    name = graphene.String()
-    id = graphene.String()
-    parent_id = graphene.String()
-    attributes = graphene.Field(ChartNodeAttributesType)
-
-
-class ResourceListType(graphene.ObjectType):
-    name = graphene.String()
-    value = graphene.Int()
-    tier = graphene.Int()
-    ipfs = graphene.String()

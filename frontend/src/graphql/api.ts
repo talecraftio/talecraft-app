@@ -24,15 +24,5 @@ export class Api {
         const r = await this.sdk.getResource({ tokenId });
         return r.resource;
     }
-
-    async getTreeChart(tokenId: string) {
-        const r = await this.sdk.getRecipeTree({ tokenId });
-        return r.treeChart;
-    }
-
-    async getResourceList() {
-        const r = await this.sdk.getResourceList();
-        return r.resourceList;
-    }
 }
 

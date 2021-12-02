@@ -22,20 +22,6 @@ export type Scalars = {
   Decimal: any;
 };
 
-export type ChartNodeAttributesType = {
-  ipfs?: Maybe<Scalars['String']>;
-  tier?: Maybe<Scalars['Int']>;
-  tokenId?: Maybe<Scalars['Int']>;
-  weight?: Maybe<Scalars['Int']>;
-};
-
-export type ChartNodeType = {
-  attributes?: Maybe<ChartNodeAttributesType>;
-  id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  parentId?: Maybe<Scalars['Int']>;
-};
-
 export type MarketplaceListingResponseType = {
   items?: Maybe<Array<MarketplaceListingType>>;
   totalItems?: Maybe<Scalars['Int']>;
@@ -59,8 +45,6 @@ export type Query = {
   listings?: Maybe<MarketplaceListingResponseType>;
   marketplaceStats?: Maybe<MarketplaceStatsType>;
   resource?: Maybe<ResourceType>;
-  resourceList?: Maybe<Array<Maybe<ResourceListType>>>;
-  treeChart?: Maybe<Array<Maybe<ChartNodeType>>>;
 };
 
 
@@ -78,18 +62,6 @@ export type Query_ResourceArgs = {
   tokenId?: Maybe<Scalars['ID']>;
 };
 
-
-export type Query_TreeChartArgs = {
-  tokenId?: Maybe<Scalars['ID']>;
-};
-
-export type ResourceListType = {
-  ipfs?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
-  tier?: Maybe<Scalars['Int']>;
-  value?: Maybe<Scalars['Int']>;
-};
-
 export type ResourceSaleEntry = {
   amount?: Maybe<Scalars['Int']>;
   datetime?: Maybe<Scalars['DateTime']>;
@@ -97,6 +69,7 @@ export type ResourceSaleEntry = {
 };
 
 export type ResourceType = {
+  currentSales?: Maybe<Array<Maybe<ResourceSaleEntry>>>;
   ipfsHash: Scalars['String'];
   name: Scalars['String'];
   sales?: Maybe<Array<Maybe<ResourceSaleEntry>>>;
@@ -105,11 +78,7 @@ export type ResourceType = {
   weight: Scalars['Int'];
 };
 
-export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> };
-
-export type TreeChartData = { name?: Maybe<string>, id?: Maybe<number>, parentId?: Maybe<number>, attributes?: Maybe<{ ipfs?: Maybe<string>, weight?: Maybe<number>, tier?: Maybe<number>, tokenId?: Maybe<number> }> };
-
-export type ResourceListItem = { name?: Maybe<string>, value?: Maybe<number>, tier?: Maybe<number>, ipfs?: Maybe<string> };
+export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> };
 
 export type GetListingsVariables = Exact<{
   tiers?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
@@ -121,7 +90,7 @@ export type GetListingsVariables = Exact<{
 }>;
 
 
-export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: any, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
+export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: any, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
 
 export type MarketplaceStats = { minElementPrice?: Maybe<any> };
 
@@ -135,19 +104,7 @@ export type GetResourceVariables = Exact<{
 }>;
 
 
-export type GetResource = { resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> };
-
-export type GetRecipeTreeVariables = Exact<{
-  tokenId: Scalars['ID'];
-}>;
-
-
-export type GetRecipeTree = { treeChart?: Maybe<Array<Maybe<{ name?: Maybe<string>, id?: Maybe<number>, parentId?: Maybe<number>, attributes?: Maybe<{ ipfs?: Maybe<string>, weight?: Maybe<number>, tier?: Maybe<number>, tokenId?: Maybe<number> }> }>>> };
-
-export type GetResourceListVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetResourceList = { resourceList?: Maybe<Array<Maybe<{ name?: Maybe<string>, value?: Maybe<number>, tier?: Maybe<number>, ipfs?: Maybe<string> }>>> };
+export type GetResource = { resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> };
 
 export const Resource = gql`
     fragment resource on ResourceType {
@@ -161,27 +118,11 @@ export const Resource = gql`
     amount
     price
   }
-}
-    `;
-export const TreeChartData = gql`
-    fragment treeChartData on ChartNodeType {
-  name
-  id
-  parentId
-  attributes {
-    ipfs
-    weight
-    tier
-    tokenId
+  currentSales {
+    datetime
+    amount
+    price
   }
-}
-    `;
-export const ResourceListItem = gql`
-    fragment resourceListItem on ResourceListType {
-  name
-  value
-  tier
-  ipfs
 }
     `;
 export const MarketplaceStats = gql`
@@ -228,20 +169,6 @@ export const GetResourceDocument = gql`
   }
 }
     ${Resource}`;
-export const GetRecipeTreeDocument = gql`
-    query getRecipeTree($tokenId: ID!) {
-  treeChart(tokenId: $tokenId) {
-    ...treeChartData
-  }
-}
-    ${TreeChartData}`;
-export const GetResourceListDocument = gql`
-    query getResourceList {
-  resourceList {
-    ...resourceListItem
-  }
-}
-    ${ResourceListItem}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -258,12 +185,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getResource(variables: GetResourceVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResource> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetResource>(GetResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResource');
-    },
-    getRecipeTree(variables: GetRecipeTreeVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetRecipeTree> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetRecipeTree>(GetRecipeTreeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getRecipeTree');
-    },
-    getResourceList(variables?: GetResourceListVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResourceList> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetResourceList>(GetResourceListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResourceList');
     }
   };
 }
