@@ -11,6 +11,7 @@ import ReactPaginate from "react-paginate";
 import Timeout from "await-timeout";
 import _ from "lodash";
 import WalletStore from "../stores/WalletStore";
+import { toBN } from "../utils/number";
 
 interface IMarketPageProps {
 }
@@ -212,7 +213,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                                             </div>
                                             <div className="card__body">
                                                 <p className="card__text">{item.amount}x #{item.resource.tokenId}</p>
-                                                <p className="card__descr"><span>Price: </span>{item.price} AVAX</p>
+                                                <p className="card__descr"><span>Price: </span>{toBN(item.price).toFixed(6)} AVAX</p>
                                             </div>
                                         </div>
                                     </Link>

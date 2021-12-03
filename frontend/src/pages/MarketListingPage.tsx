@@ -159,7 +159,7 @@ const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardP
                                             <tr>
                                                 <td><Moment date={s.datetime} format='LLL' withTitle /></td>
                                                 <td>{s.amount}</td>
-                                                <td>{s.price} AVAX</td>
+                                                <td>{toBN(s.price).toFixed(6)} AVAX</td>
                                             </tr>
                                         ))}
                                     </table>
