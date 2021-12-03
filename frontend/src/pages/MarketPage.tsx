@@ -213,7 +213,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                                             </div>
                                             <div className="card__body">
                                                 <p className="card__text">{item.amount}x #{item.resource.tokenId}</p>
-                                                <p className="card__descr"><span>Price: </span>{toBN(item.price).toFixed(6)} AVAX</p>
+                                                <p className="card__descr"><span>Price: </span>{item.price ? toBN(item.price).toFixed(6) : '0'} AVAX</p>
                                             </div>
                                         </div>
                                     </Link>
