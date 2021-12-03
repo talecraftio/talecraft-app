@@ -19,7 +19,7 @@ class Command(BaseCommand):
         with open(BASE_DIR / 'frontend/src/utils/contracts/marketplace.abi.json') as f:
             marketplace_abi = json.load(f)
 
-        web3 = Web3(HTTPProvider('https://api.avax-test.network/ext/bc/C/rpc'))
+        web3 = Web3(HTTPProvider('https://api.avax.network/ext/bc/C/rpc'))
 
         while True:
             try:
