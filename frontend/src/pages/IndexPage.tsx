@@ -290,7 +290,7 @@ const IndexPage = ({}: IIndexPageProps) => {
                                     <h3 className="section-subtitle">Q3 Phase-2021</h3>
                                     <ul className="base-text">
                                         <li>Social Media Release</li>
-                                        <li>Website Relase</li>
+                                        <li>Website Release</li>
                                         <li>Seed Round</li>
                                         <li>Private Round</li>
                                         <li>IDO Platform Partnerships</li>
@@ -309,12 +309,15 @@ const IndexPage = ({}: IIndexPageProps) => {
                                         <li>DEX Listing</li>
                                         <li>Partnerships with other Binance Smart Chain Projects</li>
                                         <li>Audit</li>
+                                        <li>Special Marketplace</li>
                                         <li>Launch of App</li>
                                         <li>Launch of First Package</li>
                                         <li>First Sale of Alchemist Chest</li>
                                         <li>Launch of Crafter Pool</li>
                                         <li>First Weekly Reward and Burn</li>
-                                        <li>Guideline-Calculator</li>
+                                        <li>Guideline Calculator</li>
+                                        <li>Achievement System</li>
+                                        <li>Crafting Game Testnet Campaingn</li>
                                     </ul>
                                 </div>
                             </div>
@@ -324,12 +327,46 @@ const IndexPage = ({}: IIndexPageProps) => {
                                 <div className="roadmap__wrap">
                                     <h3 className="section-subtitle">Q1 Phase-2022</h3>
                                     <ul className="base-text">
-                                        <li>Special MarketPlace</li>
                                         <li>New Package Upgrade for Alchemist Card</li>
                                         <li>Launch of Artist Package Platform</li>
-                                        <li>First Airdrop</li>
                                         <li>CEX Listing</li>
                                         <li>Cross-Chain extending</li>
+                                        <li>Boardgame 3D & VFX Update</li>
+                                        <li>NFT Integration System for Lauchpads</li>
+                                        <li>First Special Package</li>
+                                        <li>Launch of Craftable Platform</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="roadmap-row">
+                            <div className="roadmap">
+                                <div className="roadmap__wrap">
+                                    <h3 className="section-subtitle">Q2 Phase-2022</h3>
+                                    <ul className="base-text">
+                                        <li>Hyper Casual Game Mode</li>
+                                        <li>Unique Artist Series</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="roadmap-row">
+                            <div className="roadmap">
+                                <div className="roadmap__wrap">
+                                    <h3 className="section-subtitle">Q3 Phase-2022</h3>
+                                    <ul className="base-text">
+                                        <li>Chess Game Mode Reveal</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="roadmap-row">
+                            <div className="roadmap">
+                                <div className="roadmap__wrap">
+                                    <h3 className="section-subtitle">Q4 Phase-2022</h3>
+                                    <ul className="base-text">
+                                        <li>Launch of Metaverse</li>
+                                        <li>Sandbox Game Mode</li>
                                     </ul>
                                 </div>
                             </div>

@@ -82,7 +82,7 @@ const SellModal = ({ modalId, data: { tokenId, balance } }: ISellModalProps) => 
                         <input
                             className="form__input"
                             type="number"
-                            placeholder="Price in AVAX"
+                            placeholder="Total Price in AVAX (for all cards)"
                             min={0}
                             step={.01}
                             value={price}
