@@ -64,7 +64,8 @@ export type ChestEvents =
   | 'ChestPricePhiUpdated'
   | 'ChestsOpened'
   | 'LimitPerUserUpdated'
-  | 'OwnershipTransferred';
+  | 'OwnershipTransferred'
+  | 'StartTimeUpdated';
 export interface ChestEventsContext {
   ChestPriceEthUpdated(
     parameters: {
@@ -114,6 +115,15 @@ export interface ChestEventsContext {
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
+  StartTimeUpdated(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
 }
 export type ChestMethodNames =
   | 'new'
@@ -137,6 +147,7 @@ export type ChestMethodNames =
   | 'updateChestPriceEth'
   | 'updateChestPricePhi'
   | 'updateLimitPerUser'
+  | 'updateStartTime'
   | 'weekStart'
   | 'weeksLeft'
   | 'withdrawFees';
@@ -326,6 +337,14 @@ export interface Chest {
    * @param newValue Type: uint256, Indexed: false
    */
   updateLimitPerUser(newValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newTime Type: uint256, Indexed: false
+   */
+  updateStartTime(newTime: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

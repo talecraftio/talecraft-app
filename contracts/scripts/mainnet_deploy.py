@@ -2,7 +2,7 @@ import csv
 import json
 
 import requests
-from brownie import accounts, network, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenVestingFactory
+from brownie import accounts, network, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenVestingFactory, MarketplaceNew
 from brownie.network import Chain
 
 from scripts._utils import snowtrace_publish
@@ -48,11 +48,12 @@ def main():
     # snowtrace_publish(staking)
     # staking.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    marketplace = Marketplace.deploy(Resource[-1].address, {'from': deployer})
+    marketplace = MarketplaceNew.deploy(Resource[-1].address, PHI[-1].address, {'from': deployer})
     addresses['marketplace'] = marketplace.address
     snowtrace_publish(marketplace)
+    marketplace.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    # game = Game.deploy(resource.address, {'from': deployer})
+    # game = Game.deploy(resource.address, {'from': deplo yer})
     # addresses['game'] = game.address
     # snowtrace_publish(game)
     # game.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})

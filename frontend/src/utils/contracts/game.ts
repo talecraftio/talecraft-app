@@ -60,11 +60,14 @@ export type ContractContext = Web3ContractContext<
   GameEvents
 >;
 export type GameEvents =
+  | 'AbortTimeoutUpdated'
   | 'Approval'
   | 'AvaxPerTokenUpdated'
   | 'CreatedNewGame'
   | 'GameFinished'
   | 'GameStarted'
+  | 'MinCardsCountUpdated'
+  | 'MinWeightUpdated'
   | 'OwnershipTransferred'
   | 'PlayerEntered'
   | 'PlayerExited'
@@ -72,6 +75,15 @@ export type GameEvents =
   | 'TokensExchanged'
   | 'Transfer';
 export interface GameEventsContext {
+  AbortTimeoutUpdated(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
   Approval(
     parameters: {
       filter?: { owner?: string | string[]; spender?: string | string[] };
@@ -115,6 +127,24 @@ export interface GameEventsContext {
   GameStarted(
     parameters: {
       filter?: { gameId?: string | string[]; poolSlot?: string | string[] };
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  MinCardsCountUpdated(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  MinWeightUpdated(
+    parameters: {
+      filter?: {};
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -193,8 +223,8 @@ export interface GameEventsContext {
 }
 export type GameMethodNames =
   | 'new'
-  | 'ABORT_TIMEOUT'
   | 'abortGame'
+  | 'abortTimeout'
   | 'allowance'
   | 'approve'
   | 'avaxPerToken'
@@ -205,11 +235,14 @@ export type GameMethodNames =
   | 'enterGame'
   | 'exitGame'
   | 'getAllGames'
+  | 'getAllGamesPaginated'
   | 'getGameById'
   | 'getGameByPoolSlot'
   | 'getLastGameId'
   | 'increaseAllowance'
   | 'maxSlotId'
+  | 'minCardsCount'
+  | 'minWeight'
   | 'name'
   | 'onERC1155BatchReceived'
   | 'onERC1155Received'
@@ -223,7 +256,10 @@ export type GameMethodNames =
   | 'transfer'
   | 'transferFrom'
   | 'transferOwnership'
-  | 'updateAvaxPerToken';
+  | 'updateAbortTimeout'
+  | 'updateAvaxPerToken'
+  | 'updateMinCardsCount'
+  | 'updateMinWeight';
 export interface Player1Response {
   addr: string;
   placedCards: [string, string, string, string];
@@ -254,19 +290,19 @@ export interface Game {
   'new'(resource: string): MethodReturnContext;
   /**
    * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  ABORT_TIMEOUT(): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
    * @param poolSlot Type: uint256, Indexed: false
    */
   abortGame(poolSlot: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  abortTimeout(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -358,6 +394,18 @@ export interface Game {
    * Constant: true
    * StateMutability: view
    * Type: function
+   * @param offset Type: uint256, Indexed: false
+   * @param count Type: uint256, Indexed: false
+   */
+  getAllGamesPaginated(
+    offset: string,
+    count: string
+  ): MethodConstantReturnContext<GameinfoResponse[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
    * @param gameId Type: uint256, Indexed: false
    */
   getGameById(gameId: string): MethodConstantReturnContext<GameinfoResponse>;
@@ -394,6 +442,20 @@ export interface Game {
    * Type: function
    */
   maxSlotId(): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  minCardsCount(): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  minWeight(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -530,5 +592,29 @@ export interface Game {
    * Type: function
    * @param newValue Type: uint256, Indexed: false
    */
+  updateAbortTimeout(newValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newValue Type: uint256, Indexed: false
+   */
   updateAvaxPerToken(newValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newValue Type: uint256, Indexed: false
+   */
+  updateMinCardsCount(newValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newValue Type: uint256, Indexed: false
+   */
+  updateMinWeight(newValue: string): MethodReturnContext;
 }

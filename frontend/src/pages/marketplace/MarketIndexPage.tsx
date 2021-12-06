@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import useStateRef from 'react-usestateref';
 import { Link } from 'react-router-dom';
-import DDSlick from "../components/DDSlick";
+import DDSlick from "../../components/DDSlick";
 import { useInjection } from "inversify-react";
-import { Api } from "../graphql/api";
-import { MarketplaceListingType, MarketplaceStats } from "../graphql/sdk";
+import { Api } from "../../graphql/api";
+import { MarketplaceListingType, MarketplaceStats } from "../../graphql/sdk";
 import useAsyncEffect from "use-async-effect";
-import { IMAGES_CDN } from "../utils/const";
+import { IMAGES_CDN } from "../../utils/const";
 import ReactPaginate from "react-paginate";
 import Timeout from "await-timeout";
 import _ from "lodash";
-import WalletStore from "../stores/WalletStore";
-import { toBN } from "../utils/number";
+import WalletStore from "../../stores/WalletStore";
+import { toBN } from "../../utils/number";
 
 interface IMarketPageProps {
 }
@@ -31,7 +31,7 @@ const WEIGHTS = [
     '200-399',
 ]
 
-const MarketPage = ({}: IMarketPageProps) => {
+const MarketIndexPage = ({}: IMarketPageProps) => {
     const api = useInjection(Api);
     const walletStore = useInjection(WalletStore);
 
@@ -97,7 +97,7 @@ const MarketPage = ({}: IMarketPageProps) => {
 
     return (
         <main className="main">
-            <section className="intro-section" style={{ backgroundImage: `url(${require('url:../images/intro-market-bg.webp')})` }}>
+            <section className="intro-section" style={{ backgroundImage: `url(${require('url:../../images/intro-market-bg.webp')})` }}>
                 <div className="container">
                     <div className="intro">
                         <div className="intro__wrap">
@@ -105,7 +105,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                         </div>
                         <div className="intro-bar">
                             <div className="intro-bar__bg">
-                                <img src={require('url:../images/loading-bar.png')} alt="" />
+                                <img src={require('url:../../images/loading-bar.png')} alt="" />
                                 <div className="intro-bar__fill-wrapper">
                                     <div className="intro-bar__fill" />
                                 </div>
@@ -116,6 +116,9 @@ const MarketPage = ({}: IMarketPageProps) => {
             </section>
             <section className="market-section">
                 <div className="container">
+                    <div className='market-notice'>
+                        We have moved to a new marketplace contract. You can withdraw listed tokens from the old contract <Link to='/oldMarketplaceWithdraw'>here</Link>.
+                    </div>
                     <div className="market-head">
                         <div className="select-wrap">
                             <DDSlick selected={sort} onChange={val => { setSort(val); setPage(0); loadPage() }}>
@@ -123,7 +126,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                                 <option value="-price">HighestPrice</option>
                             </DDSlick>
                         </div>
-                        <div className='stats'>Element Floor Price{': '}{stats?.minElementPrice} AVAX</div>
+                        <div className='stats'>Element Floor Price{': '}{toBN(stats?.minElementPrice).toFixed(6)} CRAFT</div>
                         <div style={{ flexGrow: 1 }} />
                         <div className="select-wrap">
                             <div className="form-search-wrap">
@@ -213,7 +216,7 @@ const MarketPage = ({}: IMarketPageProps) => {
                                             </div>
                                             <div className="card__body">
                                                 <p className="card__text">{item.amount}x #{item.resource.tokenId}</p>
-                                                <p className="card__descr"><span>Price: </span>{item.price ? toBN(item.price).toFixed(6) : '0'} AVAX</p>
+                                                <p className="card__descr"><span>Price: </span>{item.price ? toBN(item.price).toFixed(6) : '0'} CRAFT</p>
                                             </div>
                                         </div>
                                     </Link>
@@ -236,4 +239,4 @@ const MarketPage = ({}: IMarketPageProps) => {
     )
 };
 
-export default MarketPage;
+export default MarketIndexPage;

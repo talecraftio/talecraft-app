@@ -1,0 +1,25 @@
+.main.leaderboards
+  font-size: 20px
+
+  @media screen and (max-width: 900px)
+    font-size: 14px
+
+  ul
+    li
+      display: flex
+      justify-content: space-between
+
+      &.you
+        border: 1px solid #f8b32d
+
+      &:first-child
+        border-bottom: 1px solid grey
+
+      span
+        flex: 3
+
+        &:first-child
+          flex: 1
+
+        &:nth-child(2)
+          flex: 15

@@ -5,6 +5,20 @@
     }
 }
 
+.market-notice {
+    background: #A8171B;
+    border: 2px solid #f8b32d;
+    padding: 5px 10px;
+    font-size: 20px;
+    color: white;
+    margin-bottom: 30px;
+
+    a {
+        color: white;
+        text-decoration: underline;
+    }
+}
+
 .market-head {
     display: flex;
     align-items: center;

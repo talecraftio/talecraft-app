@@ -54,27 +54,13 @@ export interface MethodConstantReturnContext<TCallReturn> {
 export interface MethodReturnContext extends MethodPayableReturnContext {}
 
 export type ContractContext = Web3ContractContext<
-  Marketplace,
-  MarketplaceMethodNames,
-  MarketplaceEventsContext,
-  MarketplaceEvents
+  MarketplaceOld,
+  MarketplaceOldMethodNames,
+  MarketplaceOldEventsContext,
+  MarketplaceOldEvents
 >;
-export type MarketplaceEvents =
-  | 'FeeUpdated'
-  | 'ListingCancelled'
-  | 'NewListing'
-  | 'OwnershipTransferred'
-  | 'Trade';
-export interface MarketplaceEventsContext {
-  FeeUpdated(
-    parameters: {
-      filter?: {};
-      fromBlock?: number;
-      toBlock?: 'latest' | number;
-      topics?: string[];
-    },
-    callback?: (error: Error, event: EventData) => void
-  ): EventResponse;
+export type MarketplaceOldEvents = 'ListingCancelled' | 'NewListing' | 'Trade';
+export interface MarketplaceOldEventsContext {
   ListingCancelled(
     parameters: {
       filter?: { listingId?: string | string[] };
@@ -87,18 +73,6 @@ export interface MarketplaceEventsContext {
   NewListing(
     parameters: {
       filter?: { seller?: string | string[]; listingId?: string | string[] };
-      fromBlock?: number;
-      toBlock?: 'latest' | number;
-      topics?: string[];
-    },
-    callback?: (error: Error, event: EventData) => void
-  ): EventResponse;
-  OwnershipTransferred(
-    parameters: {
-      filter?: {
-        previousOwner?: string | string[];
-        newOwner?: string | string[];
-      };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -119,22 +93,16 @@ export interface MarketplaceEventsContext {
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
 }
-export type MarketplaceMethodNames =
+export type MarketplaceOldMethodNames =
   | 'new'
   | 'buyListing'
   | 'cancelSale'
   | 'getListing'
   | 'getListingsBySeller'
-  | 'getLockedTokens'
   | 'onERC1155BatchReceived'
   | 'onERC1155Received'
-  | 'owner'
   | 'putOnSale'
-  | 'renounceOwnership'
-  | 'supportsInterface'
-  | 'transferOwnership'
-  | 'updateFee'
-  | 'withdrawFee';
+  | 'supportsInterface';
 export interface ListingResponse {
   tokenId: string;
   amount: string;
@@ -143,28 +111,23 @@ export interface ListingResponse {
   buyer: string;
   closed: boolean;
 }
-export interface LockeditemResponse {
-  tokenId: string;
-  amount: string;
-}
-export interface Marketplace {
+export interface MarketplaceOld {
   /**
    * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: constructor
    * @param resource Type: address, Indexed: false
-   * @param phi Type: address, Indexed: false
    */
-  'new'(resource: string, phi: string): MethodReturnContext;
+  'new'(resource: string): MethodReturnContext;
   /**
-   * Payable: false
+   * Payable: true
    * Constant: false
-   * StateMutability: nonpayable
+   * StateMutability: payable
    * Type: function
    * @param listingId Type: uint256, Indexed: false
    */
-  buyListing(listingId: string): MethodReturnContext;
+  buyListing(listingId: string): MethodPayableReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -189,16 +152,6 @@ export interface Marketplace {
    * @param seller Type: address, Indexed: false
    */
   getListingsBySeller(seller: string): MethodConstantReturnContext<string[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param seller Type: address, Indexed: false
-   */
-  getLockedTokens(
-    seller: string
-  ): MethodConstantReturnContext<LockeditemResponse[]>;
   /**
    * Payable: false
    * Constant: false
@@ -237,13 +190,6 @@ export interface Marketplace {
   ): MethodReturnContext;
   /**
    * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  owner(): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
@@ -258,13 +204,6 @@ export interface Marketplace {
   ): MethodReturnContext;
   /**
    * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   */
-  renounceOwnership(): MethodReturnContext;
-  /**
-   * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
@@ -273,28 +212,4 @@ export interface Marketplace {
   supportsInterface(
     interfaceId: string | number[]
   ): MethodConstantReturnContext<boolean>;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param newOwner Type: address, Indexed: false
-   */
-  transferOwnership(newOwner: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param newValue Type: uint256, Indexed: false
-   */
-  updateFee(newValue: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param to Type: address, Indexed: false
-   */
-  withdrawFee(to: string): MethodReturnContext;
 }

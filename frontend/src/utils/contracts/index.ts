@@ -5,6 +5,7 @@ import PHI_ABI from './phi.abi.json';
 import RESOURCE_ABI from './resource.abi.json';
 import STAKING_ABI from './staking.abi.json';
 import MARKETPLACE_ABI from './marketplace.abi.json';
+import MARKETPLACE_OLD_ABI from './marketplaceOld.abi.json';
 import GAME_ABI from './game.abi.json';
 import VESTING_FACTORY_ABI from './vesting/factory.abi.json';
 import VESTING_ABI from './vesting/vesting.abi.json';
@@ -15,6 +16,7 @@ import { ContractContext as ResourceContract } from './resource';
 import { ContractContext as PhiContract } from './phi';
 import { ContractContext as StakingContract } from './staking';
 import { ContractContext as MarketplaceContract } from './marketplace';
+import { ContractContext as MarketplaceOldContract } from './marketplaceOld';
 import { ContractContext as GameContract } from './game';
 import { ContractContext as VestingFactoryContract } from './vesting/factory';
 import { ContractContext as VestingContract } from './vesting/vesting';
@@ -40,6 +42,10 @@ export function stakingContract(web3: Web3) {
 
 export function marketplaceContract(web3: Web3) {
     return new web3.eth.Contract(MARKETPLACE_ABI as any, ADDRESSES.marketplace) as any as MarketplaceContract;
+}
+
+export function marketplaceOldContract(web3: Web3) {
+    return new web3.eth.Contract(MARKETPLACE_OLD_ABI as any, ADDRESSES.marketplaceOld) as any as MarketplaceOldContract;
 }
 
 export function gameContract(web3: Web3) {

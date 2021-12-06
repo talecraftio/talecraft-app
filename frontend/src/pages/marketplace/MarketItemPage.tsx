@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import { ModalsEnum, ModalStore } from "../stores/ModalStore";
+import { ModalsEnum, ModalStore } from "../../stores/ModalStore";
 import { useInjection } from "inversify-react";
 import { RouteChildrenProps } from "react-router";
-import { ResourcetypeResponse } from "../utils/contracts/resource";
+import { ResourcetypeResponse } from "../../utils/contracts/resource";
 import useAsyncEffect from "use-async-effect";
-import WalletStore, { BLOCK_EXPLORER } from "../stores/WalletStore";
+import WalletStore, { BLOCK_EXPLORER } from "../../stores/WalletStore";
 import { toast } from "react-toastify";
-import { IMAGES_CDN } from "../utils/const";
+import { IMAGES_CDN, MAX_UINT256 } from "../../utils/const";
 import { observer } from "mobx-react";
-import { ListingResponse } from "../utils/contracts/marketplace";
-import { ZERO_ADDRESS } from "../utils/address";
-import { toBN } from "../utils/number";
+import { ListingResponse } from "../../utils/contracts/marketplace";
+import { ZERO_ADDRESS } from "../../utils/address";
+import { toBN } from "../../utils/number";
 import Moment from "react-moment";
-import { Api } from "../graphql/api";
-import { ResourceType } from "../graphql/sdk";
+import { Api } from "../../graphql/api";
+import { ResourceType } from "../../graphql/sdk";
+import { ADDRESSES } from "../../utils/contracts";
 
 interface ICardPageProps extends RouteChildrenProps<{ listingId: string }> {
 }
 
-const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardPageProps) => {
+const MarketItemPage = observer(({ match: { params: { listingId } } }: ICardPageProps) => {
     const modalStore = useInjection(ModalStore);
     const walletStore = useInjection(WalletStore);
     const api = useInjection(Api);
@@ -87,7 +88,25 @@ const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardP
 
         try {
             const contract = walletStore.marketplaceContract;
-            const tx = await walletStore.sendTransaction(contract.methods.buyListing(listingId), { value: listing.price });
+            const phi = walletStore.phiContract;
+
+            if (toBN(await phi.methods.balanceOf(walletStore.address).call()).lt(listing.price)) {
+                toast.error('Insufficient CRAFT balance');
+                return;
+            }
+
+            const allowance = await phi.methods.allowance(walletStore.address, ADDRESSES.marketplace).call();
+            if (toBN(allowance).lt(listing.price)) {
+                const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.marketplace, MAX_UINT256));
+                toast.success(
+                    <>
+                        CRAFT was successfully approved<br />
+                        <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
+                    </>
+                );
+            }
+
+            const tx = await walletStore.sendTransaction(contract.methods.buyListing(listingId));
             toast.success(
                 <>
                     Bought successfully<br />
@@ -159,7 +178,7 @@ const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardP
                                             <tr>
                                                 <td><Moment date={s.datetime} format='LLL' withTitle /></td>
                                                 <td>{s.amount}</td>
-                                                <td>{s.price ? toBN(s.price).toFixed(6) : '0'} AVAX</td>
+                                                <td>{s.price ? toBN(s.price).toFixed(6) : '0'} CRAFT</td>
                                             </tr>
                                         ))}
                                     </table>
@@ -171,9 +190,9 @@ const MarketListingPage = observer(({ match: { params: { listingId } } }: ICardP
                     )}
                 </div>
             </section>
-            <div className="decor-img decor-img--top"><img src={require('url:../images/decor.png')} alt="" /></div>
+            <div className="decor-img decor-img--top"><img src={require('url:../../images/decor.png')} alt="" /></div>
         </main>
     )
 });
 
-export default MarketListingPage;
+export default MarketItemPage;

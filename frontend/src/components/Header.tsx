@@ -6,6 +6,7 @@ import WalletStore from "../stores/WalletStore";
 import { observer } from "mobx-react";
 import { trimAddress } from "../utils/address";
 import BackgroundAudio from "./BackgroundAudio";
+import { FaCaretDown, FaChevronDown } from "react-icons/fa";
 
 interface IHeaderProps {
 }
@@ -34,11 +35,17 @@ const Header = observer(({}: IHeaderProps) => {
                                     <li className="nav__items"><NavLink className="nav__link" to="/staking" onClick={() => setBurger(false)}>Staking</NavLink></li>
                                 </>
                             )}
-                            <li className="nav__items"><NavLink className="nav__link" to="/marketplace" onClick={() => setBurger(false)}>MarketPlace</NavLink></li>
-                            {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/wallet" onClick={() => setBurger(false)}>My Collection</NavLink></li>}
+                            <li className="nav__items"><NavLink className="nav__link" to="/marketplace" onClick={() => setBurger(false)}>Marketplace</NavLink></li>
+                            {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/wallet" onClick={() => setBurger(false)}>My Wallet</NavLink></li>}
                             {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/loyalty" onClick={() => setBurger(false)}>Loyalty</NavLink></li>}
-                            <li className="nav__items"><NavLink className="nav__link" to="/codex" onClick={() => setBurger(false)}>Codex</NavLink></li>
-                            <li className="nav__items"><a className="nav__link" target="_blank" href="https://docs.talecraft.io/crafting-guideline" onClick={() => setBurger(false)}>Guideline</a></li>
+                            <li className="nav__items nav__items-sub">
+                                <button className="nav__link">Tools</button>
+                                <ul className="nav__list nav__list-sub">
+                                    <li className="nav__items"><NavLink className="nav__link" to="/codex" onClick={() => setBurger(false)}>Codex</NavLink></li>
+                                    <li className="nav__items"><NavLink className="nav__link" to="/leaderboard" onClick={() => setBurger(false)}>Leaderboard</NavLink></li>
+                                    <li className="nav__items"><a className="nav__link" target="_blank" href="https://docs.talecraft.io/crafting-guideline" onClick={() => setBurger(false)}>Guideline</a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                     <div className="nav__wrap">

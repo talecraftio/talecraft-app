@@ -3,7 +3,8 @@ export default {
     "resource": "0xae1ed7a45bEe39566D728EF4aE312A3517ed3A8C",
     "chest": "0xABE1B93E8b6C2176B18fcde71FBe2482a0d3A543",
     "staking": "0x4B0E5DA80DeB8DC354622625360CcaA35248D156",
-    "marketplace": "0x23BBba252DA45fEac8A22F0497bD2954D67b3cD0",
+    "marketplace": "0xF536Cb8037ab72249404f14E507b7b660d052F9D",
+    "marketplaceOld": "0x23BBba252DA45fEac8A22F0497bD2954D67b3cD0",
     "game": "0xB5F94C48baf9d82D2413b067223e2dd0aFAAC55f",
     "vestingFactory": "0x2DAB3390adf79237aF1331bb7Eb4295defE6DA30"
 }

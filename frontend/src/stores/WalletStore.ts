@@ -8,6 +8,7 @@ import {
     chestContract,
     gameContract,
     marketplaceContract,
+    marketplaceOldContract,
     phiContract,
     resourceContract,
     stakingContract, timelockContract, vestingContract, vestingFactoryContract
@@ -157,6 +158,10 @@ class WalletStore {
         return marketplaceContract(this.web3);
     }
 
+    get marketplaceOldContract() {
+        return marketplaceOldContract(this.web3);
+    }
+
     get gameContract() {
         return gameContract(this.web3);
     }
@@ -244,7 +249,7 @@ class WalletStore {
     loadResourceTypes = async () => {
         const contract = this.resourceContract;
         const rtCount = await contract.methods.resourceCount().call();
-        const resourceTypeIds = _.range(0, parseInt(rtCount)).map(i => i.toString());
+        const resourceTypeIds = _.range(0, parseInt(rtCount) + 1).map(i => i.toString());
         const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
         // @ts-ignore
         runInAction(() => this.resourceTypes = resourceTypes.map(([ name, weight, tier, ingredients, ipfsHash ], i) => ({ name, weight, tier, ingredients, ipfsHash, id: i })));
