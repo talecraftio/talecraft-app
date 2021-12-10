@@ -51,6 +51,10 @@
 	}
 }
 
+button[disabled] {
+	opacity: .5;
+}
+
 .count-btn {
 	display: block;
 	height: 2.9rem;

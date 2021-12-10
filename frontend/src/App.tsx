@@ -25,6 +25,7 @@ import CodexIndexPage from "./pages/codex/CodexIndexPage";
 import CodexCardPage from "./pages/codex/CodexCardPage";
 import LottieTest from "./pages/tools/LottieTest";
 import OldMarketplaceWithdrawPage from "./pages/tools/OldMarketplaceWithdrawPage";
+import GamePage from "./pages/GamePage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -44,7 +45,7 @@ const App = observer(() => {
                     <Route path='/craft' component={CraftPage} />
                     <Route path='/leaderboard' component={LeaderboardsPage} />
                     <Route path='/_gameInfo' component={GameInfoPage} />
-                    {/*<Route path='/game' component={GamePage} />*/}
+                    <Route path='/game' component={GamePage} />
                     <Route path='/loyalty' component={LoyaltyPage} />
                     <Route path='/_vesting' component={VestingPage} />
                     <Route exact path='/codex' component={CodexIndexPage} />

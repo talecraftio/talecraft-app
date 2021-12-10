@@ -63,6 +63,8 @@ export type GameEvents =
   | 'AbortTimeoutUpdated'
   | 'Approval'
   | 'AvaxPerTokenUpdated'
+  | 'BoostPriceUpdated'
+  | 'BoostUsed'
   | 'CreatedNewGame'
   | 'GameFinished'
   | 'GameStarted'
@@ -72,6 +74,7 @@ export type GameEvents =
   | 'PlayerEntered'
   | 'PlayerExited'
   | 'PlayerPlacedCard'
+  | 'PlayerWhitelistUpdated'
   | 'TokensExchanged'
   | 'Transfer';
 export interface GameEventsContext {
@@ -96,6 +99,28 @@ export interface GameEventsContext {
   AvaxPerTokenUpdated(
     parameters: {
       filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  BoostPriceUpdated(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  BoostUsed(
+    parameters: {
+      filter?: {
+        gameId?: string | string[];
+        poolSlot?: string | string[];
+        player?: string | string[];
+      };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -202,6 +227,15 @@ export interface GameEventsContext {
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
+  PlayerWhitelistUpdated(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
   TokensExchanged(
     parameters: {
       filter?: { player?: string | string[] };
@@ -229,6 +263,8 @@ export type GameMethodNames =
   | 'approve'
   | 'avaxPerToken'
   | 'balanceOf'
+  | 'boost'
+  | 'boostPrice'
   | 'burn'
   | 'decimals'
   | 'decreaseAllowance'
@@ -249,6 +285,7 @@ export type GameMethodNames =
   | 'owner'
   | 'placeCard'
   | 'renounceOwnership'
+  | 'setWhitelisted'
   | 'startGames'
   | 'supportsInterface'
   | 'symbol'
@@ -258,15 +295,20 @@ export type GameMethodNames =
   | 'transferOwnership'
   | 'updateAbortTimeout'
   | 'updateAvaxPerToken'
+  | 'updateBoostPrice'
   | 'updateMinCardsCount'
   | 'updateMinWeight';
 export interface Player1Response {
   addr: string;
   placedCards: [string, string, string, string];
+  boostValue: string;
+  boostUsedRound: string;
 }
 export interface Player2Response {
   addr: string;
   placedCards: [string, string, string, string];
+  boostValue: string;
+  boostUsedRound: string;
 }
 export interface GameinfoResponse {
   gameId: string;
@@ -286,8 +328,9 @@ export interface Game {
    * StateMutability: nonpayable
    * Type: constructor
    * @param resource Type: address, Indexed: false
+   * @param phi Type: address, Indexed: false
    */
-  'new'(resource: string): MethodReturnContext;
+  'new'(resource: string, phi: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -339,6 +382,21 @@ export interface Game {
    * @param account Type: address, Indexed: false
    */
   balanceOf(account: string): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param poolSlot Type: uint256, Indexed: false
+   */
+  boost(poolSlot: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  boostPrice(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: false
@@ -527,6 +585,15 @@ export interface Game {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
+   * @param player Type: address, Indexed: false
+   * @param status Type: bool, Indexed: false
+   */
+  setWhitelisted(player: string, status: boolean): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
    * @param poolSlots Type: uint256[], Indexed: false
    */
   startGames(poolSlots: string[]): MethodReturnContext;
@@ -601,6 +668,14 @@ export interface Game {
    * @param newValue Type: uint256, Indexed: false
    */
   updateAvaxPerToken(newValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param newValue Type: uint256, Indexed: false
+   */
+  updateBoostPrice(newValue: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
