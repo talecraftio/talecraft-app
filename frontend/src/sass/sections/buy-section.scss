@@ -35,6 +35,25 @@
       width: 100%;
       display: block;
     }
+
+    canvas {
+      position: relative;
+      left: -40px;
+
+      @media (max-width: 1000px) {
+        left: -20px;
+      }
+    }
+
+    & > div, canvas {
+      width: 400px;
+      height: 400px;
+
+      @media (max-width: 1000px) {
+        width: 200px;
+        height: 200px;
+      }
+    }
   }
 }
 

@@ -1,11 +1,8 @@
-import React, { useRef, useState } from 'react';
-import { useAsync } from "react-use";
+import React, { useMemo, useRef, useState } from 'react';
 import { useInjection } from "inversify-react";
 import WalletStore, { BLOCK_EXPLORER } from "../stores/WalletStore";
 import { toast } from "react-toastify";
-import { animated, useSpring } from "react-spring";
 import { ADDRESSES } from "../utils/contracts";
-import Timeout from "await-timeout";
 import IntroSection from "../components/IntroSection";
 import { observer } from "mobx-react";
 import useAsyncEffect from "use-async-effect";
@@ -37,10 +34,21 @@ const ChestPage = observer(({}: IChestPageProps) => {
 
     useAsyncEffect(updateInfo, [walletStore.lastBlock]);
 
+    const animOptions = {
+        animationData: require('../animations/chest.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/chest_anim/',
+        loop: true,
+        autoplay: false,
+    };
+    const lottieApi = useRef<LottieRefCurrentProps>();
+    const animElement = useMemo(() => <Lottie renderer='canvas' {...animOptions} lottieRef={lottieApi} />, []);
+
     const onBuy = async (e: React.FormEvent) => {
         e.preventDefault();
 
         setLoading(true);
+        lottieApi.current.playSegments([0, 44], true);
+        lottieApi.current.animationItem.loop = true;
         try {
             const chest = walletStore.chestContract;
             const phi = walletStore.phiContract;
@@ -74,10 +82,14 @@ const ChestPage = observer(({}: IChestPageProps) => {
                     <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                 </>
             );
+            lottieApi.current.playSegments([45, 88]);
+            await Timeout.set(0);
+            lottieApi.current.animationItem.loop = false;
             await updateInfo();
         } catch (e) {
             console.error(e);
             toast.error('An error has occurred');
+            lottieApi.current.goToAndStop(0);
         } finally {
             setLoading(false);
         }
