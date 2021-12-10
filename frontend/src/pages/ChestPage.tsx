@@ -8,6 +8,8 @@ import { observer } from "mobx-react";
 import useAsyncEffect from "use-async-effect";
 import { Redirect } from "react-router";
 import { IMAGES_CDN, MAX_UINT256 } from "../utils/const";
+import Lottie, { LottieRefCurrentProps } from 'lottie-react';
+import Timeout from "await-timeout";
 
 interface IChestPageProps {
 }
@@ -15,11 +17,12 @@ interface IChestPageProps {
 const ChestPage = observer(({}: IChestPageProps) => {
     const walletStore = useInjection(WalletStore);
 
-    const [ saleProgress, setSaleProgress ] = useState(0);
-    const [ totalChests, setTotalChests ] = useState(0);
-    const [ soldChests, setSoldChests ] = useState(0);
-    const [ chestsCount, setChestsCount ] = useState('1');
-    const [ loading, setLoading ] = useState(false);
+    const [saleProgress, setSaleProgress] = useState(0);
+    const [totalChests, setTotalChests] = useState(0);
+    const [soldChests, setSoldChests] = useState(0);
+    const [chestsCount, setChestsCount] = useState('1');
+    const [loading, setLoading] = useState(false);
+    const [opened, setOpened] = useState(false);
 
     const updateInfo = async () => {
         const contract = walletStore.chestContract;
@@ -69,7 +72,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
                 const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.chest, MAX_UINT256));
                 toast.success(
                     <>
-                        CRAFT approved successfully<br />
+                        CRAFT approved successfully<br/>
                         <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                     </>
                 );
@@ -78,7 +81,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
             setChestsCount('1');
             toast.success(
                 <>
-                    Chests were opened successfully<br />
+                    Chests were opened successfully<br/>
                     <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
                 </>
             );
@@ -86,6 +89,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
             await Timeout.set(0);
             lottieApi.current.animationItem.loop = false;
             await updateInfo();
+            setOpened(true);
         } catch (e) {
             console.error(e);
             toast.error('An error has occurred');
@@ -100,18 +104,20 @@ const ChestPage = observer(({}: IChestPageProps) => {
 
     if (!walletStore.connected) {
         toast.error('You must connect your wallet in order to access this page');
-        return <Redirect to='/' />;
+        return <Redirect to='/'/>;
     }
 
     return (
         <main className="main">
-            <IntroSection background={require('url:../images/intro-3.webp')} title={<>Alchemist<br />Chest</>} />
+            <IntroSection background={require('url:../images/intro-3.webp')} title={<>Alchemist<br/>Chest</>}/>
             <section className="buy-section">
                 <div className="container">
                     <div className="chest-wrap">
                         <div className="chest">
                             <div className="chest__wrap">
-                                <div className="chest__img"><img src={require('url:../images/box-img.webp')} alt="" /></div>
+                                <div className="chest__img">
+                                    {animElement}
+                                </div>
                                 <form className="chest-form" onSubmit={onBuy}>
                                     <div className="chest-form__wrap">
                                         <button
@@ -154,11 +160,12 @@ const ChestPage = observer(({}: IChestPageProps) => {
                         </div>
                         <div className="progress-bar">
                             <div className="progress-bar__bg">
-                                <img src={require('url:../images/empty3.png')} alt="" />
+                                <img src={require('url:../images/empty3.png')} alt=""/>
                                 <div className="progress-bar__fill-wrapper">
                                     <div className="progress-bar__fill" style={{ width: `${saleProgress * 100}%` }}/>
                                 </div>
-                                <span className="progress-bar__name">{soldChests} / {totalChests} weekly chests sold</span>
+                                <span
+                                    className="progress-bar__name">{soldChests} / {totalChests} weekly chests sold</span>
                             </div>
                         </div>
                     </div>
@@ -167,26 +174,34 @@ const ChestPage = observer(({}: IChestPageProps) => {
             <section className="elements-section section-padding">
                 <div className="container">
                     <h2 className="section-title text-center">Collection of Four Elements</h2>
-                    <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
+                    <div className="title-img"><img src={require('url:../images/border.png')} alt="alt"/></div>
                     <div className="cards-wrap">
                         <div className="card">
                             <div className="card__wrap">
-                                <div className="card__image"><img src={`${IMAGES_CDN}/QmYKGb7p6k23XP7HGd63tJ8c4ftPT8mYQZuLZpLj26eFtc.webp`} alt="" /></div>
+                                <div className="card__image"><img
+                                    src={`${IMAGES_CDN}/QmYKGb7p6k23XP7HGd63tJ8c4ftPT8mYQZuLZpLj26eFtc.webp`} alt=""/>
+                                </div>
                             </div>
                         </div>
                         <div className="card">
                             <div className="card__wrap">
-                                <div className="card__image"><img src={`${IMAGES_CDN}/QmT3jQjCzAmPY8Mo4sHYpgN3covtw7o7XbudMDDiCX4Qh9.webp`} alt="" /></div>
+                                <div className="card__image"><img
+                                    src={`${IMAGES_CDN}/QmT3jQjCzAmPY8Mo4sHYpgN3covtw7o7XbudMDDiCX4Qh9.webp`} alt=""/>
+                                </div>
                             </div>
                         </div>
                         <div className="card">
                             <div className="card__wrap">
-                                <div className="card__image"><img src={`${IMAGES_CDN}/QmUaRGqSywM4UyvBhLW66ewWDheK2hKfnv4PYotjuCvoAa.webp`} alt="" /></div>
+                                <div className="card__image"><img
+                                    src={`${IMAGES_CDN}/QmUaRGqSywM4UyvBhLW66ewWDheK2hKfnv4PYotjuCvoAa.webp`} alt=""/>
+                                </div>
                             </div>
                         </div>
                         <div className="card">
                             <div className="card__wrap">
-                                <div className="card__image"><img src={`${IMAGES_CDN}/Qmf2ZAyZXGiB3PRp1nEG1ss9VMrtrnwutaotThU5tMxjj5.webp`} alt="" /></div>
+                                <div className="card__image"><img
+                                    src={`${IMAGES_CDN}/Qmf2ZAyZXGiB3PRp1nEG1ss9VMrtrnwutaotThU5tMxjj5.webp`} alt=""/>
+                                </div>
                             </div>
                         </div>
                     </div>
