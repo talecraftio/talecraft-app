@@ -13,6 +13,7 @@ interface ILeaderboardsPageProps {
 }
 
 const tierNames = ["None", "Stone", "Iron", 'Silver', 'Gold', 'Phi Stone'];
+const excludeAddresses = [ZERO_ADDRESS, '0xF536Cb8037ab72249404f14E507b7b660d052F9D', '0x23BBba252DA45fEac8A22F0497bD2954D67b3cD0', ADDRESSES.chest]
 
 const LeaderboardsPage = ({}: ILeaderboardsPageProps) => {
     const walletStore = useInjection(WalletStore);
@@ -37,7 +38,7 @@ const LeaderboardsPage = ({}: ILeaderboardsPageProps) => {
         const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
         setResourceTypes(resourceTypes);
         console.log('Loading players list');
-        let players = (await contract.methods.getPlayers().call()).filter(address => address != ZERO_ADDRESS && address != ADDRESSES.chest && address != ADDRESSES.marketplace);
+        let players = (await contract.methods.getPlayers().call()).filter(address => !excludeAddresses.includes(address));
         console.log('Loading balances');
         const balancesResult = {};
         const playersWeight = {};
