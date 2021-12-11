@@ -23,6 +23,12 @@ const TransferModal = ({ modalId, data: { balance, tokenId } }: ITransferModalPr
 
         if (!walletStore.web3.utils.isAddress(address)) {
             toast.error('Invalid address');
+            return;
+        }
+        const addr = walletStore.web3.utils.toChecksumAddress(address);
+        if (addr === walletStore.address) {
+            toast.error('You cannot send cards to your own address');
+            return;
         }
         setLoading(true);
         try {
