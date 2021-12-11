@@ -13,7 +13,7 @@ interface ILeaderboardsPageProps {
 }
 
 const tierNames = ["None", "Stone", "Iron", 'Silver', 'Gold', 'Phi Stone'];
-const excludeAddresses = [ZERO_ADDRESS, '0xF536Cb8037ab72249404f14E507b7b660d052F9D', '0x23BBba252DA45fEac8A22F0497bD2954D67b3cD0', ADDRESSES.chest]
+const excludeAddresses = [ZERO_ADDRESS, '0xF536Cb8037ab72249404f14E507b7b660d052F9D', '0x23BBba252DA45fEac8A22F0497bD2954D67b3cD0', ADDRESSES.chest, ADDRESSES.marketplace, ADDRESSES.game]
 
 const LeaderboardsPage = ({}: ILeaderboardsPageProps) => {
     const walletStore = useInjection(WalletStore);
