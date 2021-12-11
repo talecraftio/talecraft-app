@@ -97,8 +97,8 @@ const CodexCardPage = observer(({ match: { params: { tokenId } } }: ICodexCardPa
                                     <div className="card-row"><span>Weight</span><span>{resourceType.weight}</span></div>
                                     <div className="card-row"><span>Sold times</span><span>{serverResourceType?.sales.length}</span></div>
                                     <div className="card-row"><span>Active marketplace positions</span><span>{serverResourceType?.currentSales.length}</span></div>
-                                    <div className="card-row"><span>Highest sale price</span><span>{serverResourceType?.currentSales.length ? Math.max(...serverResourceType.currentSales.map(s => parseInt(s.price) / s.amount)).toFixed(6) : '0'} AVAX</span></div>
-                                    <div className="card-row"><span>Lowest sale price</span><span>{serverResourceType?.currentSales.length ? Math.min(...serverResourceType.currentSales.map(s => parseInt(s.price) / s.amount)).toFixed(6) : '0'} AVAX</span></div>
+                                    <div className="card-row"><span>Highest sale price</span><span>{serverResourceType?.currentSales.length ? Math.max(...serverResourceType.currentSales.map(s => parseInt(s.price) / s.amount)).toFixed(6) : '0'} CRAFT</span></div>
+                                    <div className="card-row"><span>Lowest sale price</span><span>{serverResourceType?.currentSales.length ? Math.min(...serverResourceType.currentSales.map(s => parseInt(s.price) / s.amount)).toFixed(6) : '0'} CRAFT</span></div>
                                 </div>
                             </div>
                         </div>
