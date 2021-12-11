@@ -23,18 +23,18 @@ def main():
     # phi.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     phi = PHI.at('0x8aE8be25C23833e0A01Aa200403e826F611f9CD2')
-    resource = Resource.at('0x212BF21Aa9D5e5c89a43cAC378b4b0ec13165784')
-    chest = ChestSale.at('0xe115A920c0eDC5B7dF8a94f7F39BE967aD6063D6')
+    resource = Resource.at('0xcc367e92c1b2BB0eB503F67654F3581c086eD2fc')
+    chest = ChestSale.at('0x337F2aB0E1A857A03B93d072656D3d52AA4A586A')
 
 
-    resource = Resource.deploy(phi.address, {'from': deployer})
-    addresses['resource'] = resource.address
-    snowtrace_publish(resource)
-
-    chest = ChestSale.deploy(resource.address, phi.address, 1639242000, {'from': deployer})
-    addresses['chest'] = chest.address
-    snowtrace_publish(chest)
-    chest.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    # resource = Resource.deploy(phi.address, {'from': deployer})
+    # addresses['resource'] = resource.address
+    # snowtrace_publish(resource)
+    #
+    # chest = ChestSale.deploy(resource.address, phi.address, 1639242000, {'from': deployer})
+    # addresses['chest'] = chest.address
+    # snowtrace_publish(chest)
+    # chest.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     # staking = CraftStaking.deploy(
     #     phi.address,
@@ -51,15 +51,16 @@ def main():
     # snowtrace_publish(staking)
     # staking.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    marketplace = MarketplaceNew.deploy(resource.address, phi.address, {'from': deployer})
-    addresses['marketplace'] = marketplace.address
-    snowtrace_publish(marketplace)
-    marketplace.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    # marketplace = MarketplaceNew.deploy(resource.address, phi.address, {'from': deployer})
+    # addresses['marketplace'] = marketplace.address
+    # snowtrace_publish(marketplace)
+    # marketplace.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    # game = Game.deploy(resource.address, {'from': deplo yer})
-    # addresses['game'] = game.address
-    # snowtrace_publish(game)
-    # game.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    game = Game.deploy(resource.address, phi.address, {'from': deployer})
+    addresses['game'] = game.address
+    snowtrace_publish(game)
+    game.startGames(list(range(50)), {'from': deployer})
+    game.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     # factory = TokenVestingFactory.deploy(deployer.address, {'from': deployer})
     # addresses['vestingFactory'] = factory.address
