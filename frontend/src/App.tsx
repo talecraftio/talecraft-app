@@ -24,7 +24,6 @@ import GameInfoPage from "./pages/tools/GameInfoPage";
 import CodexIndexPage from "./pages/codex/CodexIndexPage";
 import CodexCardPage from "./pages/codex/CodexCardPage";
 import LottieTest from "./pages/tools/LottieTest";
-import OldMarketplaceWithdrawPage from "./pages/tools/OldMarketplaceWithdrawPage";
 import GamePage from "./pages/GamePage";
 
 const App = observer(() => {
@@ -51,7 +50,6 @@ const App = observer(() => {
                     <Route exact path='/codex' component={CodexIndexPage} />
                     <Route exact path='/codex/:tokenId' component={CodexCardPage} />
                     <Route path='/_lottieTest' component={LottieTest} />
-                    <Route path='/oldMarketplaceWithdraw' component={OldMarketplaceWithdrawPage} />
                 </Switch>
                 <div style={{ flex: 1 }} />
                 <Footer />

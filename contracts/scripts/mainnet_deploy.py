@@ -3,7 +3,7 @@ import json
 
 import requests
 from brownie import accounts, network, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenVestingFactory, MarketplaceNew
-from brownie.network import Chain
+from brownie.network import Chain, gas_price
 
 from scripts._utils import snowtrace_publish
 
@@ -22,16 +22,19 @@ def main():
     # snowtrace_publish(phi)
     # phi.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    # phi = PHI.at('0x8aE8be25C23833e0A01Aa200403e826F611f9CD2')
-    #
-    # resource = Resource.deploy(phi.address, {'from': deployer})
-    # addresses['resource'] = resource.address
-    # snowtrace_publish(resource)
-    #
-    # chest = ChestSale.deploy(resource.address, phi.address, 1638550800, {'from': deployer})
-    # addresses['chest'] = chest.address
-    # snowtrace_publish(chest)
-    # chest.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    phi = PHI.at('0x8aE8be25C23833e0A01Aa200403e826F611f9CD2')
+    resource = Resource.at('0x212BF21Aa9D5e5c89a43cAC378b4b0ec13165784')
+    chest = ChestSale.at('0xe115A920c0eDC5B7dF8a94f7F39BE967aD6063D6')
+
+
+    resource = Resource.deploy(phi.address, {'from': deployer})
+    addresses['resource'] = resource.address
+    snowtrace_publish(resource)
+
+    chest = ChestSale.deploy(resource.address, phi.address, 1639242000, {'from': deployer})
+    addresses['chest'] = chest.address
+    snowtrace_publish(chest)
+    chest.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     # staking = CraftStaking.deploy(
     #     phi.address,
@@ -48,7 +51,7 @@ def main():
     # snowtrace_publish(staking)
     # staking.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    marketplace = MarketplaceNew.deploy(Resource[-1].address, PHI[-1].address, {'from': deployer})
+    marketplace = MarketplaceNew.deploy(resource.address, phi.address, {'from': deployer})
     addresses['marketplace'] = marketplace.address
     snowtrace_publish(marketplace)
     marketplace.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})

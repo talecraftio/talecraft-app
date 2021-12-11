@@ -47,6 +47,7 @@ contract Resource is ERC1155, Ownable {
     EnumerableSet.AddressSet internal _players;
     uint256 public craftWaitSkipPrice = 10 ether;  // default 10 CRAFT
     bool public reverseCraftActive = false;
+    bool public premintFinished = false;
 
     mapping (uint256 => ResourceType) public resourceTypes;
     mapping (address => EnumerableSet.UintSet) internal _pendingCraftsByUser;
@@ -76,10 +77,10 @@ contract Resource is ERC1155, Ownable {
     /// @param chest Address to mint tokens to
     function initialMint(ChestSale chest) external onlyOwner {
         require(!_initialMintComplete, "initial mint is performed already");
-        _mint(address(chest), 1, 75000, "");
-        _mint(address(chest), 2, 75000, "");
-        _mint(address(chest), 3, 75000, "");
-        _mint(address(chest), 4, 75000, "");
+        _mint(address(chest), 1, 72500, "");
+        _mint(address(chest), 2, 72500, "");
+        _mint(address(chest), 3, 72500, "");
+        _mint(address(chest), 4, 72500, "");
         _initialMintComplete = true;
     }
 
@@ -314,6 +315,13 @@ contract Resource is ERC1155, Ownable {
         emit ReverseCraftStatusUpdated(newValue);
     }
 
+    function updateResource(uint256 tokenId, string calldata name, uint256 weight, string calldata ipfsHash) external onlyOwner {
+        ResourceType storage rt = resourceTypes[tokenId];
+        rt.name = name;
+        rt.weight = weight;
+        rt.ipfsHash = ipfsHash;
+    }
+
     function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
         for (uint256 i=0; i<ids.length; i++) {
@@ -324,5 +332,18 @@ contract Resource is ERC1155, Ownable {
         }
         _players.add(from);
         _players.add(to);
+    }
+
+    function premint(address[] calldata to, uint256[][] calldata tokenId, uint256[][] calldata amount) external onlyOwner {
+        require(!premintFinished, "premint is finished");
+        require(to.length == amount.length && tokenId.length == amount.length, "invalid args");
+        for (uint256 i=0; i < to.length; i++) {
+            _mintBatch(to[i], tokenId[i], amount[i], "");
+        }
+    }
+
+    function finishPremint() external onlyOwner {
+        require(!premintFinished, "premint is finished");
+        premintFinished = true;
     }
 }

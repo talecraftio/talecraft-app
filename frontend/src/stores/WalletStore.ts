@@ -72,6 +72,7 @@ class WalletStore {
             await this.connect();
         }
         await this.loadResourceTypes();
+        setInterval(() => runInAction(() => this.lastBlock = Math.random()), 10000);
         runInAction(() => this.initialized = true);
     }
 

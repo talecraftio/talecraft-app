@@ -64,7 +64,7 @@ def avascan_publish(c: Contract):
 
 
 SNOWTRACE_KEY = '8MSW7WG86KADW7CQDRAT9FM4422DFYB7GR'
-SNOWTRACE_TESTNET = True
+SNOWTRACE_TESTNET = False
 SNOWTRACE_API_URL = 'https://api-testnet.snowtrace.io/api' if SNOWTRACE_TESTNET else 'https://api.snowtrace.io/api'
 
 
@@ -96,7 +96,7 @@ def snowtrace_publish(c: Contract):
                 f"Status {response.status_code} when querying {SNOWTRACE_API_URL}: {response.text}"
             )
         data = response.json()
-        print(data)
+        # print(data)
         if int(data["status"]) == 1:
             # Constructor arguments received
             break
