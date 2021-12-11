@@ -61,6 +61,13 @@ const LeaderboardsPage = ({}: ILeaderboardsPageProps) => {
                 if (parseInt(amount) > 0)
                     maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[tokenId]].tier));
             })
+            const pendingCrafts = await contract.methods.pendingCrafts(address).call();
+            const crafts = await contract.methods.getCrafts(pendingCrafts).call();
+            crafts.forEach(({ tokenId }) => {
+                playerBalancesObj[resourceTypeIds[tokenId]]++;
+                playerWeight += parseInt(resourceTypes[resourceTypeIds[tokenId]].weight);
+                maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[tokenId]].tier));
+            })
             balancesResult[address] = playerBalancesObj;
             playersWeight[address] = playerWeight;
             playersMaxTiers[address] = maxTier;
