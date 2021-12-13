@@ -1,4 +1,5 @@
 import json
+import logging
 from time import sleep
 
 from django.core.management import BaseCommand
@@ -60,5 +61,5 @@ class Command(BaseCommand):
                     max_tier = max(max_tier, resources[tid][1])
                 LeaderboardItem.objects.update_or_create(address=player,
                                                          defaults={'weight': weight, 'max_tier': max_tier})
-            print('Updated')
+            logging.warning('Updated')
             sleep(60)
