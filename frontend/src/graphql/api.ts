@@ -24,5 +24,10 @@ export class Api {
         const r = await this.sdk.getResource({ tokenId });
         return r.resource;
     }
+
+    async getLeaderboard() {
+        const r = await this.sdk.leaderboard();
+        return r.leaderboard;
+    }
 }
 

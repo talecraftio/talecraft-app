@@ -192,7 +192,7 @@ class WalletStore {
             }
             toast.warning('Unable to estimate gas limit, please check transaction confirmation window')
         }
-        return tx.send({ from: this.address, gas, gasPrice: '25000000000', ...(options || {}) });
+        return tx.send({ from: this.address, gas, ...(options || {}) });
     }
 
     getInventory = async (): Promise<InventoryItem[]> => {

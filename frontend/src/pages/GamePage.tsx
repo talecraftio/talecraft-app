@@ -196,8 +196,8 @@ const GamePage = observer(({}: IGamePageProps) => {
                 toast.success('Joined game');
             }
 
-            setActiveSlot(slot);
-            setActiveGame(game);
+            // setActiveSlot(slot);
+            // setActiveGame(game);
         } finally {
             await Timeout.set(0);
             setLoading(false);

@@ -46,3 +46,9 @@ class MarketplaceListing(models.Model):
     buyer = models.CharField(max_length=64, null=True, blank=True)
     closed = models.BooleanField(default=False, db_index=True)
     closed_at = models.DateTimeField(db_index=True, null=True, blank=True)
+
+
+class LeaderboardItem(models.Model):
+    address = models.CharField(max_length=64)
+    weight = models.PositiveIntegerField()
+    max_tier = models.PositiveSmallIntegerField()

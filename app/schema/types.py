@@ -3,7 +3,7 @@ from decimal import Decimal
 import graphene
 from graphene_django import DjangoObjectType, DjangoListField
 
-from app.models import Resource, MarketplaceListing
+from app.models import Resource, MarketplaceListing, LeaderboardItem
 
 
 def paginated_type(name, cls):
@@ -60,3 +60,9 @@ MarketplaceListingResponseType = paginated_type('MarketplaceListingResponseType'
 
 class MarketplaceStatsType(graphene.ObjectType):
     min_element_price = graphene.Decimal()
+
+
+class LeaderboardItemType(DjangoObjectType):
+    class Meta:
+        model = LeaderboardItem
+        fields = 'address', 'weight', 'max_tier'

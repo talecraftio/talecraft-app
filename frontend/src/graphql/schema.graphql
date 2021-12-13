@@ -4,6 +4,12 @@ schema {
     query: Query
 }
 
+type LeaderboardItemType {
+    address: String!
+    maxTier: Int!
+    weight: Int!
+}
+
 type MarketplaceListingResponseType {
     items: [MarketplaceListingType!]
     totalItems: Int
@@ -24,6 +30,7 @@ type MarketplaceStatsType {
 }
 
 type Query {
+    leaderboard: [LeaderboardItemType!]
     listings(order: String, page: Int, q: String, seller: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType
     resource(tokenId: ID): ResourceType

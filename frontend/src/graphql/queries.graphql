@@ -16,6 +16,12 @@ fragment resource on ResourceType {
   }
 }
 
+fragment leaderboardItem on LeaderboardItemType {
+  address
+  weight
+  maxTier
+}
+
 query getListings($tiers: [String], $weights: [String], $q: String, $seller: String, $order: String, $page: Int) {
   listings(tiers: $tiers, weights: $weights, q: $q, seller: $seller, order: $order, page: $page) {
     totalItems
@@ -46,5 +52,11 @@ query getMarketplaceStats {
 query getResource($tokenId: ID!) {
   resource(tokenId: $tokenId) {
     ...resource
+  }
+}
+
+query leaderboard {
+  leaderboard {
+    ...leaderboardItem
   }
 }

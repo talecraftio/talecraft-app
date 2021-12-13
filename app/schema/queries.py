@@ -5,8 +5,8 @@ from django.db.models import Q
 from graphene_django import DjangoListField
 from graphql import GraphQLError
 
-from app.models import MarketplaceListing, Resource
-from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType
+from app.models import MarketplaceListing, Resource, LeaderboardItem
+from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType, LeaderboardItemType
 
 
 class Query(graphene.ObjectType):
@@ -19,6 +19,7 @@ class Query(graphene.ObjectType):
                               page=graphene.Int())
     marketplace_stats = graphene.Field(MarketplaceStatsType)
     resource = graphene.Field(ResourceType, token_id=graphene.ID())
+    leaderboard = DjangoListField(LeaderboardItemType)
 
     @classmethod
     def resolve_listings(cls, root, info, tiers=None, weights=None, q='', seller='', order='price', page=0):
@@ -68,3 +69,7 @@ class Query(graphene.ObjectType):
     @classmethod
     def resolve_resource(cls, root, info, token_id):
         return Resource.objects.filter(token_id=token_id).first()
+
+    @classmethod
+    def resolve_leaderboard(cls, root, info):
+        return LeaderboardItem.objects.order_by('-weight')

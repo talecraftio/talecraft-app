@@ -131,10 +131,17 @@ contract Game is ERC20, Ownable, ERC1155Holder {
     }
 
     function enterGame(uint256 poolSlot) external {
+        require(poolSlot <= maxSlotId, "invalid slot");
         GameInfo storage game = _games[_pools[poolSlot]];
-        require(!game.started, "Game has already started");
         require(!_isPlaying[msg.sender], "You are already playing in another pool");
         require(_whitelisted.contains(msg.sender), "You're not whitelisted to use this contract");
+        while (poolSlot <= maxSlotId) {
+            if (!game.started)
+                break;
+            poolSlot++;
+            game = _games[_pools[poolSlot]];
+        }
+        require(poolSlot <= maxSlotId, "no available slots");
         _isPlaying[msg.sender] = true;
         uint256[] memory ownedTokens = _resource.ownedTokens(msg.sender);
         uint256 accumulatedWeight = 0;
@@ -197,7 +204,7 @@ contract Game is ERC20, Ownable, ERC1155Holder {
         bool isPlayer1 = game.player1.addr == msg.sender;
         bool isPlayer2 = game.player2.addr == msg.sender;
         require(isPlayer1 || isPlayer2, "You are not playing in this pool");
-        require(game.started, "Game has not started yet");
+        require(game.started && !game.finished, "The game is not running");
 
         if (isPlayer1) {
             require(game.turn == 1, "Now is not your turn");
@@ -216,24 +223,27 @@ contract Game is ERC20, Ownable, ERC1155Holder {
 
         if (game.round == 3) {
             game.finished = true;
-            uint256 player1Weights; uint256 player2Weights; uint256 multiplier = 1;
+            uint256 player1Weight; uint256 player2Weight; uint256 multiplier = 1; int8 balance = 0;
             for (uint8 i=0; i < 3; i++) {
                 if (game.player1.boostUsedRound == i)
                     multiplier = game.player1.boostValue;
                 else
                     multiplier = 1;
-                player1Weights += _resource.getResourceWeight(game.player1.placedCards[i]) * multiplier;
+                player1Weight = _resource.getResourceWeight(game.player1.placedCards[i]) * multiplier;
                 if (game.player2.boostUsedRound == i)
                     multiplier = game.player2.boostValue;
                 else
                     multiplier = 1;
-                player2Weights += _resource.getResourceWeight(game.player2.placedCards[i]) * multiplier;
+                player2Weight = _resource.getResourceWeight(game.player2.placedCards[i]) * multiplier;
+                if (player1Weight > player2Weight)
+                    balance++;
+                else if (player2Weight > player1Weight)
+                    balance--;
             }
-            if (player1Weights > player2Weights) {
+            if (balance > 0)
                 game.winner = game.player1.addr;
-            } else if (player2Weights > player1Weights) {
+            else if (balance < 0)
                 game.winner = game.player2.addr;
-            }
             if (game.winner != address(0))
                 _mint(game.winner, 1);
             emit GameFinished(game.gameId, poolSlot, game.winner);
@@ -410,6 +420,10 @@ contract Game is ERC20, Ownable, ERC1155Holder {
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
         require(from == address(0) || to == address(0), "transfers between users are not allowed");
+    }
+
+    function emergencyWithdraw(uint256[] memory tokenId, uint256[] memory amount) external onlyOwner {
+        _resource.safeBatchTransferFrom(address(this), msg.sender, tokenId, amount, "");
     }
 
     receive() external payable {}

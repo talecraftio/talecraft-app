@@ -8,6 +8,8 @@ import { ADDRESSES } from "../utils/contracts";
 import { ZERO_ADDRESS } from "../utils/address";
 import { RouterStore } from "mobx-react-router";
 import classNames from "classnames";
+import { Api } from "../graphql/api";
+import { LeaderboardItem } from "../graphql/sdk";
 
 interface ILeaderboardsPageProps {
 }
@@ -18,74 +20,77 @@ const excludeAddresses = [ZERO_ADDRESS, '0xF536Cb8037ab72249404f14E507b7b660d052
 const LeaderboardsPage = ({}: ILeaderboardsPageProps) => {
     const walletStore = useInjection(WalletStore);
     const routerStore = useInjection(RouterStore);
+    const api = useInjection(Api);
 
-    const [ resourceTypes, setResourceTypes ] = useState<ResourcetypeResponse[]>([]);
-    const [ players, setPlayers ] = useState<string[]>([]);
-    const [ balances, setBalances ] = useState<{ [address: string]: { [tokenId: string]: string } }>({});
-    const [ playersWeight, setPlayersWeight ] = useState<{ [address: string]: number }>({});
-    const [ playersMaxTiers, setPlayersMaxTiers ] = useState<{ [address: string]: number }>({});
+    // const [ resourceTypes, setResourceTypes ] = useState<ResourcetypeResponse[]>([]);
+    // const [ players, setPlayers ] = useState<string[]>([]);
+    // const [ balances, setBalances ] = useState<{ [address: string]: { [tokenId: string]: string } }>({});
+    // const [ playersWeight, setPlayersWeight ] = useState<{ [address: string]: number }>({});
+    // const [ playersMaxTiers, setPlayersMaxTiers ] = useState<{ [address: string]: number }>({});
+    const [ leaderboard, setLeaderboard ] = useState<LeaderboardItem[]>([]);
     const [ loading, setLoading ] = useState(true);
 
     const isCsv = routerStore.location.hash === '#csv';
 
     useAsyncEffect(async () => {
         setLoading(true);
-        console.log('Loading resource types');
-        const contract = walletStore.resourceContract;
-        const marketplace = walletStore.marketplaceContract;
-        const rtCount = await contract.methods.resourceCount().call();
-        const resourceTypeIds = _.range(0, parseInt(rtCount)).map(i => i.toString());
-        const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
-        setResourceTypes(resourceTypes);
-        console.log('Loading players list');
-        let players = (await contract.methods.getPlayers().call()).filter(address => !excludeAddresses.includes(address));
-        console.log('Loading balances');
-        // const balancesResult = {};
-        const playersWeight = {};
-        const playersMaxTiers = {};
-        const promises = players.map(async address => {
-            const playerBalancesList = await contract.methods.balanceOfBatch(_.range(resourceTypeIds.length).map(_ => address), resourceTypeIds).call();
-            // const playerBalancesObj = {};
-            let playerWeight = 0;
-            let maxTier = 0;
-            playerBalancesList.forEach((balance, i) => {
-                // playerBalancesObj[resourceTypeIds[i]] = balance;
-                playerWeight += parseInt(balance) * parseInt(resourceTypes[resourceTypeIds[i]].weight);
-                if (parseInt(balance) > 0)
-                    maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[i]].tier));
-            });
-            const lockedBalancesList = await marketplace.methods.getLockedTokens(address).call();
-            lockedBalancesList.forEach(({ tokenId, amount }) => {
-                // playerBalancesObj[resourceTypeIds[tokenId]] += parseInt(amount);
-                playerWeight += parseInt(amount) * parseInt(resourceTypes[resourceTypeIds[tokenId]].weight);
-                if (parseInt(amount) > 0)
-                    maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[tokenId]].tier));
-            })
-            const pendingCrafts = await contract.methods.pendingCrafts(address).call();
-            const crafts = await contract.methods.getCrafts(pendingCrafts).call();
-            crafts.forEach(({ tokenId }) => {
-                // playerBalancesObj[resourceTypeIds[tokenId]]++;
-                playerWeight += parseInt(resourceTypes[resourceTypeIds[tokenId]].weight);
-                maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[tokenId]].tier));
-            })
-            // balancesResult[address] = playerBalancesObj;
-            playersWeight[address] = playerWeight;
-            playersMaxTiers[address] = maxTier;
-        });
-        await Promise.all(promises);
-        players = _.sortBy(players, player => playersWeight[player] || 0);
-        players.reverse();
-        setPlayers(players);
-        // setBalances(balancesResult);
-        setPlayersWeight(playersWeight);
-        setPlayersMaxTiers(playersMaxTiers);
-        console.log('Done');
+        // console.log('Loading resource types');
+        // const contract = walletStore.resourceContract;
+        // const marketplace = walletStore.marketplaceContract;
+        // const rtCount = await contract.methods.resourceCount().call();
+        // const resourceTypeIds = _.range(0, parseInt(rtCount)).map(i => i.toString());
+        // const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
+        // setResourceTypes(resourceTypes);
+        // console.log('Loading players list');
+        // let players = (await contract.methods.getPlayers().call()).filter(address => !excludeAddresses.includes(address));
+        // console.log('Loading balances');
+        // // const balancesResult = {};
+        // const playersWeight = {};
+        // const playersMaxTiers = {};
+        // const promises = players.map(async address => {
+        //     const playerBalancesList = await contract.methods.balanceOfBatch(_.range(resourceTypeIds.length).map(_ => address), resourceTypeIds).call();
+        //     // const playerBalancesObj = {};
+        //     let playerWeight = 0;
+        //     let maxTier = 0;
+        //     playerBalancesList.forEach((balance, i) => {
+        //         // playerBalancesObj[resourceTypeIds[i]] = balance;
+        //         playerWeight += parseInt(balance) * parseInt(resourceTypes[resourceTypeIds[i]].weight);
+        //         if (parseInt(balance) > 0)
+        //             maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[i]].tier));
+        //     });
+        //     const lockedBalancesList = await marketplace.methods.getLockedTokens(address).call();
+        //     lockedBalancesList.forEach(({ tokenId, amount }) => {
+        //         // playerBalancesObj[resourceTypeIds[tokenId]] += parseInt(amount);
+        //         playerWeight += parseInt(amount) * parseInt(resourceTypes[resourceTypeIds[tokenId]].weight);
+        //         if (parseInt(amount) > 0)
+        //             maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[tokenId]].tier));
+        //     })
+        //     const pendingCrafts = await contract.methods.pendingCrafts(address).call();
+        //     const crafts = await contract.methods.getCrafts(pendingCrafts).call();
+        //     crafts.forEach(({ tokenId }) => {
+        //         // playerBalancesObj[resourceTypeIds[tokenId]]++;
+        //         playerWeight += parseInt(resourceTypes[resourceTypeIds[tokenId]].weight);
+        //         maxTier = Math.max(maxTier, parseInt(resourceTypes[resourceTypeIds[tokenId]].tier));
+        //     })
+        //     // balancesResult[address] = playerBalancesObj;
+        //     playersWeight[address] = playerWeight;
+        //     playersMaxTiers[address] = maxTier;
+        // });
+        // await Promise.all(promises);
+        // players = _.sortBy(players, player => playersWeight[player] || 0);
+        // players.reverse();
+        // setPlayers(players);
+        // // setBalances(balancesResult);
+        // setPlayersWeight(playersWeight);
+        // setPlayersMaxTiers(playersMaxTiers);
+        // console.log('Done');
+        setLeaderboard(await api.getLeaderboard());
         setLoading(false);
     }, []);
 
     let downloadLink;
     if (isCsv) {
-        const result = !loading && players.map(p => `${p},${playersWeight[p]},${tierNames[playersMaxTiers[p]]}`).join('\n');
+        const result = !loading && leaderboard.map(r => `${r.address},${r.weight},${tierNames[r.maxTier]}`).join('\n');
 
         if (result) {
             const blob = new Blob([result], { type: 'text/csv' });
@@ -107,12 +112,12 @@ const LeaderboardsPage = ({}: ILeaderboardsPageProps) => {
                                 <span>Weight</span>
                                 <span>Max tier</span>
                             </li>
-                            {players.filter(addr => playersWeight[addr] > 0).map((addr, i) => (
-                                <li key={addr} className={classNames(addr === walletStore.address && 'you')}>
+                            {leaderboard.filter(r => r.weight > 0).map((r, i) => (
+                                <li key={r.address} className={classNames(r.address === walletStore.address && 'you')}>
                                     <span>{i+1}</span>
-                                    <span>{addr}</span>
-                                    <span>{playersWeight[addr]}</span>
-                                    <span>{tierNames[playersMaxTiers[addr]]}</span>
+                                    <span>{r.address}</span>
+                                    <span>{r.weight}</span>
+                                    <span>{tierNames[r.maxTier]}</span>
                                 </li>
                             ))}
                         </ul>

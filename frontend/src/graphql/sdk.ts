@@ -22,6 +22,12 @@ export type Scalars = {
   Decimal: any;
 };
 
+export type LeaderboardItemType = {
+  address: Scalars['String'];
+  maxTier: Scalars['Int'];
+  weight: Scalars['Int'];
+};
+
 export type MarketplaceListingResponseType = {
   items?: Maybe<Array<MarketplaceListingType>>;
   totalItems?: Maybe<Scalars['Int']>;
@@ -42,6 +48,7 @@ export type MarketplaceStatsType = {
 };
 
 export type Query = {
+  leaderboard?: Maybe<Array<LeaderboardItemType>>;
   listings?: Maybe<MarketplaceListingResponseType>;
   marketplaceStats?: Maybe<MarketplaceStatsType>;
   resource?: Maybe<ResourceType>;
@@ -80,6 +87,8 @@ export type ResourceType = {
 
 export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> };
 
+export type LeaderboardItem = { address: string, weight: number, maxTier: number };
+
 export type GetListingsVariables = Exact<{
   tiers?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
   weights?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
@@ -106,6 +115,11 @@ export type GetResourceVariables = Exact<{
 
 export type GetResource = { resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> };
 
+export type LeaderboardVariables = Exact<{ [key: string]: never; }>;
+
+
+export type Leaderboard = { leaderboard?: Maybe<Array<{ address: string, weight: number, maxTier: number }>> };
+
 export const Resource = gql`
     fragment resource on ResourceType {
   tokenId
@@ -123,6 +137,13 @@ export const Resource = gql`
     amount
     price
   }
+}
+    `;
+export const LeaderboardItem = gql`
+    fragment leaderboardItem on LeaderboardItemType {
+  address
+  weight
+  maxTier
 }
     `;
 export const MarketplaceStats = gql`
@@ -169,6 +190,13 @@ export const GetResourceDocument = gql`
   }
 }
     ${Resource}`;
+export const LeaderboardDocument = gql`
+    query leaderboard {
+  leaderboard {
+    ...leaderboardItem
+  }
+}
+    ${LeaderboardItem}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -185,6 +213,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getResource(variables: GetResourceVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResource> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetResource>(GetResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResource');
+    },
+    leaderboard(variables?: LeaderboardVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<Leaderboard> {
+      return withWrapper((wrappedRequestHeaders) => client.request<Leaderboard>(LeaderboardDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'leaderboard');
     }
   };
 }
