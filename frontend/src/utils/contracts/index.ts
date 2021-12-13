@@ -23,6 +23,7 @@ import { ContractContext as VestingContract } from './vesting/vesting';
 import { ContractContext as TimelockContract } from './vesting/timelock';
 
 import ADDRESSES from './addresses';
+import TESTNET_ADDRESSES from './testnetAddresses';
 
 export function chestContract(web3: Web3) {
     return new web3.eth.Contract(CHEST_ABI as any, ADDRESSES.chest) as any as ChestContract;
@@ -64,4 +65,6 @@ export function timelockContract(web3: Web3, address: string) {
     return new web3.eth.Contract(TIMELOCK_ABI as any, address) as any as TimelockContract;
 }
 
-export { ADDRESSES, VestingContract, TimelockContract };
+const exportAddresses = process.env.TESTNET ? TESTNET_ADDRESSES : ADDRESSES;
+
+export { exportAddresses as ADDRESSES, VestingContract, TimelockContract };

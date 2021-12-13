@@ -23,7 +23,7 @@ import _, { parseInt } from "lodash";
 import JOE_PAIR_ABI from '../utils/contracts/joePair.abi.json';
 import { ResourcetypeResponse } from "../utils/contracts/resource";
 
-const TESTNET = false;
+const TESTNET = !!process.env.TESTNET;
 
 export const CHAIN_ID = TESTNET ? 43113 : 43114;
 export const DEFAULT_RPC_WS = TESTNET ? 'wss://api.avax-test.network/ext/bc/C/ws' : 'wss://api.avax.network/ext/bc/C/ws';
