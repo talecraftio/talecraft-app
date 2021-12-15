@@ -16,7 +16,6 @@ import { ContractContext as ResourceContract } from './resource';
 import { ContractContext as PhiContract } from './phi';
 import { ContractContext as StakingContract } from './staking';
 import { ContractContext as MarketplaceContract } from './marketplace';
-import { ContractContext as MarketplaceOldContract } from './marketplaceOld';
 import { ContractContext as GameContract } from './game';
 import { ContractContext as VestingFactoryContract } from './vesting/factory';
 import { ContractContext as VestingContract } from './vesting/vesting';
@@ -41,12 +40,12 @@ export function stakingContract(web3: Web3) {
     return new web3.eth.Contract(STAKING_ABI as any, ADDRESSES.staking) as any as StakingContract;
 }
 
-export function marketplaceContract(web3: Web3) {
-    return new web3.eth.Contract(MARKETPLACE_ABI as any, ADDRESSES.marketplace) as any as MarketplaceContract;
+export function stakingContractX7(web3: Web3) {
+    return new web3.eth.Contract(STAKING_ABI as any, ADDRESSES.staking_x7) as any as StakingContract;
 }
 
-export function marketplaceOldContract(web3: Web3) {
-    return new web3.eth.Contract(MARKETPLACE_OLD_ABI as any, ADDRESSES.marketplaceOld) as any as MarketplaceOldContract;
+export function marketplaceContract(web3: Web3) {
+    return new web3.eth.Contract(MARKETPLACE_ABI as any, ADDRESSES.marketplace) as any as MarketplaceContract;
 }
 
 export function gameContract(web3: Web3) {

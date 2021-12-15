@@ -7,12 +7,13 @@ import WalletStore, { BLOCK_EXPLORER } from "../stores/WalletStore";
 import { toBN } from "../utils/number";
 import { ADDRESSES } from "../utils/contracts";
 import { MAX_UINT256 } from "../utils/const";
+import { ContractContext as StakingContract } from '../utils/contracts/staking';
 import { toast } from "react-toastify";
 
 interface IStakingPageProps {
 }
 
-const StakingPage = observer(({}: IStakingPageProps) => {
+const StakingBlock = observer(({ contract, aprBase, craftPrice, avaxPrice, title = 'Earn CRAFT' }: { contract: StakingContract, aprBase: string, craftPrice: BN, avaxPrice: BN, title?: string }) => {
     const walletStore = useInjection(WalletStore);
 
     const [ amount, setAmount ] = useState('');
@@ -23,13 +24,10 @@ const StakingPage = observer(({}: IStakingPageProps) => {
     const [ earned, setEarned ] = useState<BN>(toBN(0));
     const [ apr, setApr ] = useState<BN>(toBN(0));
     const [ totalStakedAmount, setTotalStakedAmount ] = useState<BN>(toBN(0));
-    const [ craftPrice, setCraftPrice ] = useState<BN>(toBN(0));
-    const [ avaxPrice, setAvaxPrice ] = useState<BN>(toBN(0));
 
     useAsyncEffect(async () => {
         if (!walletStore.address) return;
 
-        const contract = walletStore.stakingContract;
         const phi = walletStore.phiContract;
 
         setEarned(toBN(await contract.methods.getPendingRewards('0', walletStore.address).call()).div('1e18'));
@@ -41,10 +39,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
         const totalStakedAmount = toBN(poolInfo.supply).div('1e18');
         setTotalStakedAmount(totalStakedAmount);
 
-        setCraftPrice(toBN(await walletStore.getTokenPrice()));
-        setAvaxPrice(toBN(await walletStore.getAvaxPrice()));
-
-        const apr = toBN('47414').div(totalStakedAmount).times(100);
+        const apr = toBN(aprBase).div(totalStakedAmount).times(100);
         setApr(apr);
     }, [walletStore.lastBlock, walletStore.address]);
 
@@ -55,7 +50,6 @@ const StakingPage = observer(({}: IStakingPageProps) => {
 
         setLoading(true);
         try {
-            const contract = walletStore.stakingContract;
             const phi = walletStore.phiContract;
 
             const allowance = toBN(await phi.methods.allowance(walletStore.address, ADDRESSES.staking).call()).div('1e18');
@@ -89,8 +83,6 @@ const StakingPage = observer(({}: IStakingPageProps) => {
     const onHarvest = async () => {
         setLoading(true);
         try {
-            const contract = walletStore.stakingContract;
-
             const tx = await walletStore.sendTransaction(contract.methods.withdraw('0', '0'));
             toast.success(
                 <>
@@ -108,8 +100,6 @@ const StakingPage = observer(({}: IStakingPageProps) => {
     const onWithdraw = async () => {
         setLoading(true);
         try {
-            const contract = walletStore.stakingContract;
-
             const userInfo = await contract.methods.userInfo('0', walletStore.address).call();
             let tx = await walletStore.sendTransaction(contract.methods.withdraw('0', userInfo.amount));
             toast.success(
@@ -124,6 +114,77 @@ const StakingPage = observer(({}: IStakingPageProps) => {
             setLoading(false);
         }
     }
+
+    return (
+        <div className="staking">
+            <form className="staking__wrap" onSubmit={onSubmit}>
+                <h2 className="section-title text-center">{title}</h2>
+                <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
+                <h4 className="section-subtitle">Stake CRAFT</h4>
+                <div className="staking__row">
+                    <p className="staking__category">APR:</p>
+                    <p className="staking__count">{apr?.toFixed(2) || '0.00'}%</p>
+                </div>
+                <div className="staking__row">
+                    <p className="staking__count">
+                        <span>CRAFT staked</span>
+                        {staked.toFixed(6)} CRAFT
+                    </p>
+                    <button className="btn up" type="button" disabled={loading || staked.isZero()} onClick={onWithdraw}>WITHDRAW</button>
+                </div>
+                <div className="staking__row">
+                    <p className="staking__count">
+                        <span>CRAFT earned</span>
+                        {earned.toFixed(6)} CRAFT
+                    </p>
+                    <button className="btn up" type="button" disabled={loading || earned.isZero()} onClick={onHarvest}>HARVEST</button>
+                </div>
+                <div className="staking__row">
+                    <p className="staking__count">
+                        <span>Total staked</span>
+                        {totalStakedAmount.toFixed(6)} CRAFT
+                    </p>
+                    <p className="staking__count">
+                        <span>TVL</span>
+                        ${totalStakedAmount.times(craftPrice).times(avaxPrice).toFixed(2)}
+                    </p>
+                </div>
+                <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
+                <div className="form__field">
+                    <input
+                        className="form__input"
+                        type="number"
+                        required
+                        min={0}
+                        max={balance.toString()}
+                        step='1e-18'
+                        placeholder="Amount"
+                        disabled={loading}
+                        value={amount}
+                        onChange={e => setAmount(e.target.value)}
+                    />
+                    <button type='button' className='btn primary' style={{ fontSize: 16, minHeight: 0, minWidth: 0 }} onClick={() => setAmount(balance.toString())} disabled={loading}>MAX</button>
+                </div>
+                <div className="staking__btn">
+                    <button className="btn primary up" type="submit" disabled={loading || toBN(amount).gt(balance) || toBN(amount).isZero()}>
+                        {allowance.lt(amount) ? 'approve' : 'stake'}
+                    </button>
+                </div>
+            </form>
+        </div>
+    )
+})
+
+const StakingPage = observer(({}: IStakingPageProps) => {
+    const walletStore = useInjection(WalletStore);
+
+    const [ craftPrice, setCraftPrice ] = useState<BN>(toBN(0));
+    const [ avaxPrice, setAvaxPrice ] = useState<BN>(toBN(0));
+
+    useAsyncEffect(async () => {
+        setCraftPrice(toBN(await walletStore.getTokenPrice()));
+        setAvaxPrice(toBN(await walletStore.getAvaxPrice()));
+    }, [walletStore.lastBlock]);
 
     return (
         <main className="main">
@@ -152,62 +213,8 @@ const StakingPage = observer(({}: IStakingPageProps) => {
             <section className="staking-section">
                 <div className="container">
                     <div className="staking-wrap">
-                        <div className="staking">
-                            <form className="staking__wrap" onSubmit={onSubmit}>
-                                <h2 className="section-title text-center">Earn $CRAFT</h2>
-                                <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
-                                <h4 className="section-subtitle">Stake $CRAFT</h4>
-                                <div className="staking__row">
-                                    <p className="staking__category">APR:</p>
-                                    <p className="staking__count">{apr?.toFixed(2) || '0.00'}%</p>
-                                </div>
-                                <div className="staking__row">
-                                    <p className="staking__count">
-                                        <span>CRAFT staked</span>
-                                        {staked.toFixed(6)} CRAFT
-                                    </p>
-                                    <button className="btn up" type="button" disabled={loading || staked.isZero()} onClick={onWithdraw}>WITHDRAW</button>
-                                </div>
-                                <div className="staking__row">
-                                    <p className="staking__count">
-                                        <span>CRAFT earned</span>
-                                        {earned.toFixed(6)} CRAFT
-                                    </p>
-                                    <button className="btn up" type="button" disabled={loading || earned.isZero()} onClick={onHarvest}>HARVEST</button>
-                                </div>
-                                <div className="staking__row">
-                                    <p className="staking__count">
-                                        <span>Total staked</span>
-                                        {totalStakedAmount.toFixed(6)} CRAFT
-                                    </p>
-                                    <p className="staking__count">
-                                        <span>TVL</span>
-                                        ${totalStakedAmount.times(craftPrice).times(avaxPrice).toFixed(2)}
-                                    </p>
-                                </div>
-                                <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
-                                <div className="form__field">
-                                    <input
-                                        className="form__input"
-                                        type="number"
-                                        required
-                                        min={0}
-                                        max={balance.toString()}
-                                        step='1e-18'
-                                        placeholder="Amount"
-                                        disabled={loading}
-                                        value={amount}
-                                        onChange={e => setAmount(e.target.value)}
-                                    />
-                                    <button type='button' className='btn primary' style={{ fontSize: 16, minHeight: 0, minWidth: 0 }} onClick={() => setAmount(balance.toString())} disabled={loading}>MAX</button>
-                                </div>
-                                <div className="staking__btn">
-                                    <button className="btn primary up" type="submit" disabled={loading || toBN(amount).gt(balance) || toBN(amount).isZero()}>
-                                        {allowance.lt(amount) ? 'approve' : 'stake'}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        <StakingBlock aprBase='47414' contract={walletStore.stakingContract} craftPrice={craftPrice} avaxPrice={avaxPrice} />
+                        <StakingBlock aprBase='311040' contract={walletStore.stakingContractX7} craftPrice={craftPrice} avaxPrice={avaxPrice} title='Earn CRAFT x7' />
                     </div>
                 </div>
             </section>

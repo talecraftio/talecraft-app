@@ -8,10 +8,9 @@ import {
     chestContract,
     gameContract,
     marketplaceContract,
-    marketplaceOldContract,
     phiContract,
     resourceContract,
-    stakingContract, timelockContract, vestingContract, vestingFactoryContract
+    stakingContract, stakingContractX7, timelockContract, vestingContract, vestingFactoryContract
 } from "../utils/contracts";
 import { MethodReturnContext } from "../utils/contracts/phi";
 import { SendOptions } from "ethereum-abi-types-generator";
@@ -155,12 +154,12 @@ class WalletStore {
         return stakingContract(this.web3);
     }
 
-    get marketplaceContract() {
-        return marketplaceContract(this.web3);
+    get stakingContractX7() {
+        return stakingContractX7(this.web3);
     }
 
-    get marketplaceOldContract() {
-        return marketplaceOldContract(this.web3);
+    get marketplaceContract() {
+        return marketplaceContract(this.web3);
     }
 
     get gameContract() {
