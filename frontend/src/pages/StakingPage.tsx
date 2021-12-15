@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 interface IStakingPageProps {
 }
 
-const StakingBlock = observer(({ contract, aprBase, craftPrice, avaxPrice, title = 'Earn CRAFT' }: { contract: StakingContract, aprBase: string, craftPrice: BN, avaxPrice: BN, title?: string }) => {
+const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPrice, title = 'Earn CRAFT' }: { contract: StakingContract, address: string, aprBase: string, craftPrice: BN, avaxPrice: BN, title?: string }) => {
     const walletStore = useInjection(WalletStore);
 
     const [ amount, setAmount ] = useState('');
@@ -32,7 +32,7 @@ const StakingBlock = observer(({ contract, aprBase, craftPrice, avaxPrice, title
 
         setEarned(toBN(await contract.methods.getPendingRewards('0', walletStore.address).call()).div('1e18'));
         setBalance(toBN(await phi.methods.balanceOf(walletStore.address).call()).div('1e18'));
-        setAllowance(toBN(await phi.methods.allowance(walletStore.address, ADDRESSES.staking).call()).div('1e18'));
+        setAllowance(toBN(await phi.methods.allowance(walletStore.address, address).call()).div('1e18'));
         setStaked(toBN((await contract.methods.userInfo('0', walletStore.address).call()).amount).div('1e18'));
 
         const poolInfo = await contract.methods.poolInfo('0').call();
@@ -52,9 +52,9 @@ const StakingBlock = observer(({ contract, aprBase, craftPrice, avaxPrice, title
         try {
             const phi = walletStore.phiContract;
 
-            const allowance = toBN(await phi.methods.allowance(walletStore.address, ADDRESSES.staking).call()).div('1e18');
+            const allowance = toBN(await phi.methods.allowance(walletStore.address, address).call()).div('1e18');
             if (allowance.lt(amount)) {
-                const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.staking, MAX_UINT256));
+                const tx = await walletStore.sendTransaction(phi.methods.approve(address, MAX_UINT256));
                 toast.success(
                     <>
                         $CRAFT was successfully approved<br />
@@ -213,8 +213,8 @@ const StakingPage = observer(({}: IStakingPageProps) => {
             <section className="staking-section">
                 <div className="container">
                     <div className="staking-wrap">
-                        <StakingBlock aprBase='47414' contract={walletStore.stakingContract} craftPrice={craftPrice} avaxPrice={avaxPrice} />
-                        <StakingBlock aprBase='311040' contract={walletStore.stakingContractX7} craftPrice={craftPrice} avaxPrice={avaxPrice} title='Earn CRAFT x7' />
+                        <StakingBlock aprBase='47414' contract={walletStore.stakingContract} craftPrice={craftPrice} avaxPrice={avaxPrice} address={ADDRESSES.staking} />
+                        <StakingBlock aprBase='311040' contract={walletStore.stakingContractX7} craftPrice={craftPrice} avaxPrice={avaxPrice} address={ADDRESSES.staking_x7} title='Earn CRAFT x7' />
                     </div>
                 </div>
             </section>
