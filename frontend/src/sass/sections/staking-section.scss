@@ -5,15 +5,18 @@
 .staking-wrap {
     display: flex;
     justify-content: center;
+    @media (max-width: 900px) {
+        flex-direction: column;
+    }
 }
 
 .staking {
     width: 100%;
     max-width: 39.9rem;
-    margin: 0 auto;
+    margin: 0 auto 20px;
 
     &_wallet {
-        
+
         .staking__wrap {
             background-color: #292F36;
             @media (min-width: 1024px) {
@@ -45,7 +48,7 @@
             padding: 1rem 1.8rem;
             @media (min-width: 1024px) {
                 font-size: 2rem;
-            } 
+            }
         }
     }
 
