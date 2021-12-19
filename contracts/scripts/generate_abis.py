@@ -1,6 +1,6 @@
 import json
 
-from brownie import accounts, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenTimelock, TokenVesting, TokenVestingFactory, MarketplaceNew
+from brownie import accounts, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, Game2, TokenTimelock, TokenVesting, TokenVestingFactory, MarketplaceNew
 from scripts._utils import snowtrace_publish
 
 
@@ -25,6 +25,9 @@ def main():
 
     with open('../frontend/src/utils/contracts/game.abi.json', 'w') as f:
         json.dump(Game.abi, f)
+
+    with open('../frontend/src/utils/contracts/game2.abi.json', 'w') as f:
+        json.dump(Game2.abi, f)
 
     with open('../frontend/src/utils/contracts/vesting/timelock.abi.json', 'w') as f:
         json.dump(TokenTimelock.abi, f)

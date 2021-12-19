@@ -172,7 +172,6 @@ const CraftPage = observer(({}: ICraftPageProps) => {
             setResultItemId(resultId);
             const resultItem = (await contract.methods.getResourceTypes([resultId]).call())[0];
             setResultItem(resultItem);
-            console.log(resultItem);
         }
         setResultLoading(false);
     }, [item1, item2]);

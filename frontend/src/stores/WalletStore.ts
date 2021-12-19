@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import store from "store";
 import Timeout from "await-timeout";
 import {
-    chestContract,
+    chestContract, game2Contract,
     gameContract,
     marketplaceContract,
     phiContract,
@@ -63,6 +63,10 @@ class WalletStore {
     @action private updateCurrentBlock = (block) => {
         this.lastBlock = block?.number;
         // this.loadProfile();
+    }
+
+    @action public triggerBlockChange = () => {
+        this.lastBlock = Math.random();
     }
 
     private initialize = async () => {
@@ -164,6 +168,10 @@ class WalletStore {
 
     get gameContract() {
         return gameContract(this.web3);
+    }
+
+    getGame2Contract(address: string) {
+        return game2Contract(this.web3, address);
     }
 
     get vestingFactoryContract() {

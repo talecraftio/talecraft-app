@@ -7,12 +7,12 @@ from scripts._utils import snowtrace_publish
 
 def main():
     try:
-        with open('../frontend/src/utils/contracts/testnetAddresses.ts', 'r') as f:
+        with open('../frontend/src/utils/contracts/addresses.ts', 'r') as f:
             addresses = json.loads(f.read()[14:])
     except:
         addresses = {}
 
-    deployer = accounts.load('deployer')
+    deployer = accounts.load('talecraft-deployer')
 
     games = addresses.get('games', {})
 
@@ -31,5 +31,5 @@ def main():
 
     addresses['games'] = games
 
-    with open('../frontend/src/utils/contracts/testnetAddresses.ts', 'w') as f:
+    with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:
         f.write('export default ' + json.dumps(addresses))

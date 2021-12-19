@@ -6,5 +6,10 @@ export default {
     "staking_x7": "0xD468A8bCe7684d6D033832bcdAbAf9439d392F5d",
     "marketplace": "0x71Ea4a973Be28128a299362015fF4A06b084C70a",
     "game": "0xe3010b04e5B5De763a2fEA47CE6c2fb08dc318F2",
-    "vestingFactory": "0x2DAB3390adf79237aF1331bb7Eb4295defE6DA30"
+    "vestingFactory": "0x2DAB3390adf79237aF1331bb7Eb4295defE6DA30",
+    "games": {
+        "0": "0xd93b8259096e3801b12da7B661f91528931A6B5f",
+        "1": "0x651Cb2CA2a70d3e5c773335a64883Fd2Ef450Ce5",
+        "2": "0xC954f572a288e84e40f03E7D92122EB0743B5dFB"
+    }
 }

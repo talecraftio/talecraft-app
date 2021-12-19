@@ -180,6 +180,42 @@
         justify-content: center;
         pointer-events: none;
     }
+
+    .table-img {
+        position: relative;
+        & > img {
+            opacity: 0;
+        }
+    }
+
+    .table-lights {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        @media (min-width: 1200px) {
+            font-size: 18px;
+        }
+        @media (min-width: 1400px) {
+            left: 40px;
+            right: 40px;
+            top: -10px;
+            & > div {
+                width: 100px !important;
+                height: 100px !important;
+            }
+        }
+        @media (min-width: 1920px) {
+            left: 40px;
+            right: 40px;
+            top: 3px;
+            & > div {
+                width: 137px !important;
+                height: 137px !important;
+            }
+        }
+        bottom: 0;
+    }
 }
 
 .table-wrap {

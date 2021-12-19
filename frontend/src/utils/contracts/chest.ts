@@ -136,12 +136,14 @@ export type ChestMethodNames =
   | 'chestPriceEth'
   | 'chestPricePhi'
   | 'chestsLeft'
+  | 'emergencyWithdraw'
   | 'limitPerUser'
   | 'onERC1155BatchReceived'
   | 'onERC1155Received'
   | 'openChest'
   | 'owner'
   | 'renounceOwnership'
+  | 'startWeek'
   | 'supportsInterface'
   | 'transferOwnership'
   | 'updateChestPriceEth'
@@ -232,6 +234,13 @@ export interface Chest {
   chestsLeft(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   */
+  emergencyWithdraw(): MethodReturnContext;
+  /**
+   * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
@@ -295,6 +304,13 @@ export interface Chest {
    * Type: function
    */
   renounceOwnership(): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   */
+  startWeek(): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

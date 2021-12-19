@@ -190,6 +190,7 @@ export type ResourceMethodNames =
   | 'claimCraft'
   | 'craft'
   | 'craftWaitSkipPrice'
+  | 'finishPremint'
   | 'getCraftingResult'
   | 'getCrafts'
   | 'getPlayers'
@@ -202,6 +203,8 @@ export type ResourceMethodNames =
   | 'ownedTokensPaginated'
   | 'owner'
   | 'pendingCrafts'
+  | 'premint'
+  | 'premintFinished'
   | 'registerResourceTypes'
   | 'renounceOwnership'
   | 'resourceCount'
@@ -216,6 +219,7 @@ export type ResourceMethodNames =
   | 'skipCraftWait'
   | 'supportsInterface'
   | 'transferOwnership'
+  | 'updateResource'
   | 'uri'
   | 'withdrawFees';
 export interface PendingcraftResponse {
@@ -296,6 +300,13 @@ export interface Resource {
    * Type: function
    */
   craftWaitSkipPrice(): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   */
+  finishPremint(): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
@@ -410,6 +421,27 @@ export interface Resource {
    * @param player Type: address, Indexed: false
    */
   pendingCrafts(player: string): MethodConstantReturnContext<string[]>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param to Type: address[], Indexed: false
+   * @param tokenId Type: uint256[][], Indexed: false
+   * @param amount Type: uint256[][], Indexed: false
+   */
+  premint(
+    to: string[],
+    tokenId: string[][],
+    amount: string[][]
+  ): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  premintFinished(): MethodConstantReturnContext<boolean>;
   /**
    * Payable: false
    * Constant: false
@@ -546,6 +578,22 @@ export interface Resource {
    * @param newOwner Type: address, Indexed: false
    */
   transferOwnership(newOwner: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param tokenId Type: uint256, Indexed: false
+   * @param name Type: string, Indexed: false
+   * @param weight Type: uint256, Indexed: false
+   * @param ipfsHash Type: string, Indexed: false
+   */
+  updateResource(
+    tokenId: string,
+    name: string,
+    weight: string,
+    ipfsHash: string
+  ): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

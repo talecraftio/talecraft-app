@@ -1,35 +1,102 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useInjection } from "inversify-react";
-import WalletStore, { BLOCK_EXPLORER } from "../stores/WalletStore";
-import { GameinfoResponse } from "../utils/contracts/game";
+import WalletStore, { BLOCK_EXPLORER } from "../../stores/WalletStore";
+import { GameinfoResponse } from "../../utils/contracts/game2";
 import { observer } from "mobx-react";
 import useAsyncEffect from "use-async-effect";
 import { useAsyncMemo } from "use-async-memo";
 import { toast } from "react-toastify";
-import { ADDRESSES } from "../utils/contracts";
-import { ZERO_ADDRESS } from "../utils/address";
-import classNames from "classnames";
+import { ADDRESSES } from "../../utils/contracts";
+import { ZERO_ADDRESS } from "../../utils/address";
 import _, { forEach } from "lodash";
-import { IMAGES_CDN, MAX_UINT256 } from "../utils/const";
-import AnimatedCardsWrap from '../components/AnimatedCardsWrap';
-import { act } from "react-dom/test-utils";
-import { toBN } from "../utils/number";
+import { IMAGES_CDN, MAX_UINT256 } from "../../utils/const";
+import { toBN } from "../../utils/number";
 import { RouterStore } from "mobx-react-router";
-import Timer from '../components/Timer';
+import Timer from '../../components/Timer';
 import { usePrevious } from "react-use";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import Timeout from "await-timeout";
+import { RouteComponentProps } from "react-router";
+import classNames from "classnames";
 
-interface IGamePageProps {
+interface IGamePageProps extends RouteComponentProps {
 }
 
-const GamePage = observer(({}: IGamePageProps) => {
+const GreenLight = () => {
+    const greenAnimOptions = {
+        animationData: require('../../animations/Green_Light_Complete.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/lights/Green_Light_Complete/images/',
+        loop: false,
+        autoplay: true,
+    };
+    const greenAnimApi = useRef<LottieRefCurrentProps>();
+    return (
+        <Lottie
+            renderer='canvas'
+            {...greenAnimOptions}
+            lottieRef={greenAnimApi}
+            style={{ width: 137, height: 137 }}
+            onComplete={() => { greenAnimApi.current.goToAndPlay(90, true) }}
+        />
+    );
+}
+
+const YellowLight = () => {
+    const yellowAnimOptions = {
+        animationData: require('../../animations/Yellow_Light_Complete.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/lights/Yellow_Light_Complete/images/',
+        loop: false,
+        autoplay: true,
+    };
+    const yellowAnimApi = useRef<LottieRefCurrentProps>();
+    return (
+        <Lottie
+            renderer='canvas'
+            {...yellowAnimOptions}
+            lottieRef={yellowAnimApi}
+            style={{ width: 137, height: 137 }}
+            onComplete={() => { yellowAnimApi.current.goToAndPlay(90, true) }}
+        />
+    );
+}
+
+const RedLight = () => {
+    const redAnimOptions = {
+        animationData: require('../../animations/Red_Light_Complete.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/lights/Red_Light_Complete/images/',
+        loop: false,
+        autoplay: true,
+    };
+    const redAnimApi = useRef<LottieRefCurrentProps>();
+    return (
+        <Lottie
+            renderer='canvas'
+            {...redAnimOptions}
+            lottieRef={redAnimApi}
+            style={{ width: 137, height: 137 }}
+            onComplete={() => { redAnimApi.current.goToAndPlay(90, true) }}
+        />
+    );
+}
+
+
+
+const GamePage = observer(({ location }: IGamePageProps) => {
     const walletStore = useInjection(WalletStore);
-    const routerStore = useInjection(RouterStore);
-    const gameContract = walletStore.gameContract;
+    const league = location.pathname.split('/')[2];
+    let gameAddress;
+    switch (league) {
+        case 'junior':
+            gameAddress = ADDRESSES.games['0']; break;
+        case 'senior':
+            gameAddress = ADDRESSES.games['1']; break;
+        case 'master':
+            gameAddress = ADDRESSES.games['2']; break;
+    }
+    const gameContract = walletStore.getGame2Contract(gameAddress);
+    const phiContract = walletStore.phiContract;
     const resourceContract = walletStore.resourceContract;
 
-    const transitionOrigin = useRef<HTMLDivElement>();
     const item1SelfSlot = useRef<HTMLDivElement>();
     const item2SelfSlot = useRef<HTMLDivElement>();
     const item3SelfSlot = useRef<HTMLDivElement>();
@@ -37,26 +104,24 @@ const GamePage = observer(({}: IGamePageProps) => {
     const item2RivalSlot = useRef<HTMLDivElement>();
     const item3RivalSlot = useRef<HTMLDivElement>();
 
-    const [ slots, setSlots ] = useState<GameinfoResponse[]>([]);
     const [ activeGame, setActiveGame ] = useState<GameinfoResponse>();
     const prevActiveGame = usePrevious(activeGame);
-    const [ activeSlot, setActiveSlot ] = useState<number>();
     const [ q, setQ ] = useState('');
-    const [ logEntries, setLogEntries ] = useState<string[]>([]);
     const [ loading, setLoading ] = useState(false);
     const [ notificationsEnabled, setNotificationsEnabled ] = useState(true);
+    const [ pastGames, setPastGames ] = useState<GameinfoResponse[]>([]);
     const [ showLoadingAnim, setShowLoadingAnim ] = useState(false);
     const [ showWinAnim, setShowWinAnim ] = useState(false);
     const [ showLoseAnim, setShowLoseAnim ] = useState(false);
 
     const inventory = useAsyncMemo(() => walletStore.getInventory(), [walletStore.lastBlock]);
-    const isPlayer1 = useMemo(() => activeGame?.player1.addr === walletStore.address, [walletStore.lastBlock, activeGame, walletStore.address]);
-    const isTurn = useMemo(() => activeGame?.turn === (isPlayer1 ? '1' : '2'), [isPlayer1, activeGame, walletStore.address]);
-    const selfInfo = useMemo(() => isPlayer1 ? activeGame?.player1 : activeGame?.player2, [activeGame]);
-    const rivalInfo = useMemo(() => isPlayer1 ? activeGame?.player2 : activeGame?.player1, [activeGame]);
+    const isPlayer0 = useMemo(() => activeGame?.player[0].addr === walletStore.address, [walletStore.lastBlock, activeGame, walletStore.address]);
+    const isTurn = useMemo(() => activeGame?.turn === (isPlayer0 ? '0' : '1'), [isPlayer0, activeGame, walletStore.address]);
+    const selfInfo = useMemo(() => isPlayer0 ? activeGame?.player[0] : activeGame?.player[1], [activeGame]);
+    const rivalInfo = useMemo(() => isPlayer0 ? activeGame?.player[1] : activeGame?.player[0], [activeGame]);
 
     const loadingAnimOptions = {
-        animationData: require('../animations/loading.json'),
+        animationData: require('../../animations/loading.json'),
         assetsPath: 'https://app.talecraft.io/uploads/loading/',
         loop: true,
         autoplay: true,
@@ -70,7 +135,7 @@ const GamePage = observer(({}: IGamePageProps) => {
     />, []);
 
     const loseAnimOptions = {
-        animationData: require('../animations/youLose.json'),
+        animationData: require('../../animations/youLose.json'),
         assetsPath: 'https://app.talecraft.io/uploads/youLose/',
         loop: false,
         autoplay: true,
@@ -81,11 +146,11 @@ const GamePage = observer(({}: IGamePageProps) => {
         {...loseAnimOptions}
         lottieRef={loseAnimApi}
         style={{ width: 600, height: 300 }}
-        onComplete={() => { console.log('iter'); setShowLoseAnim(false) }}
+        onComplete={() => { setShowLoseAnim(false) }}
     />, []);
 
     const winAnimOptions = {
-        animationData: require('../animations/youWin.json'),
+        animationData: require('../../animations/youWin.json'),
         assetsPath: 'https://app.talecraft.io/uploads/youWin/',
         loop: false,
         autoplay: true,
@@ -96,38 +161,60 @@ const GamePage = observer(({}: IGamePageProps) => {
         {...winAnimOptions}
         lottieRef={winAnimApi}
         style={{ width: 600, height: 300 }}
-        onComplete={() => { console.log('iter'); setShowWinAnim(false) }}
+        onComplete={() => { setShowWinAnim(false) }}
     />, []);
 
-    useAsyncEffect(async () => {
-        let slots = [];
-        const maxId = parseInt(await gameContract.methods.maxSlotId().call());
-        for (let i=0; i <= maxId; i += 50) {
-            const page = await gameContract.methods.getAllGamesPaginated(i.toString(), Math.min(50, maxId - i).toString()).call();
-            slots = slots.concat(page);
-        }
-        setSlots(slots);
-        if (!activeGame) {
-            for (let i=0; i < slots.length; i++) {
-                const slot = slots[i];
-                if ([slot.player1.addr, slot.player2.addr].includes(walletStore.address) && !slot.finished) {
-                    setActiveGame(slot);
-                    setActiveSlot(i);
-                    break;
-                }
-            }
-        }
-        if (activeGame) {
-            setActiveGame(await gameContract.methods.getGameById(activeGame.gameId).call());
-        }
-    }, [walletStore.lastBlock]);
+    const getLight = (round: number) => {
+        if (!activeGame || activeGame.player[0].placedCards[round] == '0' || activeGame.player[1].placedCards[round] == '0')
+            // return (<YellowLight />);
+            return (
+                <div>
+                    <img src={require('url:../../images/empty_bulb.png')} style={{ width: '100%', height: '100%' }} />
+                </div>
+            );
+        let p0w = walletStore.resourceTypes[activeGame.player[0].placedCards[round]].weight;
+        if (activeGame.player[0].boostUsedRound == round.toString())
+            p0w *= parseInt(activeGame.player[0].boostValue);
+        let p1w = walletStore.resourceTypes[activeGame.player[1].placedCards[round]].weight;
+        if (activeGame.player[1].boostUsedRound == round.toString())
+            p1w *= parseInt(activeGame.player[0].boostValue);
+        if (p0w > p1w)
+            return isPlayer0 ? <GreenLight /> : <RedLight />;
+        else if (p1w > p0w)
+            return isPlayer0 ? <RedLight /> : <GreenLight />;
+        else
+            return <YellowLight />;
+    }
+
+    const light0 = useMemo(
+        () => getLight(0),
+        [activeGame?.player[0].placedCards[0], activeGame?.player[1].placedCards[0]]
+    );
+    const light1 = useMemo(
+        () => getLight(1),
+        [activeGame?.player[0].placedCards[1], activeGame?.player[1].placedCards[1]]
+    );
+    const light2 = useMemo(
+        () => getLight(2),
+        [activeGame?.player[0].placedCards[2], activeGame?.player[1].placedCards[2]]
+    );
 
     useAsyncEffect(async () => {
-        if (!activeGame) {
-            setLogEntries([]);
+        if (!walletStore.address)
             return;
-        }
+        let activeGameId = await gameContract.methods.currentGames(walletStore.address).call();
+        if (activeGameId === '0')
+            if (activeGame)
+                activeGameId = activeGame.gameId;
+        if (activeGameId !== '0')
+            setActiveGame(await gameContract.methods.game(activeGameId).call());
+        const pastGamesIds = await gameContract.methods.playerGames(walletStore.address).call();
+        setPastGames(await Promise.all(pastGamesIds.map(gid => gameContract.methods.game(gid).call())));
+    }, [walletStore.lastBlock, walletStore.connected]);
 
+    useAsyncEffect(async () => {
+        if (!activeGame)
+            return;
 
         if (!prevActiveGame?.started && activeGame.started)
             new Notification('TaleCraft', { body: 'A game has started' });
@@ -144,25 +231,6 @@ const GamePage = observer(({}: IGamePageProps) => {
                 setShowLoseAnim(true);
             }
         }
-
-        const events = await gameContract.getPastEvents('allEvents' as any, { fromBlock: 2217934 });
-        setLogEntries([]);
-        setLogEntries(events.filter(e => e.returnValues.gameId === activeGame.gameId).map(e => {
-            switch (e.event) {
-                case 'PlayerEntered':
-                    return `${e.blockNumber}: ${e.returnValues.player} entered`;
-                case 'PlayerExited':
-                    return `${e.blockNumber}: ${e.returnValues.player} exited`;
-                case 'GameStarted':
-                    return `${e.blockNumber}: Game started`;
-                case 'PlayerPlacedCard':
-                    return `${e.blockNumber}: ${e.returnValues.player} placed card #${e.returnValues.tokenId}`;
-                case 'GameFinished':
-                    return `${e.blockNumber}: Game finished, winner: ${e.returnValues.winner}`;
-                case 'CreatedNewGame':
-                    return `${e.blockNumber}: Game created`;
-            }
-        }));
     }, [activeGame]);
 
     useAsyncEffect(async () => {
@@ -173,11 +241,17 @@ const GamePage = observer(({}: IGamePageProps) => {
     const filteredInventory = useMemo(() => inventory?.
         filter(item => parseInt(item.tokenId) > 4 && (q ? new RegExp(`.*${q}.*`, 'i').test(item.info.name) : true)), [inventory]);
 
-    if (!walletStore.address) {
-        return <div>Connect wallet first</div>;
+    if (!walletStore.connected) {
+        return (
+            <main className="main leaderboards" style={{ color: 'white' }}>
+                <div className="container" style={{ marginTop: 150 }}>
+                    Connect wallet to access this page
+                </div>
+            </main>
+        );
     }
 
-    const onJoin = async (slot: number, game: GameinfoResponse) => {
+    const onJoin = async () => {
         setLoading(true);
         await Timeout.set(0);
         setShowLoadingAnim(true);
@@ -186,18 +260,31 @@ const GamePage = observer(({}: IGamePageProps) => {
         await Timeout.set(0);
 
         try {
-            if (game.gameId === activeGame?.gameId) {
-                toast.warning('Selected already');
-                return;
+            const phiAllowance = toBN(await phiContract.methods.allowance(walletStore.address, gameAddress).call());
+            if (phiAllowance.lt(toBN(await gameContract.methods.boostPrice().call()).plus(await gameContract.methods.joinPrice().call()))) {
+                const tx = await walletStore.sendTransaction(phiContract.methods.approve(gameAddress, MAX_UINT256));
+                toast.success(
+                    <>
+                        CRAFT approved successfully<br/>
+                        <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
+                    </>
+                );
             }
 
-            if (game.player1.addr !== walletStore.address && game.player2.addr !== walletStore.address) {
-                await walletStore.sendTransaction(gameContract.methods.enterGame(slot.toString()));
-                toast.success('Joined game');
+            const resourceAllowance = await resourceContract.methods.isApprovedForAll(walletStore.address, gameAddress).call();
+            if (!resourceAllowance) {
+                const tx = await walletStore.sendTransaction(resourceContract.methods.setApprovalForAll(gameAddress, true));
+                toast.success(
+                    <>
+                        Resource approved successfully<br/>
+                        <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
+                    </>
+                );
             }
 
-            // setActiveSlot(slot);
-            // setActiveGame(game);
+            await walletStore.sendTransaction(gameContract.methods.joinGame());
+            toast.success('Joined game');
+            walletStore.triggerBlockChange();
         } finally {
             await Timeout.set(0);
             setLoading(false);
@@ -213,20 +300,17 @@ const GamePage = observer(({}: IGamePageProps) => {
             return;
         }
 
-        if (!await resourceContract.methods.isApprovedForAll(walletStore.address, ADDRESSES.game).call()) {
-            await walletStore.sendTransaction(resourceContract.methods.setApprovalForAll(ADDRESSES.game, true));
-            toast.success('Approved');
-        }
-
-        await walletStore.sendTransaction(gameContract.methods.placeCard(activeSlot.toString(), placeTokenId));
+        await walletStore.sendTransaction(gameContract.methods.placeCard(placeTokenId));
         toast.success('Placed');
+        walletStore.triggerBlockChange();
     }
 
     const onAbort = async () => {
         setLoading(true);
         try {
-            const tx = await walletStore.sendTransaction(gameContract.methods.abortGame(activeSlot.toString()));
+            const tx = await walletStore.sendTransaction(gameContract.methods.abort());
             toast.success('Game aborted');
+            walletStore.triggerBlockChange();
         } finally {
             setLoading(false);
         }
@@ -235,31 +319,26 @@ const GamePage = observer(({}: IGamePageProps) => {
     const onBoost = async () => {
         setLoading(true);
         try {
-            const phi = walletStore.phiContract;
-            if (toBN(await phi.methods.allowance(walletStore.address, ADDRESSES.game).call()).lt(await gameContract.methods.boostPrice().call())) {
-                const tx = await walletStore.sendTransaction(phi.methods.approve(ADDRESSES.game, MAX_UINT256));
-                toast.success(
-                    <>
-                        CRAFT approved successfully<br/>
-                        <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
-                    </>
-                );
-            }
-            const tx = await walletStore.sendTransaction(gameContract.methods.boost(activeSlot.toString()));
+            const tx = await walletStore.sendTransaction(gameContract.methods.boost());
             toast.success('Boost applied');
+            walletStore.triggerBlockChange();
         } finally {
             setLoading(false);
         }
     }
 
-    const havePastGames = slots.filter((g, i) => g.finished && (g.player1.addr === walletStore.address || g.player2.addr === walletStore.address)).length > 0
+    const onSpectate = async (gameId: string) => {
+        setLoading(true);
+        setActiveGame(await gameContract.methods.game(gameId).call());
+        setLoading(false);
+    }
 
     return (
         <main className='main'>
             <section className="game-section">
                 <div className="container">
                     <h2 className="section-title text-center">Board Game Mode</h2>
-                    <div className="title-img"><img src={require('../images/border.png')} alt="alt"/></div>
+                    <div className="title-img"><img src={require('../../images/border.png')} alt="alt"/></div>
                     {/*<button className='btn primary' onClick={() => { setShowLoadingAnim(!showLoadingAnim); loadingAnimApi.current.goToAndPlay(0, true); }}>toggle loading</button>*/}
                     {!notificationsEnabled && (
                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
@@ -277,44 +356,21 @@ const GamePage = observer(({}: IGamePageProps) => {
                             </button>
                         </div>
                     )}
-                    {routerStore.location.hash === '#joinlist' && (
-                        <div className="join-wrap">
-                            {slots.map((g, i) => {
-                                let players = 0;
-                                g.player1.addr !== ZERO_ADDRESS && players++;
-                                g.player2.addr !== ZERO_ADDRESS && players++;
-                                const isActive = activeGame?.gameId == g.gameId;
-                                const isJoined = [g.player1.addr, g.player2.addr].includes(walletStore.address);
-                                return (
-                                    <div className="join-col" key={i}>
-                                        <button
-                                            className={classNames('btn-join', isActive && 'active', isJoined && 'joined', players === 2 && !isJoined || g.finished && 'inactive')}
-                                            type="button"
-                                            onClick={() => onJoin(i, g)}
-                                        >
-                                            Join game {(i+1).toString().padStart(2, '0')} ({players}/2)
-                                        </button>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    )}
-                    {havePastGames && (
+                    {pastGames.length > 0 && (
                         <>
                             <h3 className="section-title text-center">Your past games</h3>
                             <div className="join-wrap">
-                                {slots.map((g, i) => {
+                                {pastGames.map((g, i) => {
                                     const isActive = activeGame?.gameId == g.gameId;
-                                    const isJoined = [g.player1.addr, g.player2.addr].includes(walletStore.address);
-                                    if (!isJoined || !g.finished) return null;
+                                    if (!g.finished) return null;
                                     return (
                                         <div className="join-col" key={i}>
                                             <button
-                                                className={classNames('btn-join', isActive && 'active', isJoined && 'joined', !isJoined || g.finished && 'inactive')}
+                                                className={classNames('btn-join', isActive && 'active')}
                                                 type="button"
-                                                onClick={() => onJoin(i, g)}
+                                                onClick={() => onSpectate(g.gameId)}
                                             >
-                                                View game {(i+1).toString().padStart(2, '0')}
+                                                View game #{(i+1).toString()}
                                             </button>
                                         </div>
                                     )
@@ -328,14 +384,7 @@ const GamePage = observer(({}: IGamePageProps) => {
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <button
                                 className='btn primary'
-                                onClick={() => {
-                                    for (let i=0; i < slots.length; i++) {
-                                        if (!slots[i].started) {
-                                            onJoin(i, slots[i]);
-                                            break;
-                                        }
-                                    }
-                                }}
+                                onClick={() => onJoin()}
                                 disabled={loading}
                             >
                                 Join a new game
@@ -348,7 +397,7 @@ const GamePage = observer(({}: IGamePageProps) => {
 
             {activeGame && walletStore.resourceTypes && (
                 <>
-                    <section className="table-section" style={{ backgroundImage: `url(${require('../images/table-bg.jpeg')})` }}>
+                    <section className="table-section" style={{ backgroundImage: `url(${require('../../images/table-bg.jpeg')})` }}>
                         <div className="container">
                             <div className="table-bg">
                                 <div className='table-status'>
@@ -356,8 +405,8 @@ const GamePage = observer(({}: IGamePageProps) => {
                                         if (!activeGame.started) {
                                             return 'Waiting for the second player';
                                         } else if (activeGame.finished) {
-                                            const winner1 = activeGame.winner === activeGame.player1.addr;
-                                            return `Game finished, you ${(isPlayer1 ? winner1 : !winner1) ? 'won' : 'lost'}`;
+                                            const winner0 = activeGame.winner === activeGame.player[0].addr;
+                                            return `Game finished, you ${(isPlayer0 ? winner0 : !winner0) ? 'won' : 'lost'}`;
                                         } else if (isTurn) {
                                             return 'Your turn';
                                         } else {
@@ -370,7 +419,7 @@ const GamePage = observer(({}: IGamePageProps) => {
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
-                                                    <img src={require('../images/board.jpg')} alt=""/>
+                                                    <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item1RivalSlot}>
                                                         {rivalInfo?.placedCards[0] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[0])].ipfsHash}.webp`} />}
                                                         {rivalInfo?.boostUsedRound === '0' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
@@ -381,7 +430,7 @@ const GamePage = observer(({}: IGamePageProps) => {
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
-                                                    <img src={require('../images/board.jpg')} alt=""/>
+                                                    <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item2RivalSlot}>
                                                         {rivalInfo?.placedCards[1] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[1])].ipfsHash}.webp`} />}
                                                         {rivalInfo?.boostUsedRound === '1' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
@@ -392,7 +441,7 @@ const GamePage = observer(({}: IGamePageProps) => {
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
-                                                    <img src={require('../images/board.jpg')} alt=""/>
+                                                    <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item3RivalSlot}>
                                                         {rivalInfo?.placedCards[2] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[2])].ipfsHash}.webp`} />}
                                                         {rivalInfo?.boostUsedRound === '2' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
@@ -400,11 +449,18 @@ const GamePage = observer(({}: IGamePageProps) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="table-img"><img src={require('../images/table-decor.png')} alt=""/></div>
+                                        <div className="table-img">
+                                            <img src={require('../../images/table-decor.png')} alt=""/>
+                                            <div className="table-lights">
+                                                {light0}
+                                                {light1}
+                                                {light2}
+                                            </div>
+                                        </div>
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
-                                                    <img src={require('../images/board.jpg')} alt=""/>
+                                                    <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item1SelfSlot}>
                                                         {selfInfo?.placedCards[0] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[0]) ].ipfsHash}.webp`} />}
                                                         {selfInfo?.boostUsedRound === '0' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
@@ -415,7 +471,7 @@ const GamePage = observer(({}: IGamePageProps) => {
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
-                                                    <img src={require('../images/board.jpg')} alt=""/>
+                                                    <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item2SelfSlot}>
                                                         {selfInfo?.placedCards[1] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[1])].ipfsHash}.webp`} />}
                                                         {selfInfo?.boostUsedRound === '1' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
@@ -426,7 +482,7 @@ const GamePage = observer(({}: IGamePageProps) => {
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
-                                                    <img src={require('../images/board.jpg')} alt=""/>
+                                                    <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item3SelfSlot}>
                                                         {selfInfo?.placedCards[2] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[2])].ipfsHash}.webp`} />}
                                                         {selfInfo?.boostUsedRound === '2' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
@@ -447,7 +503,7 @@ const GamePage = observer(({}: IGamePageProps) => {
                                                     <button className='btn red' onClick={onAbort} disabled={loading}>Abort</button>
                                                 )
                                             ) : (
-                                                (isPlayer1 && parseInt(activeGame.player1.boostUsedRound) === 0xFF || !isPlayer1 && parseInt(activeGame.player2.boostUsedRound) === 0xFF) && (
+                                                (isPlayer0 && parseInt(activeGame.player[0].boostUsedRound) === 0xFF || !isPlayer0 && parseInt(activeGame.player[1].boostUsedRound) === 0xFF) && (
                                                     <button className='btn' onClick={onBoost} disabled={loading}>Boost</button>
                                                 )
                                             )}
@@ -460,13 +516,13 @@ const GamePage = observer(({}: IGamePageProps) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="table-decor" style={{ backgroundImage: `url(${require('../images/border.png')})` }}/>
+                        <div className="table-decor" style={{ backgroundImage: `url(${require('../../images/border.png')})` }}/>
                     </section>
                     {activeGame.started && !activeGame.finished && isTurn && (
                         <section className="collection-section">
                             <div className="container">
                                 <h2 className="section-title text-center">My Card Collection</h2>
-                                <div className="title-img"><img src={require('../images/border.png')} alt="alt"/></div>
+                                <div className="title-img"><img src={require('../../images/border.png')} alt="alt"/></div>
                                 <div className="form-search-wrap">
                                     <div className="form-search" >
                                         <div className="form-search__wrap">

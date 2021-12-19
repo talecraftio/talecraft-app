@@ -24,7 +24,9 @@ import GameInfoPage from "./pages/tools/GameInfoPage";
 import CodexIndexPage from "./pages/codex/CodexIndexPage";
 import CodexCardPage from "./pages/codex/CodexCardPage";
 import LottieTest from "./pages/tools/LottieTest";
-import GamePage from "./pages/GamePage";
+import GamePage from "./pages/game/GamePage";
+import GameLeagueSelectPage from "./pages/game/GameLeagueSelectPage";
+import GameLeaderboardPage from "./pages/game/GameLeaderboardPage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -44,7 +46,9 @@ const App = observer(() => {
                     <Route path='/craft' component={CraftPage} />
                     <Route path='/leaderboard' component={LeaderboardsPage} />
                     <Route path='/_gameInfo' component={GameInfoPage} />
-                    <Route path='/game' component={GamePage} />
+                    <Route exact path='/game' component={GameLeagueSelectPage} />
+                    <Route exact path={['/game/junior', '/game/senior', '/game/master']} component={GamePage} />
+                    <Route exact path={['/game/junior/leaderboard', '/game/senior/leaderboard', '/game/master/leaderboard']} component={GameLeaderboardPage} />
                     <Route path='/loyalty' component={LoyaltyPage} />
                     <Route path='/_vesting' component={VestingPage} />
                     <Route exact path='/codex' component={CodexIndexPage} />
