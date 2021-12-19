@@ -77,9 +77,9 @@ const GameLeagueSelectPage = observer(({}: IGameLeagueSelectPageProps) => {
                     <h1 className='section-title text-center'>Select game league</h1>
 
                     <div className="staking-wrap">
-                        <GameLeagueItem title='Junior' entry='10' minWeight={6} maxWeight={50} link='/game/junior' />
-                        <GameLeagueItem title='Senior' entry='12' minWeight={51} maxWeight={150} link='/game/senior' />
-                        <GameLeagueItem title='Master' entry='15' minWeight={151} maxWeight={1000} link='/game/master' />
+                        <GameLeagueItem title='Junior' entry='0' minWeight={6} maxWeight={50} link='/game/junior' />
+                        <GameLeagueItem title='Senior' entry='0' minWeight={51} maxWeight={150} link='/game/senior' />
+                        <GameLeagueItem title='Master' entry='0' minWeight={151} maxWeight={1000} link='/game/master' />
                     </div>
                 </div>
             </section>
