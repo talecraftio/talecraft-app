@@ -18,7 +18,6 @@ import WalletPage from "./pages/WalletPage";
 import CraftPage from "./pages/CraftPage";
 import LeaderboardsPage from "./pages/LeaderboardsPage";
 import MarketItemPage from "./pages/marketplace/MarketItemPage";
-import LoyaltyPage from "./pages/LoyaltyPage";
 import VestingPage from "./pages/VestingPage";
 import GameInfoPage from "./pages/tools/GameInfoPage";
 import CodexIndexPage from "./pages/codex/CodexIndexPage";
@@ -49,7 +48,6 @@ const App = observer(() => {
                     <Route exact path='/game' component={GameLeagueSelectPage} />
                     <Route exact path={['/game/junior', '/game/senior', '/game/master']} component={GamePage} />
                     <Route exact path={['/game/junior/leaderboard', '/game/senior/leaderboard', '/game/master/leaderboard']} component={GameLeaderboardPage} />
-                    <Route path='/loyalty' component={LoyaltyPage} />
                     <Route path='/_vesting' component={VestingPage} />
                     <Route exact path='/codex' component={CodexIndexPage} />
                     <Route exact path='/codex/:tokenId' component={CodexCardPage} />

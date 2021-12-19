@@ -37,7 +37,6 @@ const Header = observer(({}: IHeaderProps) => {
                             )}
                             <li className="nav__items"><NavLink className="nav__link" to="/marketplace" onClick={() => setBurger(false)}>Marketplace</NavLink></li>
                             {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/wallet" onClick={() => setBurger(false)}>My Wallet</NavLink></li>}
-                            {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/loyalty" onClick={() => setBurger(false)}>Loyalty</NavLink></li>}
                             {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/game" onClick={() => setBurger(false)}>Board Game</NavLink></li>}
                             <li className="nav__items nav__items-sub">
                                 <button className="nav__link">Tools</button>
