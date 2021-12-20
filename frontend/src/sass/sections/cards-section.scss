@@ -1,4 +1,4 @@
-.cards-section {
+.card-section {
   .section-title {
     margin-bottom: 2.9rem;
   }
@@ -23,5 +23,11 @@
       margin-bottom: 1.6rem;
       font-weight: 400;
     }
+  }
+
+  .history-table-wrapper {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
   }
 }

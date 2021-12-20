@@ -61,6 +61,7 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
     IERC20 internal immutable _phi;
 
     event PlayerEntered(uint256 indexed gameId, address indexed player);
+    event PlayerLeft(uint256 indexed gameId, address indexed player);
     event GameStarted(uint256 indexed gameId);
     event PlayerPlacedCard(uint256 indexed gameId, address indexed player, uint256 tokenId);
     event GameFinished(uint256 indexed gameId, address indexed winner);
@@ -155,6 +156,19 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         lastGameTimestamps[msg.sender] = block.timestamp;
     }
 
+    function leaveGame() external {
+        uint256 gameId = currentGames[msg.sender];
+        require(gameId != 0, "you are not in a game");
+        GameInfo storage game_ = _games[gameId];
+        require(!game_.started, "game is started already");
+        game_.player[0].addr = address(0);
+        _phi.safeTransfer(msg.sender, game_.bank);
+        game_.bank = 0;
+        _playerGames[msg.sender].remove(gameId);
+        currentGames[msg.sender] = 0;
+        emit PlayerLeft(gameId, msg.sender);
+    }
+
     function placeCard(uint256 tokenId) external {
         uint256 gameId = currentGames[msg.sender];
         require(gameId != 0, "you are not playing a game");
@@ -164,9 +178,10 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         require(turn0 && game_.player[0].addr == msg.sender || !turn0 && game_.player[1].addr == msg.sender, "not your turn");
         _resource.safeTransferFrom(msg.sender, address(this), tokenId, 1, "");
         game_.player[game_.turn].placedCards[game_.round] = tokenId;
-        game_.turn = turn0 ? 1 : 0;
-        if (!turn0)
+        if (game_.round == 1 && turn0 || game_.round != 1 && !turn0)
             game_.round++;
+        else
+            game_.turn = turn0 ? 1 : 0;
         emit PlayerPlacedCard(gameId, msg.sender, tokenId);
         game_.lastAction = block.timestamp;
         if (game_.round == 3)

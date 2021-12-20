@@ -73,6 +73,7 @@ export type Game2Events =
   | 'OwnershipTransferred'
   | 'Paused'
   | 'PlayerEntered'
+  | 'PlayerLeft'
   | 'PlayerPlacedCard'
   | 'Unpaused';
 export interface Game2EventsContext {
@@ -196,6 +197,15 @@ export interface Game2EventsContext {
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
+  PlayerLeft(
+    parameters: {
+      filter?: { gameId?: string | string[]; player?: string | string[] };
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
   PlayerPlacedCard(
     parameters: {
       filter?: { gameId?: string | string[]; player?: string | string[] };
@@ -231,6 +241,7 @@ export type Game2MethodNames =
   | 'lastGameTimestamps'
   | 'leaderboard'
   | 'leaderboardPaginated'
+  | 'leaveGame'
   | 'maxWeight'
   | 'minWeight'
   | 'onERC1155BatchReceived'
@@ -400,6 +411,13 @@ export interface Game2 {
     offset: string,
     count: string
   ): MethodConstantReturnContext<LeaderboarditemResponse[]>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   */
+  leaveGame(): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

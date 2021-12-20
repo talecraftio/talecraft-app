@@ -116,9 +116,9 @@ const MarketIndexPage = ({}: IMarketPageProps) => {
             </section>
             <section className="market-section">
                 <div className="container">
-                    <div className='market-notice'>
+                    {/*<div className='market-notice'>
                         We have moved to a new marketplace contract. You can withdraw listed tokens from the old contract <Link to='/oldMarketplaceWithdraw'>here</Link>.
-                    </div>
+                    </div>*/}
                     <div className="market-head">
                         <div className="select-wrap">
                             <DDSlick selected={sort} onChange={val => { setSort(val); setPage(0); loadPage() }}>

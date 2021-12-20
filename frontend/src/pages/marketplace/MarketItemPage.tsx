@@ -170,22 +170,19 @@ const MarketItemPage = observer(({ match: { params: { listingId } } }: ICardPage
                                         )}
                                     </div>
                                     <h2 className="section-title">Sale history</h2>
-                                    {/*<TableScrollbar rows={10}>*/}
-                                        <table>
-                                            <tr>
-                                                <th>Datetime</th>
-                                                <th>Amount</th>
-                                                <th>Price</th>
-                                            </tr>
-                                            {apiResourceType.sales.map(s => (
-                                                <tr>
-                                                    <td><Moment date={s.datetime} format='LLL' withTitle /></td>
-                                                    <td>{s.amount}</td>
-                                                    <td>{s.price ? toBN(s.price).toFixed(6) : '0'} CRAFT</td>
-                                                </tr>
-                                            ))}
+                                    <div className="history-table-wrapper">
+                                        <table className='history-table'>
+                                            <tbody>
+                                                {apiResourceType.sales.map(s => (
+                                                    <tr>
+                                                        <td><Moment date={s.datetime} format='LLL' withTitle /></td>
+                                                        <td>{s.amount}</td>
+                                                        <td>{s.price ? toBN(s.price).toFixed(6) : '0'} CRAFT</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
                                         </table>
-                                    {/*</TableScrollbar>*/}
+                                    </div>
                                 </div>
                             </div>
                         ) : (

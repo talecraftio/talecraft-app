@@ -299,6 +299,12 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         }
     }
 
+    const onLeave = async () => {
+        await walletStore.sendTransaction(gameContract.methods.leaveGame());
+        toast.success('Game abandoned');
+        walletStore.triggerBlockChange();
+    }
+
     const onPlace = async (placeTokenId: string) => {
         if ((await resourceContract.methods.balanceOf(walletStore.address, placeTokenId).call()) === '0') {
             toast.error('You do not own tokens with this ID');
@@ -384,7 +390,18 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                         </>
                     )}
                     {activeGame && !activeGame.finished ? (
-                        <h3 className="section-title text-center">You are playing</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <h3 className="section-title text-center">You are playing</h3>
+                            {activeGame && !activeGame.started && (+new Date() / 1000) >= parseInt(activeGame.lastAction) + 7 * 60 && (
+                                <button
+                                    className='btn primary'
+                                    onClick={() => onLeave()}
+                                    disabled={loading}
+                                >
+                                    Leave game
+                                </button>
+                            )}
+                        </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <button
