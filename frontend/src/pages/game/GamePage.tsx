@@ -214,7 +214,7 @@ const GamePage = observer(({ location }: IGamePageProps) => {
             setActiveGame(game);
         }
         const pastGamesIds = await gameContract.methods.playerGames(walletStore.address).call();
-        setPastGames(await Promise.all(pastGamesIds.map(gid => gameContract.methods.game(gid).call())));
+        setPastGames((await Promise.all(pastGamesIds.map(gid => gameContract.methods.game(gid).call()))).filter(g => g.finished));
     }, [walletStore.lastBlock, walletStore.connected]);
 
     useAsyncEffect(async () => {
@@ -302,6 +302,7 @@ const GamePage = observer(({ location }: IGamePageProps) => {
     const onLeave = async () => {
         await walletStore.sendTransaction(gameContract.methods.leaveGame());
         toast.success('Game abandoned');
+        setActiveGame(undefined);
         walletStore.triggerBlockChange();
     }
 
@@ -373,7 +374,6 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                             <div className="join-wrap">
                                 {pastGames.map((g, i) => {
                                     const isActive = activeGame?.gameId == g.gameId;
-                                    if (!g.finished) return null;
                                     return (
                                         <div className="join-col" key={i}>
                                             <button
