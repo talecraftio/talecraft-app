@@ -15,6 +15,8 @@ import Moment from "react-moment";
 import { Api } from "../../graphql/api";
 import { ResourceType } from "../../graphql/sdk";
 import { ADDRESSES } from "../../utils/contracts";
+import TableScrollbar from 'react-table-scrollbar';
+
 
 interface ICardPageProps extends RouteChildrenProps<{ listingId: string }> {
 }
@@ -168,20 +170,22 @@ const MarketItemPage = observer(({ match: { params: { listingId } } }: ICardPage
                                         )}
                                     </div>
                                     <h2 className="section-title">Sale history</h2>
-                                    <table>
-                                        <tr>
-                                            <th>Datetime</th>
-                                            <th>Amount</th>
-                                            <th>Price</th>
-                                        </tr>
-                                        {apiResourceType.sales.map(s => (
+                                    <TableScrollbar rows={10}>
+                                        <table>
                                             <tr>
-                                                <td><Moment date={s.datetime} format='LLL' withTitle /></td>
-                                                <td>{s.amount}</td>
-                                                <td>{s.price ? toBN(s.price).toFixed(6) : '0'} CRAFT</td>
+                                                <th>Datetime</th>
+                                                <th>Amount</th>
+                                                <th>Price</th>
                                             </tr>
-                                        ))}
-                                    </table>
+                                            {apiResourceType.sales.map(s => (
+                                                <tr>
+                                                    <td><Moment date={s.datetime} format='LLL' withTitle /></td>
+                                                    <td>{s.amount}</td>
+                                                    <td>{s.price ? toBN(s.price).toFixed(6) : '0'} CRAFT</td>
+                                                </tr>
+                                            ))}
+                                        </table>
+                                    </TableScrollbar>
                                 </div>
                             </div>
                         ) : (

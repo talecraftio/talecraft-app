@@ -91,6 +91,7 @@
     "react-spring": "^9.3.0",
     "react-spring-animated-grid": "^0.2.3",
     "react-stonecutter": "^0.3.10",
+    "react-table-scrollbar": "^0.1.11",
     "react-toastify": "^8.0.2",
     "react-transition-group": "^4.4.2",
     "react-truncate": "^2.4.0",

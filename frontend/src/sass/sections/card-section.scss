@@ -21,6 +21,7 @@
     .card {
       width: 70%;
       margin-bottom: 2rem;
+      align-self: flex-start;
       @media (min-width: 768px) {
         width: 100%;
         margin-bottom: 0;
