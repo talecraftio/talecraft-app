@@ -178,9 +178,11 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         let p0w = walletStore.resourceTypes[activeGame.player[0].placedCards[round]].weight;
         if (activeGame.player[0].boostUsedRound == round.toString())
             p0w *= parseInt(activeGame.player[0].boostValue);
+        // console.log(0, activeGame.player[0].boostUsedRound, activeGame.player[0].boostValue, round.toString());
         let p1w = walletStore.resourceTypes[activeGame.player[1].placedCards[round]].weight;
         if (activeGame.player[1].boostUsedRound == round.toString())
-            p1w *= parseInt(activeGame.player[0].boostValue);
+            p1w *= parseInt(activeGame.player[1].boostValue);
+        // console.log(1, activeGame.player[1].boostUsedRound, activeGame.player[1].boostValue, round.toString());
         if (p0w > p1w)
             return isPlayer0 ? <GreenLight /> : <RedLight />;
         else if (p1w > p0w)
@@ -417,6 +419,8 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                         if (!activeGame.started) {
                                             return 'Waiting for the second player';
                                         } else if (activeGame.finished) {
+                                            if (activeGame.winner === ZERO_ADDRESS)
+                                                return 'Game finished, draw';
                                             const winner0 = activeGame.winner === activeGame.player[0].addr;
                                             return `Game finished, you ${(isPlayer0 ? winner0 : !winner0) ? 'won' : 'lost'}`;
                                         } else if (isTurn) {
