@@ -97,6 +97,9 @@ const GamePage = observer(({ location }: IGamePageProps) => {
     const phiContract = walletStore.phiContract;
     const resourceContract = walletStore.resourceContract;
 
+    const spectate = location.hash.includes('spec');
+    const [ spectateNumber, setSpectateNumber ] = useState('');
+
     const item1SelfSlot = useRef<HTMLDivElement>();
     const item2SelfSlot = useRef<HTMLDivElement>();
     const item3SelfSlot = useRef<HTMLDivElement>();
@@ -392,6 +395,15 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                             {showLoadingAnim && <div className='table-loading'>{loadingAnim}</div>}
                         </div>
                     )}
+                    {spectate && (
+                        <form onSubmit={async (e: React.FormEvent) => {
+                            e.preventDefault();
+                            setActiveGame(await gameContract.methods.game(spectateNumber).call());
+                        }}>
+                            <input type='number' value={spectateNumber} onChange={e => setSpectateNumber(e.target.value)} />
+                            <button type='submit'>spectate</button>
+                        </form>
+                    )}
                 </div>
             </section>
 
@@ -513,6 +525,9 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                 <div className="table-overlay-anim">
                                     {showWinAnim && winAnim}
                                     {showLoseAnim && loseAnim}
+                                </div>
+                                <div className="table-debug">
+                                    Game ID: #{activeGame.gameId}
                                 </div>
                             </div>
                         </div>

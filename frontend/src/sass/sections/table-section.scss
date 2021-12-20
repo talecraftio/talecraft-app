@@ -216,6 +216,32 @@
         }
         bottom: 0;
     }
+
+    .table-debug {
+        position: absolute;
+        bottom: 0;
+        font-size: 16px;
+        color: white;
+        @media (min-width: 1200px) {
+            bottom: 10px;
+            font-size: 16px;
+            color: black;
+        }
+        @media (min-width: 1400px) {
+            bottom: 10px;
+            font-size: 16px;
+            color: black;
+        }
+        @media (min-width: 1920px) {
+            bottom: 45px;
+            font-size: 16px;
+            color: black;
+        }
+        left: 0;
+        right: 0;
+        text-align: center;
+        pointer-events: none;
+    }
 }
 
 .table-wrap {
