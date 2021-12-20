@@ -175,14 +175,12 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                     <img src={require('url:../../images/empty_bulb.png')} style={{ width: '100%', height: '100%' }} />
                 </div>
             );
-        let p0w = walletStore.resourceTypes[activeGame.player[0].placedCards[round]].weight;
+        let p0w = parseInt(walletStore.resourceTypes[activeGame.player[0].placedCards[round]].weight);
         if (activeGame.player[0].boostUsedRound == round.toString())
             p0w *= parseInt(activeGame.player[0].boostValue);
-        // console.log(0, activeGame.player[0].boostUsedRound, activeGame.player[0].boostValue, round.toString());
-        let p1w = walletStore.resourceTypes[activeGame.player[1].placedCards[round]].weight;
+        let p1w = parseInt(walletStore.resourceTypes[activeGame.player[1].placedCards[round]].weight);
         if (activeGame.player[1].boostUsedRound == round.toString())
             p1w *= parseInt(activeGame.player[1].boostValue);
-        // console.log(1, activeGame.player[1].boostUsedRound, activeGame.player[1].boostValue, round.toString());
         if (p0w > p1w)
             return isPlayer0 ? <GreenLight /> : <RedLight />;
         else if (p1w > p0w)
@@ -211,8 +209,10 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         if (activeGameId === '0')
             if (activeGame)
                 activeGameId = activeGame.gameId;
-        if (activeGameId !== '0')
-            setActiveGame(await gameContract.methods.game(activeGameId).call());
+        if (activeGameId !== '0') {
+            const game = await gameContract.methods.game(activeGameId).call();
+            setActiveGame(game);
+        }
         const pastGamesIds = await gameContract.methods.playerGames(walletStore.address).call();
         setPastGames(await Promise.all(pastGamesIds.map(gid => gameContract.methods.game(gid).call())));
     }, [walletStore.lastBlock, walletStore.connected]);
