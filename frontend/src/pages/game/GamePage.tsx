@@ -402,8 +402,8 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                             e.preventDefault();
                             setActiveGame(await gameContract.methods.game(spectateNumber).call());
                         }}>
-                            <input type='number' value={spectateNumber} onChange={e => setSpectateNumber(e.target.value)} />
-                            <button type='submit'>spectate</button>
+                            <input type='number' value={spectateNumber} onChange={e => setSpectateNumber(e.target.value)} className='form__field form__input' />
+                            <button type='submit' className='btn primary'>spectate</button>
                         </form>
                     )}
                 </div>
@@ -531,7 +531,7 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                     {showLoseAnim && loseAnim}
                                 </div>
                                 <div className="table-debug">
-                                    Game ID: #{activeGame.gameId}
+                                    Game ID: #{activeGame.gameId} {league}
                                 </div>
                             </div>
                         </div>
