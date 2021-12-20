@@ -170,7 +170,7 @@ const MarketItemPage = observer(({ match: { params: { listingId } } }: ICardPage
                                         )}
                                     </div>
                                     <h2 className="section-title">Sale history</h2>
-                                    <TableScrollbar rows={10}>
+                                    {/*<TableScrollbar rows={10}>*/}
                                         <table>
                                             <tr>
                                                 <th>Datetime</th>
@@ -185,7 +185,7 @@ const MarketItemPage = observer(({ match: { params: { listingId } } }: ICardPage
                                                 </tr>
                                             ))}
                                         </table>
-                                    </TableScrollbar>
+                                    {/*</TableScrollbar>*/}
                                 </div>
                             </div>
                         ) : (
