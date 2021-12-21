@@ -49,6 +49,8 @@
     "bootstrap-icons": "^1.7.1",
     "chart.js": "^3.5.1",
     "chartjs": "^0.3.24",
+    "chartjs-adapter-moment": "^1.0.0",
+    "chartjs-plugin-zoom": "^1.2.0",
     "classnames": "^2.3.1",
     "copy-to-clipboard": "^3.3.1",
     "cross-env": "^7.0.3",

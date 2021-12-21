@@ -15,7 +15,22 @@ import Moment from "react-moment";
 import { Api } from "../../graphql/api";
 import { ResourceType } from "../../graphql/sdk";
 import { ADDRESSES } from "../../utils/contracts";
-import TableScrollbar from 'react-table-scrollbar';
+import {
+    LinearScale,
+    Chart as ChartJS,
+    CategoryScale,
+    PointElement,
+    LineElement,
+    Tooltip,
+    Title,
+    Legend,
+    TimeScale,
+} from 'chart.js';
+import adapterMoment from 'chartjs-adapter-moment';
+import zoomPlugin from 'chartjs-plugin-zoom';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(LinearScale, CategoryScale, PointElement, LineElement, Tooltip, Title, Legend, TimeScale, adapterMoment, zoomPlugin);
 
 
 interface ICardPageProps extends RouteChildrenProps<{ listingId: string }> {
@@ -183,6 +198,42 @@ const MarketItemPage = observer(({ match: { params: { listingId } } }: ICardPage
                                             </tbody>
                                         </table>
                                     </div>
+                                    <Line
+                                        data={{
+                                            labels: apiResourceType.sales.map(s => s.datetime),
+                                            datasets: [
+                                                {
+                                                    label: 'Price per each',
+                                                    data: apiResourceType.sales.map(s => parseFloat(s.price) / s.amount),
+                                                    borderColor: '#98753D',
+                                                    backgroundColor: '#A8171B',
+                                                }
+                                            ]
+                                        }}
+                                        options={{
+                                            scales: {
+                                                x: {
+                                                    type: 'time',
+                                                    time: {
+                                                        unit: 'day',
+                                                    }
+                                                }
+                                            },
+                                            plugins: {
+                                                zoom: {
+                                                    pan: {
+                                                        enabled: true,
+                                                        mode: 'x',
+                                                    },
+                                                    zoom: {
+                                                        wheel: { enabled: true },
+                                                        pinch: { enabled: true },
+                                                        mode: 'x',
+                                                    },
+                                                }
+                                            }
+                                        }}
+                                    />
                                 </div>
                             </div>
                         ) : (
