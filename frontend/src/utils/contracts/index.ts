@@ -63,6 +63,10 @@ export function vestingFactoryContract(web3: Web3) {
     return new web3.eth.Contract(VESTING_FACTORY_ABI as any, ADDRESSES.vestingFactory) as any as VestingFactoryContract;
 }
 
+export function vestingFactory2Contract(web3: Web3) {
+    return new web3.eth.Contract(VESTING_FACTORY_ABI as any, ADDRESSES.vestingFactory2) as any as VestingFactoryContract;
+}
+
 export function vestingContract(web3: Web3, address: string) {
     return new web3.eth.Contract(VESTING_ABI as any, address) as any as VestingContract;
 }

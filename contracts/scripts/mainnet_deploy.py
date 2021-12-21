@@ -56,15 +56,15 @@ def main():
     # snowtrace_publish(marketplace)
     # marketplace.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    game = Game.deploy(resource.address, phi.address, {'from': deployer})
-    addresses['game'] = game.address
-    snowtrace_publish(game)
-    game.startGames(list(range(50)), {'from': deployer})
-    game.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    # game = Game.deploy(resource.address, phi.address, {'from': deployer})
+    # addresses['game'] = game.address
+    # snowtrace_publish(game)
+    # game.startGames(list(range(50)), {'from': deployer})
+    # game.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    # factory = TokenVestingFactory.deploy(deployer.address, {'from': deployer})
-    # addresses['vestingFactory'] = factory.address
-    # snowtrace_publish(factory)
+    factory = TokenVestingFactory.deploy(deployer.address, {'from': deployer})
+    addresses['vestingFactory'] = factory.address
+    snowtrace_publish(factory)
 
     # resource.initialMint(chest.address, {'from': deployer})
 

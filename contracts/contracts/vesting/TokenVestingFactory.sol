@@ -94,6 +94,22 @@ contract TokenVestingFactory {
         }
     }
 
+    function deployDiffAmountsMultipleVestingContractAndDepositTokens(
+        address _owner,
+        address[] calldata _beneficiaries,
+        uint256 _start,
+        uint256 _cliff,
+        uint256 _duration,
+        bool _revocable,
+        IERC20 _token,
+        uint256[] calldata amounts
+    ) public {
+        for (uint256 i=0; i < _beneficiaries.length; i++) {
+            TokenVesting c = deployVestingContract(_owner, _beneficiaries[i], _start, _cliff, _duration, _revocable);
+            _token.transferFrom(msg.sender, address(c), amounts[i]);
+        }
+    }
+
     function deployTimelockContract(
         address _beneficiary,
         address _owner,
@@ -132,11 +148,25 @@ contract TokenVestingFactory {
         uint256 _releaseTime,
         bool _revocable,
         IERC20 _token,
-        uint256 amount
+        uint256 amountEach
     ) public {
         for (uint256 i=0; i < _beneficiaries.length; i++) {
             TokenTimelock c = deployTimelockContract(_beneficiaries[i], _owner, _releaseTime, _revocable);
-            _token.transferFrom(msg.sender, address(c), amount);
+            _token.transferFrom(msg.sender, address(c), amountEach);
+        }
+    }
+
+    function deployDiffAmountsMultipleTimelockContractAndDepositTokens(
+        address[] calldata _beneficiaries,
+        address _owner,
+        uint256 _releaseTime,
+        bool _revocable,
+        IERC20 _token,
+        uint256[] calldata amounts
+    ) public {
+        for (uint256 i=0; i < _beneficiaries.length; i++) {
+            TokenTimelock c = deployTimelockContract(_beneficiaries[i], _owner, _releaseTime, _revocable);
+            _token.transferFrom(msg.sender, address(c), amounts[i]);
         }
     }
 

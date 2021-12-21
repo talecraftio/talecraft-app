@@ -5,12 +5,18 @@ import { toast } from "react-toastify";
 import store from "store";
 import Timeout from "await-timeout";
 import {
-    chestContract, game2Contract,
+    chestContract,
+    game2Contract,
     gameContract,
     marketplaceContract,
     phiContract,
     resourceContract,
-    stakingContract, stakingContractX7, timelockContract, vestingContract, vestingFactoryContract
+    stakingContract,
+    stakingContractX7,
+    timelockContract,
+    vestingContract,
+    vestingFactory2Contract,
+    vestingFactoryContract
 } from "../utils/contracts";
 import { MethodReturnContext } from "../utils/contracts/phi";
 import { SendOptions } from "ethereum-abi-types-generator";
@@ -176,6 +182,10 @@ class WalletStore {
 
     get vestingFactoryContract() {
         return vestingFactoryContract(this.web3);
+    }
+
+    get vestingFactory2Contract() {
+        return vestingFactory2Contract(this.web3);
     }
 
     getVestingContract(address: string) {

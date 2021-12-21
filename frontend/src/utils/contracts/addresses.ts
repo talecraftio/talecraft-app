@@ -7,6 +7,7 @@ export default {
     "marketplace": "0x71Ea4a973Be28128a299362015fF4A06b084C70a",
     "game": "0xe3010b04e5B5De763a2fEA47CE6c2fb08dc318F2",
     "vestingFactory": "0x2DAB3390adf79237aF1331bb7Eb4295defE6DA30",
+    "vestingFactory2": "0xBE1DB97d48675ad905F191e3614A8D23326aB586",
     "games": {
         "0": "0x4D09152044E96C91a71e205822DC4Ed3d4fd0022",
         "1": "0xDe9aB6bE01de37a1681a6c66d93E952Dee8Ba712",

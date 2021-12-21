@@ -67,9 +67,11 @@ const VestingPage = observer(({}: IVestingPageProps) => {
         if (!walletStore.address || !walletStore.connected)
             return;
         const vestingContracts = (await walletStore.vestingFactoryContract.methods.vestingContracts(walletStore.address).call()).map(addr => walletStore.getVestingContract(addr));
-        setVestingContracts(vestingContracts);
+        const vestingContracts2 = (await walletStore.vestingFactory2Contract.methods.vestingContracts(walletStore.address).call()).map(addr => walletStore.getVestingContract(addr));
+        setVestingContracts(vestingContracts.concat(vestingContracts2));
         const timelockContracts = (await walletStore.vestingFactoryContract.methods.timelockContracts(walletStore.address).call()).map(addr => walletStore.getTimelockContract(addr));
-        setTimelockContracts(timelockContracts);
+        const timelockContracts2 = (await walletStore.vestingFactory2Contract.methods.timelockContracts(walletStore.address).call()).map(addr => walletStore.getTimelockContract(addr));
+        setTimelockContracts(timelockContracts.concat(timelockContracts2));
         setUpdate(Math.random());
     }, [walletStore.address, walletStore.connected, walletStore.lastBlock]);
 
