@@ -26,7 +26,7 @@ import {
     Legend,
     TimeScale,
 } from 'chart.js';
-import adapterMoment from 'chartjs-adapter-moment';
+import 'chartjs-adapter-moment';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { Line } from 'react-chartjs-2';
 
