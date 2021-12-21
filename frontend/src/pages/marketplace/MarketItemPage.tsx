@@ -30,7 +30,7 @@ import 'chartjs-adapter-moment';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { Line } from 'react-chartjs-2';
 
-ChartJS.register(LinearScale, CategoryScale, PointElement, LineElement, Tooltip, Title, Legend, TimeScale, adapterMoment, zoomPlugin);
+ChartJS.register(LinearScale, CategoryScale, PointElement, LineElement, Tooltip, Title, Legend, TimeScale, zoomPlugin);
 
 
 interface ICardPageProps extends RouteChildrenProps<{ listingId: string }> {
