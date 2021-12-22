@@ -46,20 +46,30 @@ class Command(BaseCommand):
                 balances = resource.functions.balanceOfBatch([player] * len(resources), list(range(1, len(resources) + 1))).call()
                 weight = 0
                 max_tier = 0
-                for i, balance in enumerate(balances, 1):
-                    weight += balance * resources[i][0]
+                tier_weights = [0, 0, 0, 0, 0, 0]
+                for tid, balance in enumerate(balances, 1):
+                    weight += balance * resources[tid][0]
+                    tier_weights[resources[tid][1]] += balance * resources[tid][0]
                     if balance > 0:
-                        max_tier = max(max_tier, resources[i][1])
+                        max_tier = max(max_tier, resources[tid][1])
                 marketplace_balances = marketplace.functions.getLockedTokens(player).call()
                 for tid, amount, *_ in marketplace_balances:
                     weight += amount * resources[tid][0]
+                    tier_weights[resources[tid][1]] += amount * resources[tid][0]
                     if amount > 0:
                         max_tier = max(max_tier, resources[tid][1])
                 pending_crafts = resource.functions.getCrafts(resource.functions.pendingCrafts(player).call()).call()
                 for tid, *_ in pending_crafts:
                     weight += resources[tid][0]
+                    tier_weights[resources[tid][1]] += resources[tid][0]
                     max_tier = max(max_tier, resources[tid][1])
                 LeaderboardItem.objects.update_or_create(address=player,
-                                                         defaults={'weight': weight, 'max_tier': max_tier})
+                                                         defaults={'weight': weight, 'max_tier': max_tier,
+                                                                   'tier0': tier_weights[0],
+                                                                   'tier1': tier_weights[1],
+                                                                   'tier2': tier_weights[2],
+                                                                   'tier3': tier_weights[3],
+                                                                   'tier4': tier_weights[4],
+                                                                   'tier5': tier_weights[5]})
             logging.warning('Updated')
             sleep(60)
