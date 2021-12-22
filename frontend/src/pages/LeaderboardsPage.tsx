@@ -116,7 +116,7 @@ const LeaderboardsPage = ({}: ILeaderboardsPageProps) => {
                                 <li key={r.address} className={classNames(r.address === walletStore.address && 'you')}>
                                     <span>{i+1}</span>
                                     <span>{r.address}</span>
-                                    <span style={{ textDecoration: 'dotted' }} title={`Elements: ${r.tier0}, Stone: ${r.tier1}, Iron: ${r.tier2}, Silver: ${r.tier3}, Gold: ${r.tier4}, Phi Stone: ${r.tier5}`}>{r.weight}</span>
+                                    <span><span style={{ borderBottom: '1px dotted white' }} title={`Elements: ${r.tier0}, Stone: ${r.tier1}, Iron: ${r.tier2}, Silver: ${r.tier3}, Gold: ${r.tier4}, Phi Stone: ${r.tier5}`}>{r.weight}</span></span>
                                     <span>{tierNames[r.maxTier]}</span>
                                 </li>
                             ))}
