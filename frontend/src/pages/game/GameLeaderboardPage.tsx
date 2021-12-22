@@ -8,6 +8,7 @@ import WalletStore from "../../stores/WalletStore";
 import useAsyncEffect from "use-async-effect";
 import { LeaderboarditemResponse } from "../../utils/contracts/game2";
 import classNames from "classnames";
+import AsyncRender from "../../components/AsyncRender";
 
 interface IGameLeaderboardPageProps extends RouteComponentProps {
 }
@@ -26,13 +27,13 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
         case 'master':
             gameAddress = ADDRESSES.games['2']; break;
     }
+    const contract = walletStore.getGame2Contract(gameAddress);
 
     const [ loading, setLoading ] = useState(true);
     const [ leaderboard, setLeaderboard ] = useState<LeaderboarditemResponse[]>([]);
 
     useAsyncEffect(async () => {
         setLoading(true);
-        const contract = walletStore.getGame2Contract(gameAddress);
         const leaderboard = await contract.methods.leaderboard().call();
         setLeaderboard(_.reverse(_.sortBy(leaderboard.filter(i => parseInt(i.wins) > 0), i => parseInt(i.wins))));
         setLoading(false);
@@ -48,12 +49,14 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
                             <li>
                                 <span>#</span>
                                 <span>Address</span>
+                                <span>Played</span>
                                 <span>Wins</span>
                             </li>
                             {leaderboard.map((r, i) => (
                                 <li key={r.player} className={classNames(r.player === walletStore.address && 'you')}>
                                     <span>{i+1}</span>
                                     <span>{r.player}</span>
+                                    <span><AsyncRender>{async () => (await contract.methods.playerGames(r.player).call()).length}</AsyncRender></span>
                                     <span>{r.wins}</span>
                                 </li>
                             ))}
