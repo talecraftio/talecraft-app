@@ -34,7 +34,7 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
         setLoading(true);
         const contract = walletStore.getGame2Contract(gameAddress);
         const leaderboard = await contract.methods.leaderboard().call();
-        setLeaderboard(_.reverse(_.sortBy(leaderboard.filter(i => parseInt(i.wins) > 0), i => i.wins)));
+        setLeaderboard(_.reverse(_.sortBy(leaderboard.filter(i => parseInt(i.wins) > 0), i => parseInt(i.wins))));
         setLoading(false);
     }, []);
 
