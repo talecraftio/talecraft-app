@@ -90,7 +90,10 @@ const LeaderboardsPage = ({}: ILeaderboardsPageProps) => {
 
     let downloadLink;
     if (isCsv) {
-        const result = !loading && leaderboard.map(r => `${r.address},${r.weight},${tierNames[r.maxTier]}`).join('\n');
+        const result = !loading && (
+            'address,weight,tier0_weight,tier1_weight,tier2_weight,tier3_weight,tier4_weight,tier5_weight,max_tier' +
+            leaderboard.map(r => `${r.address},${r.weight},${r.tier0},${r.tier1},${r.tier2},${r.tier3},${r.tier4},${r.tier5},${tierNames[r.maxTier]}`).join('\n')
+        );
 
         if (result) {
             const blob = new Blob([result], { type: 'text/csv' });
