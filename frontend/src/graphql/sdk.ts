@@ -25,6 +25,12 @@ export type Scalars = {
 export type LeaderboardItemType = {
   address: Scalars['String'];
   maxTier: Scalars['Int'];
+  tier0: Scalars['Int'];
+  tier1: Scalars['Int'];
+  tier2: Scalars['Int'];
+  tier3: Scalars['Int'];
+  tier4: Scalars['Int'];
+  tier5: Scalars['Int'];
   weight: Scalars['Int'];
 };
 
@@ -87,7 +93,7 @@ export type ResourceType = {
 
 export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> };
 
-export type LeaderboardItem = { address: string, weight: number, maxTier: number };
+export type LeaderboardItem = { address: string, weight: number, maxTier: number, tier0: number, tier1: number, tier2: number, tier3: number, tier4: number, tier5: number };
 
 export type GetListingsVariables = Exact<{
   tiers?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
@@ -118,7 +124,7 @@ export type GetResource = { resource?: Maybe<{ tokenId: number, name: string, ti
 export type LeaderboardVariables = Exact<{ [key: string]: never; }>;
 
 
-export type Leaderboard = { leaderboard?: Maybe<Array<{ address: string, weight: number, maxTier: number }>> };
+export type Leaderboard = { leaderboard?: Maybe<Array<{ address: string, weight: number, maxTier: number, tier0: number, tier1: number, tier2: number, tier3: number, tier4: number, tier5: number }>> };
 
 export const Resource = gql`
     fragment resource on ResourceType {
@@ -144,6 +150,12 @@ export const LeaderboardItem = gql`
   address
   weight
   maxTier
+  tier0
+  tier1
+  tier2
+  tier3
+  tier4
+  tier5
 }
     `;
 export const MarketplaceStats = gql`

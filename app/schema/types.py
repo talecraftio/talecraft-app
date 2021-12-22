@@ -65,4 +65,4 @@ class MarketplaceStatsType(graphene.ObjectType):
 class LeaderboardItemType(DjangoObjectType):
     class Meta:
         model = LeaderboardItem
-        fields = 'address', 'weight', 'max_tier'
+        fields = 'address', 'weight', 'max_tier', 'tier0', 'tier1', 'tier2', 'tier3', 'tier4', 'tier5',

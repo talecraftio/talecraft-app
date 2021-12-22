@@ -20,6 +20,12 @@ fragment leaderboardItem on LeaderboardItemType {
   address
   weight
   maxTier
+  tier0
+  tier1
+  tier2
+  tier3
+  tier4
+  tier5
 }
 
 query getListings($tiers: [String], $weights: [String], $q: String, $seller: String, $order: String, $page: Int) {

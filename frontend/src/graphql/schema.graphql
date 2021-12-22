@@ -7,6 +7,12 @@ schema {
 type LeaderboardItemType {
     address: String!
     maxTier: Int!
+    tier0: Int!
+    tier1: Int!
+    tier2: Int!
+    tier3: Int!
+    tier4: Int!
+    tier5: Int!
     weight: Int!
 }
 
