@@ -167,6 +167,21 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         onComplete={() => { setShowWinAnim(false) }}
     />, []);
 
+    const boostAnimOptions = {
+        animationData: require('../../animations/boost.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/boost/images/',
+        loop: true,
+        autoplay: true,
+    };
+    const boostAnimApi = useRef<LottieRefCurrentProps>();
+    const boostAnim = useMemo(() => <Lottie
+        className='boost-anim'
+        renderer='canvas'
+        {...boostAnimOptions}
+        lottieRef={boostAnimApi}
+        style={{ width: 600, height: 840 }}
+    />, []);
+
     const getLight = (round: number) => {
         if (!activeGame || activeGame.player[0].placedCards[round] == '0' || activeGame.player[1].placedCards[round] == '0')
             // return (<YellowLight />);
@@ -345,6 +360,8 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         setLoading(false);
     }
 
+
+
     return (
         <main className='main'>
             <section className="game-section">
@@ -452,33 +469,39 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
+                                                    <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item1RivalSlot}>
                                                         {rivalInfo?.placedCards[0] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[0])].ipfsHash}.webp`} />}
                                                         {rivalInfo?.boostUsedRound === '0' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
                                                     </div>
+                                                    {rivalInfo?.boostUsedRound === '0' && boostAnim}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
+                                                    <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item2RivalSlot}>
                                                         {rivalInfo?.placedCards[1] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[1])].ipfsHash}.webp`} />}
                                                         {rivalInfo?.boostUsedRound === '1' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
                                                     </div>
+                                                    {rivalInfo?.boostUsedRound === '1' && boostAnim}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
+                                                    <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item3RivalSlot}>
                                                         {rivalInfo?.placedCards[2] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[2])].ipfsHash}.webp`} />}
                                                         {rivalInfo?.boostUsedRound === '2' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
                                                     </div>
+                                                    {rivalInfo?.boostUsedRound === '2' && boostAnim}
                                                 </div>
                                             </div>
                                         </div>
@@ -493,33 +516,39 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
+                                                    <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item1SelfSlot}>
                                                         {selfInfo?.placedCards[0] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[0]) ].ipfsHash}.webp`} />}
                                                         {selfInfo?.boostUsedRound === '0' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
                                                     </div>
+                                                    {selfInfo?.boostUsedRound === '0' && boostAnim}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
+                                                    <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item2SelfSlot}>
                                                         {selfInfo?.placedCards[1] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[1])].ipfsHash}.webp`} />}
                                                         {selfInfo?.boostUsedRound === '1' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
                                                     </div>
+                                                    {selfInfo?.boostUsedRound === '1' && boostAnim}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="card card_table">
                                             <div className="card__wrap">
                                                 <div className="card__image">
+                                                    <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item3SelfSlot}>
                                                         {selfInfo?.placedCards[2] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[2])].ipfsHash}.webp`} />}
                                                         {selfInfo?.boostUsedRound === '2' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
                                                     </div>
+                                                    {selfInfo?.boostUsedRound === '2' && boostAnim}
                                                 </div>
                                             </div>
                                         </div>

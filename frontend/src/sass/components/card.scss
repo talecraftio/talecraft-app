@@ -165,6 +165,28 @@
         top: 0;
       }
     }
+
+    .boost-anim {
+      position: absolute;
+      z-index: 5;
+      pointer-events: none;
+      width: 110% !important;
+      height: 107% !important;
+      top: -4%;
+      left: -5%;
+      @media (min-width: 768px) {
+        width: 168px !important;
+        height: 218px !important;
+        top: -8px;
+        left: -9px;
+      }
+      @media (min-width: 1920px) {
+        width: 245px !important;
+        height: 320px !important;
+        top: -15px;
+        left: -14.5px;
+      }
+    }
   }
 
   &__row {
