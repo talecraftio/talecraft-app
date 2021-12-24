@@ -48,18 +48,24 @@ class Command(BaseCommand):
                 max_tier = 0
                 tier_weights = [0, 0, 0, 0, 0, 0]
                 for tid, balance in enumerate(balances, 1):
+                    if tid <= 4:
+                        continue
                     weight += balance * resources[tid][0]
                     tier_weights[resources[tid][1]] += balance * resources[tid][0]
                     if balance > 0:
                         max_tier = max(max_tier, resources[tid][1])
                 marketplace_balances = marketplace.functions.getLockedTokens(player).call()
                 for tid, amount, *_ in marketplace_balances:
+                    if tid <= 4:
+                        continue
                     weight += amount * resources[tid][0]
                     tier_weights[resources[tid][1]] += amount * resources[tid][0]
                     if amount > 0:
                         max_tier = max(max_tier, resources[tid][1])
                 pending_crafts = resource.functions.getCrafts(resource.functions.pendingCrafts(player).call()).call()
                 for tid, *_ in pending_crafts:
+                    if tid <= 4:
+                        continue
                     weight += resources[tid][0]
                     tier_weights[resources[tid][1]] += resources[tid][0]
                     max_tier = max(max_tier, resources[tid][1])
