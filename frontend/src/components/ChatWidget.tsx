@@ -87,7 +87,9 @@ const ChatWidget = ({ chatId }: IChatWidgetProps) => {
         const reconnect = () => {
             setJoined(false);
             wsRef.current?.removeEventListener('message', onMessage);
-            wsRef.current = new WebSocket(`wss://39100.dev.bennnnsss.com/ws/chat/?_=${Math.random()}`);
+            const l = window.location;
+            const wsHost = ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname + ((l.port != '80' && l.port != '443') ? ":" + l.port : "");
+            wsRef.current = new WebSocket(`${wsHost}/ws/chat/?_=${Math.random()}`);
             wsRef.current.addEventListener('message', onMessage);
             wsRef.current.onerror = wsRef.current.onclose = () => setTimeout(reconnect, 500);
         }

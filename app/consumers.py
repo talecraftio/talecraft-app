@@ -33,7 +33,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             self.address = address = msg['address']
             self.tab_id = msg['tabId']
             cached_value = str(cache.get(f'chat_token:{token}'))
-            print(f'chat_token:{token}', cached_value, chat_id)
+            # print(f'chat_token:{token}', cached_value, chat_id)
             if str(cache.get(f'chat_token:{token}')) == chat_id:  # token valid
                 group_id = f'chat.{chat_id}'
                 await self.channel_layer.group_add(group_id, self.channel_name)
