@@ -1,6 +1,6 @@
 import csv
 
-from brownie import accounts, Contract, Resource
+from brownie import accounts, Contract, Resource, network
 
 
 BATCH_SIZE = 30
@@ -8,6 +8,8 @@ BATCH_SIZE = 30
 
 def main():
     deployer = accounts.load('deployer')
+
+    network.gas_price(150000000000)
 
     with open('items.csv') as f:
         csv_reader = csv.reader(f, delimiter=',')
@@ -41,5 +43,5 @@ def main():
             ] for item in list(items.values())[i:i+BATCH_SIZE] if item['tier'] > 0
         ], {'from': deployer})
 
-    contract.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    # contract.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 

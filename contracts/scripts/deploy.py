@@ -3,7 +3,7 @@ import json
 
 import requests
 from brownie import accounts, Contract, PHI, ChestSale, Resource, CraftStaking, Marketplace, Game, TokenVestingFactory, MarketplaceNew
-from brownie.network import Chain
+from brownie.network import Chain, gas_price
 
 from scripts._utils import snowtrace_publish
 
@@ -14,6 +14,8 @@ def main():
             addresses = json.loads(f.read()[14:])
     except:
         addresses = {}
+
+    gas_price(150000000000)
 
     deployer = accounts.load('deployer')
 
@@ -64,6 +66,10 @@ def main():
     factory = TokenVestingFactory.deploy(deployer.address, {'from': deployer})
     addresses['vestingFactory'] = factory.address
     snowtrace_publish(factory)
+
+    chest = ChestSale[-1]
+    phi = PHI[-1]
+    resource = Resource[-1]
 
     resource.initialMint(chest.address, {'from': deployer})
 

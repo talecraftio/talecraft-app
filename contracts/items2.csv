@@ -1,0 +1,14 @@
+ocean,sea,sea,4,stone tier,QmRT7cTaSgeivasnHN1hb85RtgHR6PHrf2y9EPJ7rCJESF
+pearl,ocean,stone,7,stone tier,QmQy1PmEtDy5mmycMfYkByHSu8bJ32x87xMHmA3V5YdCw2
+island,ocean,ocean,8,stone tier,QmXdJUMTkfgqETqp12nufdWn8jWpuWnoN2cb7FuWMGFRsg
+algae,ocean,life,12,iron tier,QmQnei7a375tynjLp4yRonHehkvoUCuuK2McrTghWVtnHG
+reef,pearl,island,15,iron tier,QmSpuHUgtfKmZj6BgrvrJw2DAzfqufeDqbKnoYRKHH6wJp
+fish,ocean,algae,16,iron tier,QmWWUFfYTH8aLyp3MxS4gbpczaiWdFS3oyjg2jLrmKKZmA
+crab,reef,fish,31,iron tier,Qmae3FLykvNxtLrADAtz4zVN6VAYUvAHKRdJR4uKrxvjxh
+starfish,fish,star,56,silver tier,Qmf6QMFKHfBHczLUoVJDJwUP41hxp8yBbkmwwh4hF19pRK
+aquarium,crab,starfish,87,gold tier,QmdW4k9H6tfgFA7LSgvGTSXoGnvpQagPnZ11BTdb99vXj4
+islander,island,aquarium,95,gold tier,QmbX9g8L9qv1fjrcir7Z5wtBQ2STXE7DYVNJH1zeRz7i4o
+goldfish,fish,aquarium,103,gold tier,QmTT4wNGxcBx2Ua2sV6T9PqBWhd9w8GLKgSYaNEsyMiCuR
+treasury,goldfish,pearl,110,gold tier,QmeqwbqRE1Cw6BFYN9drqn1RdF54jTKxPJPdhtZkDnRNLY
+tus,treasury,island,118,gold tier,QmZLBWsDJSKMgrEGDKTDPAjmDmcD2eDCzhyeHsBpcvnuFK
+crabada,tus,islander,213,phi stone tier,QmYUs5kRzrPL66yyiN4QnDnFNpnftJaqq6jKRt6cHxysVp

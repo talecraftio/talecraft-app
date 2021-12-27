@@ -18,6 +18,7 @@ import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import Timeout from "await-timeout";
 import { RouteComponentProps } from "react-router";
 import classNames from "classnames";
+import ChatWidget from "../../components/ChatWidget";
 
 interface IGamePageProps extends RouteComponentProps {
 }
@@ -631,13 +632,11 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                             </div>
                         </section>
                     )}
+                    {activeGame.started && (
+                        <ChatWidget chatId={`game.${league}.${activeGame.gameId}`} />
+                    )}
                 </>
             )}
-            <div style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
-                {/*{loadingAnim}*/}
-                {/*{winAnim}*/}
-                {/*{loseAnim}*/}
-            </div>
         </main>
     )
 });

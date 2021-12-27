@@ -29,5 +29,10 @@ export class Api {
         const r = await this.sdk.leaderboard();
         return r.leaderboard;
     }
+
+    async getChatToken(chatId: string, sig: string) {
+        const r = await this.sdk.chatToken({ chatId, sig });
+        return r.chatToken;
+    }
 }
 

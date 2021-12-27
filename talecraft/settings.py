@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'dbsettings',
     'graphene_django',
     'corsheaders',
+    'channels',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -65,6 +66,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'talecraft.wsgi.application'
+ASGI_APPLICATION = 'talecraft.asgi.application'
 
 DATABASES = {
     'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3'),
@@ -93,6 +95,15 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [REDIS_URL],
+        },
+    },
 }
 
 LOGGING = {
@@ -158,3 +169,4 @@ CONSTANCE_CONFIG = {
 
 DBSETTINGS_VALUE_LENGTH = 2048
 STATICFILES_STORAGE = 'spa.storage.SPAStaticFilesStorage'
+TESTNET = (BASE_DIR / '.testnet').exists()

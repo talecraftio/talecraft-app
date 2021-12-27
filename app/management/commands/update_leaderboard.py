@@ -1,26 +1,14 @@
-import json
 import logging
 from time import sleep
 
 from django.core.management import BaseCommand
-from web3 import HTTPProvider, Web3
 
 from app.models import Resource, LeaderboardItem
-from talecraft.settings import BASE_DIR
+from talecraft.crypto import addresses, resource, marketplace
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        with open(BASE_DIR / 'frontend/src/utils/contracts/addresses.ts') as f:
-            addresses = json.loads(f.read()[14:])
-
-        with open(BASE_DIR / 'frontend/src/utils/contracts/marketplace.abi.json') as f:
-            marketplace_abi = json.load(f)
-
-        with open(BASE_DIR / 'frontend/src/utils/contracts/resource.abi.json') as f:
-            resource_abi = json.load(f)
-
-        web3 = Web3(HTTPProvider('https://api.avax.network/ext/bc/C/rpc'))
         resources = {
             r.token_id: (r.weight, r.tier)
             for r in Resource.objects.exclude(token_id=0).order_by('token_id')
@@ -34,9 +22,6 @@ class Command(BaseCommand):
             addresses['marketplace'],
             addresses['game'],
         ]
-
-        resource = web3.eth.contract(address=addresses['resource'], abi=resource_abi)
-        marketplace = web3.eth.contract(address=addresses['marketplace'], abi=marketplace_abi)
 
         while True:
             players = resource.functions.getPlayers().call()

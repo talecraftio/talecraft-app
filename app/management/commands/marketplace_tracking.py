@@ -1,31 +1,19 @@
-import json
 import logging
 import time
 
 from django.core.management import BaseCommand
 from django.db import transaction
 from django.utils import timezone
-from web3 import Web3, HTTPProvider
 
-from talecraft.settings import BASE_DIR
+from talecraft.crypto import marketplace, web3
 from app.models import internal_options as io, Resource, MarketplaceListing
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        with open(BASE_DIR / 'frontend/src/utils/contracts/addresses.ts') as f:
-            addresses = json.loads(f.read()[14:])
-
-        with open(BASE_DIR / 'frontend/src/utils/contracts/marketplace.abi.json') as f:
-            marketplace_abi = json.load(f)
-
-        web3 = Web3(HTTPProvider('https://api.avax.network/ext/bc/C/rpc'))
-
         while True:
             try:
                 with transaction.atomic():
-                    contract = web3.eth.contract(address=addresses['marketplace'], abi=marketplace_abi)
-
                     to_block = web3.eth.blockNumber
                     if not io.marketplace_last_block:
                         io.marketplace_last_block = to_block
@@ -37,10 +25,10 @@ class Command(BaseCommand):
                         from_block = io.marketplace_last_block + 1
                         logging.warning('  Checking blocks {} ~ {}'.format(from_block, to_block))
 
-                        evts = contract.events.NewListing().getLogs(fromBlock=from_block, toBlock=to_block)
+                        evts = marketplace.events.NewListing().getLogs(fromBlock=from_block, toBlock=to_block)
                         for evt in evts:
                             logging.warning(f'    NewListing(seller={evt.args.seller}, listingId={evt.args.listingId})')
-                            listing = contract.functions.getListing(evt.args.listingId).call()
+                            listing = marketplace.functions.getListing(evt.args.listingId).call()
                             logging.warning(f'      listing={repr(listing)}')
                             MarketplaceListing.objects.create(listing_id=evt.args.listingId,
                                                               resource=Resource.objects.get(token_id=listing[0]),
@@ -49,7 +37,7 @@ class Command(BaseCommand):
                                                               seller=listing[3])
                             logging.warning(f'    Listing #{evt.args.listingId} created')
 
-                        evts = contract.events.ListingCancelled().getLogs(fromBlock=from_block, toBlock=to_block)
+                        evts = marketplace.events.ListingCancelled().getLogs(fromBlock=from_block, toBlock=to_block)
                         for evt in evts:
                             logging.warning(f'    ListingCancelled(listingId={evt.args.listingId})')
                             listing = MarketplaceListing.objects.filter(listing_id=evt.args.listingId).first()
@@ -61,7 +49,7 @@ class Command(BaseCommand):
                             else:
                                 logging.warning(f'    Did not find listing #{evt.args.listingId} to cancel')
 
-                        evts = contract.events.Trade().getLogs(fromBlock=from_block, toBlock=to_block)
+                        evts = marketplace.events.Trade().getLogs(fromBlock=from_block, toBlock=to_block)
                         for evt in evts:
                             logging.warning(f'    Trade(seller={evt.args.seller}, buyer={evt.args.buyer}, listingId={evt.args.listingId})')
                             listing = MarketplaceListing.objects.filter(listing_id=evt.args.listingId).first()

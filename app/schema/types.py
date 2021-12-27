@@ -3,7 +3,7 @@ from decimal import Decimal
 import graphene
 from graphene_django import DjangoObjectType, DjangoListField
 
-from app.models import Resource, MarketplaceListing, LeaderboardItem
+from app.models import Resource, MarketplaceListing, LeaderboardItem, GameChatMessage
 
 
 def paginated_type(name, cls):
@@ -66,3 +66,9 @@ class LeaderboardItemType(DjangoObjectType):
     class Meta:
         model = LeaderboardItem
         fields = 'address', 'weight', 'max_tier', 'tier0', 'tier1', 'tier2', 'tier3', 'tier4', 'tier5',
+
+
+class GameChatMessageType(DjangoObjectType):
+    class Meta:
+        model = GameChatMessage
+        fields = 'id', 'author', 'datetime', 'text',

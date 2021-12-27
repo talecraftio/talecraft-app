@@ -66,3 +66,7 @@ query leaderboard {
     ...leaderboardItem
   }
 }
+
+query chatToken($chatId: String!, $sig: String!) {
+  chatToken(chatId: $chatId, sig: $sig)
+}

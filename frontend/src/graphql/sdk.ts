@@ -54,10 +54,17 @@ export type MarketplaceStatsType = {
 };
 
 export type Query = {
+  chatToken?: Maybe<Scalars['String']>;
   leaderboard?: Maybe<Array<LeaderboardItemType>>;
   listings?: Maybe<MarketplaceListingResponseType>;
   marketplaceStats?: Maybe<MarketplaceStatsType>;
   resource?: Maybe<ResourceType>;
+};
+
+
+export type Query_ChatTokenArgs = {
+  chatId?: Maybe<Scalars['String']>;
+  sig?: Maybe<Scalars['String']>;
 };
 
 
@@ -125,6 +132,14 @@ export type LeaderboardVariables = Exact<{ [key: string]: never; }>;
 
 
 export type Leaderboard = { leaderboard?: Maybe<Array<{ address: string, weight: number, maxTier: number, tier0: number, tier1: number, tier2: number, tier3: number, tier4: number, tier5: number }>> };
+
+export type ChatTokenVariables = Exact<{
+  chatId: Scalars['String'];
+  sig: Scalars['String'];
+}>;
+
+
+export type ChatToken = { chatToken?: Maybe<string> };
 
 export const Resource = gql`
     fragment resource on ResourceType {
@@ -209,6 +224,11 @@ export const LeaderboardDocument = gql`
   }
 }
     ${LeaderboardItem}`;
+export const ChatTokenDocument = gql`
+    query chatToken($chatId: String!, $sig: String!) {
+  chatToken(chatId: $chatId, sig: $sig)
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -228,6 +248,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     leaderboard(variables?: LeaderboardVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<Leaderboard> {
       return withWrapper((wrappedRequestHeaders) => client.request<Leaderboard>(LeaderboardDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'leaderboard');
+    },
+    chatToken(variables: ChatTokenVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChatToken> {
+      return withWrapper((wrappedRequestHeaders) => client.request<ChatToken>(ChatTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'chatToken');
     }
   };
 }

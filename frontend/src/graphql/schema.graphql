@@ -36,6 +36,7 @@ type MarketplaceStatsType {
 }
 
 type Query {
+    chatToken(chatId: String, sig: String): String
     leaderboard: [LeaderboardItemType!]
     listings(order: String, page: Int, q: String, seller: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType

@@ -58,3 +58,15 @@ class LeaderboardItem(models.Model):
     tier3 = models.PositiveIntegerField(default=0)
     tier4 = models.PositiveIntegerField(default=0)
     tier5 = models.PositiveIntegerField(default=0)
+
+
+class GameChat(models.Model):
+    chat_id = models.CharField(max_length=16, db_index=True)
+
+
+class GameChatMessage(models.Model):
+    chat = models.ForeignKey(GameChat, on_delete=models.CASCADE, related_name='messages')
+    author = models.CharField(max_length=64)
+    datetime = models.DateTimeField(auto_now_add=True)
+    text = models.TextField()
+
