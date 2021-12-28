@@ -1,10 +1,12 @@
 import logging
+from datetime import datetime, timedelta
 from time import sleep
 
 from django.core.management import BaseCommand
+from django.db.models import F
 
-from app.models import Resource, LeaderboardItem
-from talecraft.crypto import addresses, resource, marketplace
+from app.models import internal_options as io, Resource, LeaderboardItem, GameLeaderboardItem
+from talecraft.crypto import addresses, resource, marketplace, games
 
 
 class Command(BaseCommand):
@@ -62,5 +64,21 @@ class Command(BaseCommand):
                                                                    'tier3': tier_weights[3],
                                                                    'tier4': tier_weights[4],
                                                                    'tier5': tier_weights[5]})
-            logging.warning('Updated')
+            logging.warning('Global leaderboards updated')
+
+            now = datetime.utcnow()
+            if not io.last_game_leaderboards_reset or io.last_game_leaderboards_reset < now - timedelta(2):
+                if now.weekday() == 6 and now.hour > 17:
+                    GameLeaderboardItem.objects.update(_wins_offset=F('_wins'), _played_offset=F('_played'))
+                    io.last_game_leaderboards_reset = now
+                    logging.warning('Game leaderboards reset')
+
+            for i, league in enumerate(games.keys()):
+                leaderboard = games[league].functions.leaderboard().call()
+                for player, wins in leaderboard:
+                    played = len(games[league].functions.playerGames(player).call())
+                    GameLeaderboardItem.objects.update_or_create(address=player, league=i, defaults={'_wins': wins, '_played': played})
+
+            logging.warning('Game leaderboards updated')
+
             sleep(60)

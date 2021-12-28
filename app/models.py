@@ -60,6 +60,23 @@ class LeaderboardItem(models.Model):
     tier5 = models.PositiveIntegerField(default=0)
 
 
+class GameLeaderboardItem(models.Model):
+    league = models.PositiveSmallIntegerField()
+    address = models.CharField(max_length=64)
+    _played = models.PositiveIntegerField()
+    _wins = models.PositiveIntegerField()
+    _played_offset = models.PositiveIntegerField(default=0)
+    _wins_offset = models.PositiveIntegerField(default=0)
+
+    @property
+    def played(self):
+        return self._played - self._played_offset
+
+    @property
+    def wins(self):
+        return self._wins - self._wins_offset
+
+
 class GameChat(models.Model):
     chat_id = models.CharField(max_length=16, db_index=True)
 

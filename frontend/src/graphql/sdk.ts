@@ -22,6 +22,13 @@ export type Scalars = {
   Decimal: any;
 };
 
+export type GameLeaderboardItemType = {
+  address: Scalars['String'];
+  league: Scalars['Int'];
+  played?: Maybe<Scalars['Int']>;
+  wins?: Maybe<Scalars['Int']>;
+};
+
 export type LeaderboardItemType = {
   address: Scalars['String'];
   maxTier: Scalars['Int'];
@@ -55,6 +62,7 @@ export type MarketplaceStatsType = {
 
 export type Query = {
   chatToken?: Maybe<Scalars['String']>;
+  gameLeaderboard?: Maybe<Array<GameLeaderboardItemType>>;
   leaderboard?: Maybe<Array<LeaderboardItemType>>;
   listings?: Maybe<MarketplaceListingResponseType>;
   marketplaceStats?: Maybe<MarketplaceStatsType>;
@@ -102,6 +110,8 @@ export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: 
 
 export type LeaderboardItem = { address: string, weight: number, maxTier: number, tier0: number, tier1: number, tier2: number, tier3: number, tier4: number, tier5: number };
 
+export type GameLeaderboardItem = { address: string, wins?: Maybe<number>, played?: Maybe<number>, league: number };
+
 export type GetListingsVariables = Exact<{
   tiers?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
   weights?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
@@ -132,6 +142,11 @@ export type LeaderboardVariables = Exact<{ [key: string]: never; }>;
 
 
 export type Leaderboard = { leaderboard?: Maybe<Array<{ address: string, weight: number, maxTier: number, tier0: number, tier1: number, tier2: number, tier3: number, tier4: number, tier5: number }>> };
+
+export type GameLeaderboardVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GameLeaderboard = { gameLeaderboard?: Maybe<Array<{ address: string, wins?: Maybe<number>, played?: Maybe<number>, league: number }>> };
 
 export type ChatTokenVariables = Exact<{
   chatId: Scalars['String'];
@@ -171,6 +186,14 @@ export const LeaderboardItem = gql`
   tier3
   tier4
   tier5
+}
+    `;
+export const GameLeaderboardItem = gql`
+    fragment gameLeaderboardItem on GameLeaderboardItemType {
+  address
+  wins
+  played
+  league
 }
     `;
 export const MarketplaceStats = gql`
@@ -224,6 +247,13 @@ export const LeaderboardDocument = gql`
   }
 }
     ${LeaderboardItem}`;
+export const GameLeaderboardDocument = gql`
+    query gameLeaderboard {
+  gameLeaderboard {
+    ...gameLeaderboardItem
+  }
+}
+    ${GameLeaderboardItem}`;
 export const ChatTokenDocument = gql`
     query chatToken($chatId: String!, $sig: String!) {
   chatToken(chatId: $chatId, sig: $sig)
@@ -248,6 +278,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     leaderboard(variables?: LeaderboardVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<Leaderboard> {
       return withWrapper((wrappedRequestHeaders) => client.request<Leaderboard>(LeaderboardDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'leaderboard');
+    },
+    gameLeaderboard(variables?: GameLeaderboardVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GameLeaderboard> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GameLeaderboard>(GameLeaderboardDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'gameLeaderboard');
     },
     chatToken(variables: ChatTokenVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChatToken> {
       return withWrapper((wrappedRequestHeaders) => client.request<ChatToken>(ChatTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'chatToken');

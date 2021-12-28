@@ -4,6 +4,13 @@ schema {
     query: Query
 }
 
+type GameLeaderboardItemType {
+    address: String!
+    league: Int!
+    played: Int
+    wins: Int
+}
+
 type LeaderboardItemType {
     address: String!
     maxTier: Int!
@@ -37,6 +44,7 @@ type MarketplaceStatsType {
 
 type Query {
     chatToken(chatId: String, sig: String): String
+    gameLeaderboard: [GameLeaderboardItemType!]
     leaderboard: [LeaderboardItemType!]
     listings(order: String, page: Int, q: String, seller: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType

@@ -28,6 +28,13 @@ fragment leaderboardItem on LeaderboardItemType {
   tier5
 }
 
+fragment gameLeaderboardItem on GameLeaderboardItemType {
+  address
+  wins
+  played
+  league
+}
+
 query getListings($tiers: [String], $weights: [String], $q: String, $seller: String, $order: String, $page: Int) {
   listings(tiers: $tiers, weights: $weights, q: $q, seller: $seller, order: $order, page: $page) {
     totalItems
@@ -64,6 +71,12 @@ query getResource($tokenId: ID!) {
 query leaderboard {
   leaderboard {
     ...leaderboardItem
+  }
+}
+
+query gameLeaderboard {
+  gameLeaderboard {
+    ...gameLeaderboardItem
   }
 }
 

@@ -9,33 +9,38 @@ import useAsyncEffect from "use-async-effect";
 import { LeaderboarditemResponse } from "../../utils/contracts/game2";
 import classNames from "classnames";
 import AsyncRender from "../../components/AsyncRender";
+import { Api } from "../../graphql/api";
+import { GameLeaderboardItem } from "../../graphql/sdk";
 
 interface IGameLeaderboardPageProps extends RouteComponentProps {
 }
 
 const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
     const walletStore = useInjection(WalletStore);
+    const api = useInjection(Api);
     const location = useLocation();
 
     const league = location.pathname.split('/')[2];
     let gameAddress;
+    let leagueId;
     switch (league) {
         case 'junior':
-            gameAddress = ADDRESSES.games['0']; break;
+            gameAddress = ADDRESSES.games['0']; leagueId = 0; break;
         case 'senior':
-            gameAddress = ADDRESSES.games['1']; break;
+            gameAddress = ADDRESSES.games['1']; leagueId = 0; break;
         case 'master':
-            gameAddress = ADDRESSES.games['2']; break;
+            gameAddress = ADDRESSES.games['2']; leagueId = 0; break;
     }
     const contract = walletStore.getGame2Contract(gameAddress);
 
     const [ loading, setLoading ] = useState(true);
-    const [ leaderboard, setLeaderboard ] = useState<LeaderboarditemResponse[]>([]);
+    const [ leaderboard, setLeaderboard ] = useState<GameLeaderboardItem[]>([]);
 
     useAsyncEffect(async () => {
         setLoading(true);
-        const leaderboard = await contract.methods.leaderboard().call();
-        setLeaderboard(_.reverse(_.sortBy(leaderboard.filter(i => parseInt(i.wins) > 0), i => parseInt(i.wins))));
+        // const leaderboard = await contract.methods.leaderboard().call();
+        const leaderboard = await api.getGameLeaderboard();
+        setLeaderboard(_.reverse(_.sortBy(leaderboard.filter(i => i.wins > 0 && i.league == leagueId), i => i.wins)));
         setLoading(false);
     }, []);
 
@@ -53,10 +58,10 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
                                 <span>Wins</span>
                             </li>
                             {leaderboard.map((r, i) => (
-                                <li key={r.player} className={classNames(r.player === walletStore.address && 'you')}>
+                                <li key={r.address} className={classNames(r.address === walletStore.address && 'you')}>
                                     <span>{i+1}</span>
-                                    <span>{r.player}</span>
-                                    <span><AsyncRender>{async () => (await contract.methods.playerGames(r.player).call()).length}</AsyncRender></span>
+                                    <span>{r.address}</span>
+                                    <span>{r.played}</span>
                                     <span>{r.wins}</span>
                                 </li>
                             ))}

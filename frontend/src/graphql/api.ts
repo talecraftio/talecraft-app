@@ -30,6 +30,11 @@ export class Api {
         return r.leaderboard;
     }
 
+    async getGameLeaderboard() {
+        const r = await this.sdk.gameLeaderboard();
+        return r.gameLeaderboard;
+    }
+
     async getChatToken(chatId: string, sig: string) {
         const r = await this.sdk.chatToken({ chatId, sig });
         return r.chatToken;

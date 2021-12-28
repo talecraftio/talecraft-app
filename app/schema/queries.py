@@ -4,14 +4,15 @@ from uuid import uuid4
 import graphene
 from django.conf import settings
 from django.core.cache import cache
-from django.db.models import Q
+from django.db.models import Q, F
 from eth_account.messages import encode_defunct
 from graphene_django import DjangoListField
 from graphql import GraphQLError
 from web3 import Web3, HTTPProvider
 
-from app.models import MarketplaceListing, Resource, LeaderboardItem, GameChat
-from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType, LeaderboardItemType
+from app.models import MarketplaceListing, Resource, LeaderboardItem, GameChat, GameLeaderboardItem
+from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType, LeaderboardItemType, \
+    GameLeaderboardItemType
 from talecraft.crypto import web3, games
 
 
@@ -26,6 +27,7 @@ class Query(graphene.ObjectType):
     marketplace_stats = graphene.Field(MarketplaceStatsType)
     resource = graphene.Field(ResourceType, token_id=graphene.ID())
     leaderboard = DjangoListField(LeaderboardItemType)
+    game_leaderboard = DjangoListField(GameLeaderboardItemType)
     chat_token = graphene.String(chat_id=graphene.String(), sig=graphene.String())
 
     @classmethod
@@ -80,6 +82,10 @@ class Query(graphene.ObjectType):
     @classmethod
     def resolve_leaderboard(cls, root, info):
         return LeaderboardItem.objects.order_by('-weight')
+
+    @classmethod
+    def resolve_game_leaderboard(cls, root, info):
+        return GameLeaderboardItem.objects.exclude(_wins=F('_wins_offset'), _played=F('_played_offset'))
 
     @classmethod
     def resolve_chat_token(cls, root, info, chat_id, sig):
