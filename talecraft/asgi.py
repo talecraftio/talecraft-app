@@ -10,8 +10,6 @@ django.setup()
 
 from app.consumers import ChatConsumer
 
-application = get_asgi_application()
-
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     'websocket': URLRouter([
