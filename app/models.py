@@ -11,7 +11,7 @@ class Resource(models.Model):
     name = models.CharField(max_length=64)
     tier = models.PositiveSmallIntegerField(db_index=True)
     ipfs_hash = models.CharField(max_length=64)
-    ingredients = models.ManyToManyField('self')
+    ingredients = models.ManyToManyField('self', symmetrical=False)
     weight = models.PositiveIntegerField()
 
     def as_tree_json(self, parent=None):
