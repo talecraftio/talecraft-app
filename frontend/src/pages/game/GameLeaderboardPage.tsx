@@ -27,9 +27,9 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
         case 'junior':
             gameAddress = ADDRESSES.games['0']; leagueId = 0; break;
         case 'senior':
-            gameAddress = ADDRESSES.games['1']; leagueId = 0; break;
+            gameAddress = ADDRESSES.games['1']; leagueId = 1; break;
         case 'master':
-            gameAddress = ADDRESSES.games['2']; leagueId = 0; break;
+            gameAddress = ADDRESSES.games['2']; leagueId = 2; break;
     }
     const contract = walletStore.getGame2Contract(gameAddress);
 
