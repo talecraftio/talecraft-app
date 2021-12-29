@@ -269,12 +269,20 @@ class WalletStore {
     }
 
     loadResourceTypes = async () => {
-        const contract = this.resourceContract;
-        const rtCount = await contract.methods.resourceCount().call();
-        const resourceTypeIds = _.range(0, parseInt(rtCount) + 1).map(i => i.toString());
-        const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
+        // const contract = this.resourceContract;
+        // const rtCount = await contract.methods.resourceCount().call();
+        // const resourceTypeIds = _.range(0, parseInt(rtCount) + 1).map(i => i.toString());
+        // const resourceTypes = await contract.methods.getResourceTypes(resourceTypeIds).call();
         // @ts-ignore
-        runInAction(() => this.resourceTypes = resourceTypes.map(([ name, weight, tier, ingredients, ipfsHash ], i) => ({ name, weight, tier, ingredients, ipfsHash, id: i })));
+        const resourceTypes = await this.rootStore.api.getResourceTypes();
+        runInAction(() => this.resourceTypes = resourceTypes.map(({ name, weight, tier, ingredients, ipfsHash, tokenId }) => ({
+            name,
+            weight: weight.toString(),
+            tier: tier.toString(),
+            ingredients: ingredients.map(i => i.toString()),
+            ipfsHash,
+            id: tokenId
+        })));
     }
 }
 

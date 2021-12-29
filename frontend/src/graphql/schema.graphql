@@ -49,6 +49,7 @@ type Query {
     listings(order: String, page: Int, q: String, seller: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType
     resource(tokenId: ID): ResourceType
+    resources: [ResourceType!]
     settings: SettingsType
 }
 
@@ -60,6 +61,7 @@ type ResourceSaleEntry {
 
 type ResourceType {
     currentSales: [ResourceSaleEntry]
+    ingredients: [Int]
     ipfsHash: String!
     name: String!
     sales: [ResourceSaleEntry]

@@ -26,6 +26,7 @@ class Query(graphene.ObjectType):
                               order=graphene.String(required=False),
                               page=graphene.Int())
     marketplace_stats = graphene.Field(MarketplaceStatsType)
+    resources = DjangoListField(ResourceType)
     resource = graphene.Field(ResourceType, token_id=graphene.ID())
     leaderboard = DjangoListField(LeaderboardItemType)
     game_leaderboard = DjangoListField(GameLeaderboardItemType)
@@ -76,6 +77,10 @@ class Query(graphene.ObjectType):
         return {
             'min_element_price': Decimal(min([e.price for e in elements if e] or [0])),
         }
+
+    @classmethod
+    def resolve_resources(cls, root, info):
+        return Resource.objects.exclude(token_id=0).order_by('token_id')
 
     @classmethod
     def resolve_resource(cls, root, info, token_id):

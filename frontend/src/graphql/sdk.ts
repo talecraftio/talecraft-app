@@ -67,6 +67,7 @@ export type Query = {
   listings?: Maybe<MarketplaceListingResponseType>;
   marketplaceStats?: Maybe<MarketplaceStatsType>;
   resource?: Maybe<ResourceType>;
+  resources?: Maybe<Array<ResourceType>>;
   settings?: Maybe<SettingsType>;
 };
 
@@ -99,6 +100,7 @@ export type ResourceSaleEntry = {
 
 export type ResourceType = {
   currentSales?: Maybe<Array<Maybe<ResourceSaleEntry>>>;
+  ingredients?: Maybe<Array<Maybe<Scalars['Int']>>>;
   ipfsHash: Scalars['String'];
   name: Scalars['String'];
   sales?: Maybe<Array<Maybe<ResourceSaleEntry>>>;
@@ -111,7 +113,7 @@ export type SettingsType = {
   chestSaleActive?: Maybe<Scalars['Boolean']>;
 };
 
-export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> };
+export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, ingredients?: Maybe<Array<Maybe<number>>>, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> };
 
 export type LeaderboardItem = { address: string, weight: number, maxTier: number, tier0: number, tier1: number, tier2: number, tier3: number, tier4: number, tier5: number };
 
@@ -127,7 +129,7 @@ export type GetListingsVariables = Exact<{
 }>;
 
 
-export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: any, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
+export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: any, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, ingredients?: Maybe<Array<Maybe<number>>>, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
 
 export type MarketplaceStats = { minElementPrice?: Maybe<any> };
 
@@ -136,12 +138,17 @@ export type GetMarketplaceStatsVariables = Exact<{ [key: string]: never; }>;
 
 export type GetMarketplaceStats = { marketplaceStats?: Maybe<{ minElementPrice?: Maybe<any> }> };
 
+export type GetResourceTypesVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetResourceTypes = { resources?: Maybe<Array<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, ingredients?: Maybe<Array<Maybe<number>>>, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }>> };
+
 export type GetResourceVariables = Exact<{
   tokenId: Scalars['ID'];
 }>;
 
 
-export type GetResource = { resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> };
+export type GetResource = { resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, ingredients?: Maybe<Array<Maybe<number>>>, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> };
 
 export type LeaderboardVariables = Exact<{ [key: string]: never; }>;
 
@@ -183,6 +190,7 @@ export const Resource = gql`
     amount
     price
   }
+  ingredients
 }
     `;
 export const LeaderboardItem = gql`
@@ -243,6 +251,13 @@ export const GetMarketplaceStatsDocument = gql`
   }
 }
     ${MarketplaceStats}`;
+export const GetResourceTypesDocument = gql`
+    query getResourceTypes {
+  resources {
+    ...resource
+  }
+}
+    ${Resource}`;
 export const GetResourceDocument = gql`
     query getResource($tokenId: ID!) {
   resource(tokenId: $tokenId) {
@@ -289,6 +304,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getMarketplaceStats(variables?: GetMarketplaceStatsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMarketplaceStats> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetMarketplaceStats>(GetMarketplaceStatsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMarketplaceStats');
+    },
+    getResourceTypes(variables?: GetResourceTypesVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResourceTypes> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetResourceTypes>(GetResourceTypesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResourceTypes');
     },
     getResource(variables: GetResourceVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResource> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetResource>(GetResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResource');

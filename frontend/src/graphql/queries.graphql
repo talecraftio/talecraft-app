@@ -14,6 +14,7 @@ fragment resource on ResourceType {
     amount
     price
   }
+  ingredients
 }
 
 fragment leaderboardItem on LeaderboardItemType {
@@ -59,6 +60,12 @@ fragment marketplaceStats on MarketplaceStatsType {
 query getMarketplaceStats {
   marketplaceStats {
     ...marketplaceStats
+  }
+}
+
+query getResourceTypes {
+  resources {
+    ...resource
   }
 }
 

@@ -23,6 +23,7 @@ class ResourceSaleEntry(graphene.ObjectType):
 class ResourceType(DjangoObjectType):
     sales = graphene.List(ResourceSaleEntry)
     current_sales = graphene.List(ResourceSaleEntry)
+    ingredients = graphene.List(graphene.Int)
 
     @staticmethod
     def resolve_sales(resource: Resource, info):
@@ -42,9 +43,13 @@ class ResourceType(DjangoObjectType):
             'price': Decimal(l.price),
         } for l in sales]
 
+    @staticmethod
+    def resolve_ingredients(resource: Resource, info):
+        return list(resource.ingredients.values_list('token_id', flat=True))
+
     class Meta:
         model = Resource
-        fields = 'token_id', 'name', 'tier', 'ipfs_hash', 'weight', 'sales', 'current_sales',
+        fields = 'token_id', 'name', 'tier', 'ipfs_hash', 'weight', 'sales', 'current_sales', 'ingredients'
 
 
 class MarketplaceListingType(DjangoObjectType):
