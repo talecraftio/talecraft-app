@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'graphene_django',
     'corsheaders',
     'channels',
+    'constance',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -165,6 +166,7 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 CONSTANCE_CONFIG = {
+    'CHEST_SALE_ACTIVE': (False, ''),
 }
 
 DBSETTINGS_VALUE_LENGTH = 2048

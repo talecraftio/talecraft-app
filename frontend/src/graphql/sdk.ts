@@ -67,6 +67,7 @@ export type Query = {
   listings?: Maybe<MarketplaceListingResponseType>;
   marketplaceStats?: Maybe<MarketplaceStatsType>;
   resource?: Maybe<ResourceType>;
+  settings?: Maybe<SettingsType>;
 };
 
 
@@ -104,6 +105,10 @@ export type ResourceType = {
   tier: Scalars['Int'];
   tokenId: Scalars['Int'];
   weight: Scalars['Int'];
+};
+
+export type SettingsType = {
+  chestSaleActive?: Maybe<Scalars['Boolean']>;
 };
 
 export type Resource = { tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> };
@@ -155,6 +160,11 @@ export type ChatTokenVariables = Exact<{
 
 
 export type ChatToken = { chatToken?: Maybe<string> };
+
+export type SettingsVariables = Exact<{ [key: string]: never; }>;
+
+
+export type Settings = { settings?: Maybe<{ chestSaleActive?: Maybe<boolean> }> };
 
 export const Resource = gql`
     fragment resource on ResourceType {
@@ -259,6 +269,13 @@ export const ChatTokenDocument = gql`
   chatToken(chatId: $chatId, sig: $sig)
 }
     `;
+export const SettingsDocument = gql`
+    query settings {
+  settings {
+    chestSaleActive
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -284,6 +301,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     chatToken(variables: ChatTokenVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChatToken> {
       return withWrapper((wrappedRequestHeaders) => client.request<ChatToken>(ChatTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'chatToken');
+    },
+    settings(variables?: SettingsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<Settings> {
+      return withWrapper((wrappedRequestHeaders) => client.request<Settings>(SettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'settings');
     }
   };
 }

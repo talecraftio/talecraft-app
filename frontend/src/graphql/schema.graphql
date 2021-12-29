@@ -49,6 +49,7 @@ type Query {
     listings(order: String, page: Int, q: String, seller: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType
     resource(tokenId: ID): ResourceType
+    settings: SettingsType
 }
 
 type ResourceSaleEntry {
@@ -65,6 +66,10 @@ type ResourceType {
     tier: Int!
     tokenId: Int!
     weight: Int!
+}
+
+type SettingsType {
+    chestSaleActive: Boolean
 }
 
 

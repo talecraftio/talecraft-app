@@ -83,3 +83,9 @@ query gameLeaderboard {
 query chatToken($chatId: String!, $sig: String!) {
   chatToken(chatId: $chatId, sig: $sig)
 }
+
+query settings {
+  settings {
+    chestSaleActive
+  }
+}

@@ -27,6 +27,7 @@ import _, { parseInt } from "lodash";
 
 import JOE_PAIR_ABI from '../utils/contracts/joePair.abi.json';
 import { ResourcetypeResponse } from "../utils/contracts/resource";
+import { SettingsType } from "../graphql/sdk";
 
 const TESTNET = !!process.env.TESTNET;
 
@@ -55,6 +56,7 @@ class WalletStore {
     @observable connected: boolean = false;
     @observable lastBlock: number;
     @observable resourceTypes: (ResourcetypeResponse & { id: number })[] = [];
+    @observable settings: SettingsType;
     // @observable profile: Profile;
 
     private rawProvider: any = new Web3.providers.HttpProvider(DEFAULT_RPC);
@@ -82,6 +84,8 @@ class WalletStore {
         }
         await this.loadResourceTypes();
         setInterval(() => runInAction(() => this.lastBlock = Math.random()), 10000);
+        const settings = await this.rootStore.api.getSettings();
+        runInAction(() => this.settings = settings);
         runInAction(() => this.initialized = true);
     }
 

@@ -39,5 +39,10 @@ export class Api {
         const r = await this.sdk.chatToken({ chatId, sig });
         return r.chatToken;
     }
+
+    async getSettings() {
+        const r = await this.sdk.settings();
+        return r.settings;
+    }
 }
 

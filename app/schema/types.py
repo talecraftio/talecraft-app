@@ -81,3 +81,7 @@ class GameChatMessageType(DjangoObjectType):
     class Meta:
         model = GameChatMessage
         fields = 'id', 'author', 'datetime', 'text',
+
+
+class SettingsType(graphene.ObjectType):
+    chest_sale_active = graphene.Boolean()

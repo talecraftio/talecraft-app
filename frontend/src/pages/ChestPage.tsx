@@ -150,7 +150,7 @@ const ChestPage = observer(({}: IChestPageProps) => {
                                     </div>
                                     <button
                                         className="btn primary up"
-                                        disabled
+                                        disabled={loading || !walletStore.settings?.chestSaleActive}
                                         type="submit"
                                     >
                                         BUY CHESTS

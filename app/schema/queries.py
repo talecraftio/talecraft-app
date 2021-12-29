@@ -12,7 +12,7 @@ from web3 import Web3, HTTPProvider
 
 from app.models import MarketplaceListing, Resource, LeaderboardItem, GameChat, GameLeaderboardItem
 from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType, LeaderboardItemType, \
-    GameLeaderboardItemType
+    GameLeaderboardItemType, SettingsType
 from talecraft.crypto import web3, games
 
 
@@ -29,6 +29,7 @@ class Query(graphene.ObjectType):
     leaderboard = DjangoListField(LeaderboardItemType)
     game_leaderboard = DjangoListField(GameLeaderboardItemType)
     chat_token = graphene.String(chat_id=graphene.String(), sig=graphene.String())
+    settings = graphene.Field(SettingsType)
 
     @classmethod
     def resolve_listings(cls, root, info, tiers=None, weights=None, q='', seller='', order='price', page=0):
@@ -105,3 +106,9 @@ class Query(graphene.ObjectType):
             return chat_token
         else:
             raise GraphQLError('Invalid chat id prefix')
+
+    @classmethod
+    def resolve_settings(cls, root, info):
+        return {
+            'chest_sale_active': settings.CHEST_SALE_ACTIVE,
+        }
