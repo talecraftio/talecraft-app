@@ -80,7 +80,7 @@ class Query(graphene.ObjectType):
 
     @classmethod
     def resolve_resources(cls, root, info):
-        return Resource.objects.exclude(token_id=0).order_by('token_id')
+        return Resource.objects.order_by('token_id')
 
     @classmethod
     def resolve_resource(cls, root, info, token_id):
