@@ -2,6 +2,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 import graphene
+from constance import config
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q, F
@@ -110,5 +111,5 @@ class Query(graphene.ObjectType):
     @classmethod
     def resolve_settings(cls, root, info):
         return {
-            'chest_sale_active': settings.CHEST_SALE_ACTIVE,
+            'chest_sale_active': config.CHEST_SALE_ACTIVE,
         }
