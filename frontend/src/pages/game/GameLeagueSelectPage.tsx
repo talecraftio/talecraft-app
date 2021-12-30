@@ -17,20 +17,25 @@ const GameLeagueItem = observer(({ title, address, minWeight, maxWeight, link })
     const eligible = useAsyncMemo(async () => {
         if (!walletStore.resourceTypes.length)
             return false;
+        const address = walletStore.address;
         const inventory = await walletStore.getInventory();
         let weight = _.sum(inventory.map(i => parseInt(i.tokenId) > 4 ? i.balance * walletStore.resourceTypes[i.tokenId].weight : 0));
-        const listingIds = await walletStore.marketplaceContract.methods.getListingsBySeller(walletStore.address).call();
+        const listingIds = await walletStore.marketplaceContract.methods.getListingsBySeller(address).call();
         weight += _.sum(await Promise.all(listingIds.map(async lid => {
             const l = await walletStore.marketplaceContract.methods.getListing(lid).call();
-            return parseInt(l.amount) * walletStore.resourceTypes[l.tokenId].weight;
+            if (parseInt(l.tokenId) > 4)
+                return parseInt(l.amount) * walletStore.resourceTypes[l.tokenId].weight;
+            return 0;
         })));
-        const craftIds = await walletStore.resourceContract.methods.pendingCrafts(walletStore.address).call();
+        const craftIds = await walletStore.resourceContract.methods.pendingCrafts(address).call();
         weight += _.sum(await Promise.all(craftIds.map(async cid => {
             const c = await walletStore.resourceContract.methods.getCrafts([cid]).call();
-            return walletStore.resourceTypes[c[0].tokenId].weight;
+            if (parseInt(c[0].tokenId) > 4)
+                return parseInt(walletStore.resourceTypes[c[0].tokenId].weight);
+            return 0;
         })));
         return weight >= minWeight && weight <= maxWeight;
-    }, [walletStore.address, walletStore.lastBlock, walletStore.resourceTypes]);
+    }, [address, walletStore.lastBlock, walletStore.resourceTypes]);
 
     const entryPrice = useAsyncMemo(async () => {
         const contract = walletStore.getGame2Contract(address);
