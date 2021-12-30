@@ -20,6 +20,8 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
     const api = useInjection(Api);
     const location = useLocation();
 
+    const isCsv = location.hash === '#csv';
+
     const league = location.pathname.split('/')[2];
     let gameAddress;
     let leagueId;
@@ -44,12 +46,26 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
         setLoading(false);
     }, []);
 
+    let downloadLink;
+    if (isCsv) {
+        const result = !loading && (
+            'address,played,wins' +
+            leaderboard.map(r => `${r.address},${r.played},${r.wins}`).join('\n')
+        );
+
+        if (result) {
+            const blob = new Blob([result], { type: 'text/csv' });
+            downloadLink = URL.createObjectURL(blob);
+        }
+    }
+
     return (
         <main className="main leaderboards" style={{ color: 'white' }}>
             <div className="container" style={{ marginTop: 150 }}>
                 <h1>{_.capitalize(league)} game leaderboard</h1>
                 {loading ? 'Loading...' : (
                     <>
+                        {isCsv && <div><a href={downloadLink} download='player_weights.csv' style={{ fontSize: 14, color: 'white', fontFamily: 'monospace', textDecoration: 'underline' }}>Download CSV</a></div>}
                         <ul>
                             <li>
                                 <span>#</span>
