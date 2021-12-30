@@ -65,7 +65,7 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
                 <h1>{_.capitalize(league)} game leaderboard</h1>
                 {loading ? 'Loading...' : (
                     <>
-                        {isCsv && <div><a href={downloadLink} download='player_weights.csv' style={{ fontSize: 14, color: 'white', fontFamily: 'monospace', textDecoration: 'underline' }}>Download CSV</a></div>}
+                        {isCsv && <div><a href={downloadLink} download={`${league}_leaderboard.csv`} style={{ fontSize: 14, color: 'white', fontFamily: 'monospace', textDecoration: 'underline' }}>Download CSV</a></div>}
                         <ul>
                             <li>
                                 <span>#</span>
