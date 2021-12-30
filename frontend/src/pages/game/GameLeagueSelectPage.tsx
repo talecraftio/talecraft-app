@@ -19,12 +19,12 @@ const GameLeagueItem = observer(({ title, address, minWeight, maxWeight, link })
             return false;
         const address = walletStore.address;
         const inventory = await walletStore.getInventory();
-        let weight = _.sum(inventory.map(i => parseInt(i.tokenId) > 4 ? i.balance * walletStore.resourceTypes[i.tokenId].weight : 0));
+        let weight = _.sum(inventory.map(i => parseInt(i.tokenId) > 4 ? i.balance * parseInt(walletStore.resourceTypes[i.tokenId].weight) : 0));
         const listingIds = await walletStore.marketplaceContract.methods.getListingsBySeller(address).call();
         weight += _.sum(await Promise.all(listingIds.map(async lid => {
             const l = await walletStore.marketplaceContract.methods.getListing(lid).call();
             if (parseInt(l.tokenId) > 4)
-                return parseInt(l.amount) * walletStore.resourceTypes[l.tokenId].weight;
+                return parseInt(l.amount) * parseInt(walletStore.resourceTypes[l.tokenId].weight);
             return 0;
         })));
         const craftIds = await walletStore.resourceContract.methods.pendingCrafts(address).call();
