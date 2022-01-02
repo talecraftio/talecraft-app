@@ -45,7 +45,7 @@ class ResourceType(DjangoObjectType):
 
     @staticmethod
     def resolve_ingredients(resource: Resource, info):
-        return list(resource.ingredients.values_list('token_id', flat=True))
+        return resource.ingredients
 
     class Meta:
         model = Resource

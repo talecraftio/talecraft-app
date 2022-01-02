@@ -25,9 +25,9 @@ class Command(BaseCommand):
         with transaction.atomic():
             for i, (name, weight, tier, ingredients, ipfs) in enumerate(resources, 1):
                 res, _ = Resource.objects.update_or_create(token_id=i, defaults=dict(name=name, tier=tier, ipfs_hash=ipfs, weight=weight, id=i))
-                res.ingredients.clear()
                 if ingredients:
-                    res.ingredients.add(*Resource.objects.filter(token_id__in=ingredients))
+                    res.ingredients = list(map(int, ingredients))
+                    res.save()
                 resource_objs.append(res)
             # zero id
             zid, _ = Resource.objects.update_or_create(token_id=0, defaults=dict(name='missingno', tier=0, ipfs_hash='', weight=0, id=0))
