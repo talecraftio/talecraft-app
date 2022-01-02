@@ -68,7 +68,7 @@ class Command(BaseCommand):
 
             now = datetime.utcnow()
             if not io.last_game_leaderboards_reset or io.last_game_leaderboards_reset < now - timedelta(2):
-                if now.weekday() == 6 and now.hour > 17:
+                if now.weekday() == 6 and now.hour >= 17:
                     GameLeaderboardItem.objects.update(_wins_offset=F('_wins'), _played_offset=F('_played'))
                     io.last_game_leaderboards_reset = now
                     logging.warning('Game leaderboards reset')
