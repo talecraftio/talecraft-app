@@ -41,6 +41,7 @@ const Header = observer(({}: IHeaderProps) => {
                             <li className="nav__items nav__items-sub">
                                 <button className="nav__link">Tools</button>
                                 <ul className="nav__list nav__list-sub">
+                                    <li className="nav__items"><NavLink className="nav__link" to="/_vesting" onClick={() => setBurger(false)}>Rewards</NavLink></li>
                                     <li className="nav__items"><NavLink className="nav__link" to="/codex" onClick={() => setBurger(false)}>Codex</NavLink></li>
                                     <li className="nav__items"><NavLink className="nav__link" to="/leaderboard" onClick={() => setBurger(false)}>Leaderboard</NavLink></li>
                                     <li className="nav__items"><a className="nav__link" target="_blank" href="https://docs.talecraft.io/crafting-guideline" onClick={() => setBurger(false)}>Guideline</a></li>
