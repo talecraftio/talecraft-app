@@ -68,15 +68,21 @@ class Command(BaseCommand):
 
             now = datetime.utcnow()
             if not io.last_game_leaderboards_reset or io.last_game_leaderboards_reset < now - timedelta(2):
-                if now.weekday() == 6 and now.hour >= 17:
+                if now.weekday() == 4 and now.hour >= 17:
                     GameLeaderboardItem.objects.update(_wins_offset=F('_wins'), _played_offset=F('_played'))
                     io.last_game_leaderboards_reset = now
                     logging.warning('Game leaderboards reset')
 
             for i, league in enumerate(games.keys()):
-                leaderboard = games[league].functions.leaderboard().call()
-                for player, wins in leaderboard:
+                leaderboard = {
+                    player: wins for player, wins in games[league].functions.leaderboard().call()
+                }
+                for evt in games[league].events.PlayerEntered().getLogs(fromBlock=8521077, toBlock='latest'):
+                    leaderboard.setdefault(evt.args.player, 0)
+                for player, wins in leaderboard.items():
                     played = len(games[league].functions.playerGames(player).call())
+                    if played == 0 and wins == 0:
+                        continue
                     GameLeaderboardItem.objects.update_or_create(address=player, league=i, defaults={'_wins': wins, '_played': played})
 
             logging.warning('Game leaderboards updated')

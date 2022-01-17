@@ -42,7 +42,7 @@ const GameLeaderboardPage = observer(({}: IGameLeaderboardPageProps) => {
         setLoading(true);
         // const leaderboard = await contract.methods.leaderboard().call();
         const leaderboard = await api.getGameLeaderboard();
-        setLeaderboard(_.reverse(_.sortBy(leaderboard.filter(i => i.wins > 0 && i.league == leagueId), i => i.wins)));
+        setLeaderboard(_.reverse(_.sortBy(leaderboard.filter(i => i.league == leagueId), i => i.wins)));
         setLoading(false);
     }, []);
 
