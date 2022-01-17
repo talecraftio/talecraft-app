@@ -33,6 +33,7 @@ type MarketplaceListingType {
     buyer: String
     closed: Boolean!
     listingId: Int!
+    perItem: Decimal
     price: Decimal!
     resource: ResourceType
     seller: String!

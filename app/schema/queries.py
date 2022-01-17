@@ -34,7 +34,7 @@ class Query(graphene.ObjectType):
     settings = graphene.Field(SettingsType)
 
     @classmethod
-    def resolve_listings(cls, root, info, tiers=None, weights=None, q='', seller='', order='price', page=0):
+    def resolve_listings(cls, root, info, tiers=None, weights=None, q='', seller='', order='per_item', page=0):
         weights_q = Q()
         weights_cnt = 0
         tiers_q = Q()
@@ -54,7 +54,7 @@ class Query(graphene.ObjectType):
             for tier in tiers:
                 tiers_q |= Q(resource__tier=tier)
                 tiers_cnt += 1
-        qs = MarketplaceListing.objects.filter(closed=False)
+        qs = MarketplaceListing.objects.filter(closed=False).annotate(per_item=F('price') / F('amount'))
         if weights_cnt:
             qs = qs.filter(weights_q)
         if tiers_cnt:
@@ -73,7 +73,7 @@ class Query(graphene.ObjectType):
     @classmethod
     def resolve_marketplace_stats(cls, root, info):
         qs = MarketplaceListing.objects.filter(closed=False)
-        elements = [qs.filter(resource__token_id=i).order_by('price').first() for i in range(1, 5)]
+        elements = [qs.filter(resource__token_id=i).annotate(per_item=F('price') / F('amount')).order_by('per_item').first() for i in range(1, 5)]
         return {
             'min_element_price': Decimal(min([e.price for e in elements if e] or [0])),
         }

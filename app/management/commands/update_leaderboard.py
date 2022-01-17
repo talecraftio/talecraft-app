@@ -26,10 +26,15 @@ class Command(BaseCommand):
         ]
 
         while True:
+            logging.warning('Leaderboard update started')
+            logging.warning('  Global leaderboard')
+            logging.warning('    Fetching players list...')
             players = resource.functions.getPlayers().call()
-            for player in players:
+            for i, player in enumerate(players):
+                logging.warning(f'    Player {i+1}/{len(players)}: {player}')
                 if player in exclude_addresses:
                     continue
+                logging.warning('      Fetching balances...')
                 balances = resource.functions.balanceOfBatch([player] * len(resources), list(range(1, len(resources) + 1))).call()
                 weight = 0
                 max_tier = 0
@@ -49,6 +54,7 @@ class Command(BaseCommand):
                 #     tier_weights[resources[tid][1]] += amount * resources[tid][0]
                 #     if amount > 0:
                 #         max_tier = max(max_tier, resources[tid][1])
+                logging.warning('      Fetching crafts...')
                 pending_crafts = resource.functions.getCrafts(resource.functions.pendingCrafts(player).call()).call()
                 for tid, *_ in pending_crafts:
                     if tid <= 4:
@@ -56,6 +62,7 @@ class Command(BaseCommand):
                     weight += resources[tid][0]
                     tier_weights[resources[tid][1]] += resources[tid][0]
                     max_tier = max(max_tier, resources[tid][1])
+                logging.warning('      Saving...')
                 LeaderboardItem.objects.update_or_create(address=player,
                                                          defaults={'weight': weight, 'max_tier': max_tier,
                                                                    'tier0': tier_weights[0],

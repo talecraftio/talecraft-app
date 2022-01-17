@@ -54,10 +54,15 @@ class ResourceType(DjangoObjectType):
 
 class MarketplaceListingType(DjangoObjectType):
     resource = graphene.Field(ResourceType)
+    per_item = graphene.Decimal()
+
+    @staticmethod
+    def resolve_per_item(listing: MarketplaceListing, info):
+        return Decimal(listing.price / listing.amount)
 
     class Meta:
         model = MarketplaceListing
-        fields = 'listing_id', 'resource', 'amount', 'price', 'seller', 'buyer', 'closed',
+        fields = 'listing_id', 'resource', 'amount', 'price', 'seller', 'buyer', 'closed', 'per_item',
 
 
 MarketplaceListingResponseType = paginated_type('MarketplaceListingResponseType', MarketplaceListingType)

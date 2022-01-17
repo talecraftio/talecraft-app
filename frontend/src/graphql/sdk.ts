@@ -51,6 +51,7 @@ export type MarketplaceListingType = {
   buyer?: Maybe<Scalars['String']>;
   closed: Scalars['Boolean'];
   listingId: Scalars['Int'];
+  perItem?: Maybe<Scalars['Decimal']>;
   price: Scalars['Decimal'];
   resource?: Maybe<ResourceType>;
   seller: Scalars['String'];
@@ -129,7 +130,7 @@ export type GetListingsVariables = Exact<{
 }>;
 
 
-export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: any, seller: string, buyer?: Maybe<string>, closed: boolean, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, ingredients?: Maybe<Array<Maybe<number>>>, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
+export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: any, seller: string, buyer?: Maybe<string>, closed: boolean, perItem?: Maybe<any>, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, ingredients?: Maybe<Array<Maybe<number>>>, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
 
 export type MarketplaceStats = { minElementPrice?: Maybe<any> };
 
@@ -240,6 +241,7 @@ export const GetListingsDocument = gql`
       seller
       buyer
       closed
+      perItem
     }
   }
 }

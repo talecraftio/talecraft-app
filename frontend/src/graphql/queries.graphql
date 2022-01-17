@@ -49,6 +49,7 @@ query getListings($tiers: [String], $weights: [String], $q: String, $seller: Str
       seller
       buyer
       closed
+      perItem
     }
   }
 }

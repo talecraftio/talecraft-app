@@ -122,8 +122,8 @@ const MarketIndexPage = ({}: IMarketPageProps) => {
                     <div className="market-head">
                         <div className="select-wrap">
                             <DDSlick selected={sort} onChange={val => { setSort(val); setPage(0); loadPage() }}>
-                                <option value="price">LowestPrice</option>
-                                <option value="-price">HighestPrice</option>
+                                <option value="per_item">LowestPrice</option>
+                                <option value="-per_item">HighestPrice</option>
                             </DDSlick>
                         </div>
                         <div className='stats'>Element Floor Price{': '}{toBN(stats?.minElementPrice).toFixed(6)} CRAFT</div>
@@ -217,6 +217,7 @@ const MarketIndexPage = ({}: IMarketPageProps) => {
                                             <div className="card__body">
                                                 <p className="card__text">{item.amount}x #{item.resource.tokenId}</p>
                                                 <p className="card__descr"><span>Price: </span>{item.price ? toBN(item.price).toFixed(6) : '0'} CRAFT</p>
+                                                <p className="card__descr"><span>Price each: </span>{item.perItem ? toBN(item.perItem).toFixed(6) : '0'} CRAFT</p>
                                             </div>
                                         </div>
                                     </Link>
