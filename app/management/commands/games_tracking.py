@@ -29,26 +29,26 @@ class Command(BaseCommand):
                             evts = games[league].events.PlayerEntered().getLogs(fromBlock=from_block, toBlock=to_block)
                             for evt in evts:
                                 logging.warning(f'    PlayerEntered(gameId={evt.args.gameId}, player={evt.args.player})')
-                                game, _ = GameInfo.objects.get_or_create(league=league, game_id=evt.args.gameId)
+                                game, _ = GameInfo.objects.get_or_create(league=i, game_id=evt.args.gameId)
                                 GamePlayer.objects.create(game=game, address=evt.args.player)
 
                             evts = games[league].events.PlayerLeft().getLogs(fromBlock=from_block, toBlock=to_block)
                             for evt in evts:
                                 logging.warning(f'    PlayerLeft(gameId={evt.args.gameId}, player={evt.args.player})')
-                                game = GameInfo.objects.get(league=league, game_id=evt.args.gameId)
+                                game = GameInfo.objects.get(league=i, game_id=evt.args.gameId)
                                 GamePlayer.objects.filter(game=game, address=evt.args.player).delete()
 
                             evts = games[league].events.GameStarted().getLogs(fromBlock=from_block, toBlock=to_block)
                             for evt in evts:
                                 logging.warning(f'    GameStarted(gameId={evt.args.gameId})')
-                                game = GameInfo.objects.get(league=league, game_id=evt.args.gameId)
+                                game = GameInfo.objects.get(league=i, game_id=evt.args.gameId)
                                 game.started = True
                                 game.save()
 
                             evts = games[league].events.GameFinished().getLogs(fromBlock=from_block, toBlock=to_block)
                             for evt in evts:
                                 logging.warning(f'    GameFinished(gameId={evt.args.gameId}, winner={evt.args.winner})')
-                                game = GameInfo.objects.get(league=league, game_id=evt.args.gameId)
+                                game = GameInfo.objects.get(league=i, game_id=evt.args.gameId)
                                 game.winner = evt.args.winner
                                 game.finished = True
                                 game.save()
@@ -56,7 +56,7 @@ class Command(BaseCommand):
                             evts = games[league].events.GameAborted().getLogs(fromBlock=from_block, toBlock=to_block)
                             for evt in evts:
                                 logging.warning(f'    GameAborted(gameId={evt.args.gameId}, winner={evt.args.winner})')
-                                game = GameInfo.objects.get(league=league, game_id=evt.args.gameId)
+                                game = GameInfo.objects.get(league=i, game_id=evt.args.gameId)
                                 game.winner = evt.args.winner
                                 game.finished = True
                                 game.save()
