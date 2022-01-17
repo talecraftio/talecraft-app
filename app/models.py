@@ -70,11 +70,11 @@ class GameChatMessage(models.Model):
 
 
 class GameInfo(models.Model):
-    league = models.PositiveSmallIntegerField()
-    game_id = models.PositiveIntegerField()
+    league = models.PositiveSmallIntegerField(db_index=True)
+    game_id = models.PositiveIntegerField(db_index=True)
     winner = models.CharField(max_length=64, null=True, blank=True)
-    started = models.BooleanField(default=False)
-    finished = models.BooleanField(default=False)
+    started = models.BooleanField(default=False, db_index=True)
+    finished = models.BooleanField(default=False, db_index=True)
 
 
 class GamePlayer(models.Model):

@@ -45,6 +45,11 @@ export class Api {
         return r.chatToken;
     }
 
+    async getGameStats() {
+        const r = await this.sdk.gameStats();
+        return r.gameStats;
+    }
+
     async getSettings() {
         const r = await this.sdk.settings();
         return r.settings;

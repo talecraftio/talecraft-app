@@ -11,6 +11,17 @@ type GameLeaderboardItemType {
     wins: Int
 }
 
+type GameStatsItemType {
+    inGame: Int
+    waiting: Int
+}
+
+type GameStatsType {
+    junior: GameStatsItemType
+    master: GameStatsItemType
+    senior: GameStatsItemType
+}
+
 type LeaderboardItemType {
     address: String!
     maxTier: Int!
@@ -46,6 +57,7 @@ type MarketplaceStatsType {
 type Query {
     chatToken(chatId: String, sig: String): String
     gameLeaderboard: [GameLeaderboardItemType!]
+    gameStats: GameStatsType
     leaderboard: [LeaderboardItemType!]
     listings(order: String, page: Int, q: String, seller: String, tiers: [String], weights: [String]): MarketplaceListingResponseType
     marketplaceStats: MarketplaceStatsType

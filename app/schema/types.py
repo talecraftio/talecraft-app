@@ -93,5 +93,16 @@ class GameChatMessageType(DjangoObjectType):
         fields = 'id', 'author', 'datetime', 'text',
 
 
+class GameStatsItemType(graphene.ObjectType):
+    waiting = graphene.Int()
+    in_game = graphene.Int()
+
+
+class GameStatsType(graphene.ObjectType):
+    junior = graphene.Field(GameStatsItemType)
+    senior = graphene.Field(GameStatsItemType)
+    master = graphene.Field(GameStatsItemType)
+
+
 class SettingsType(graphene.ObjectType):
     chest_sale_active = graphene.Boolean()

@@ -11,9 +11,10 @@ from graphene_django import DjangoListField
 from graphql import GraphQLError
 from web3 import Web3, HTTPProvider
 
-from app.models import MarketplaceListing, Resource, LeaderboardItem, GameChat, GameLeaderboardItem
+from app.models import MarketplaceListing, Resource, LeaderboardItem, GameChat, GameLeaderboardItem, GameInfo, \
+    GamePlayer
 from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType, LeaderboardItemType, \
-    GameLeaderboardItemType, SettingsType
+    GameLeaderboardItemType, SettingsType, GameStatsType
 from talecraft.crypto import web3, games
 
 
@@ -31,6 +32,7 @@ class Query(graphene.ObjectType):
     leaderboard = DjangoListField(LeaderboardItemType)
     game_leaderboard = DjangoListField(GameLeaderboardItemType)
     chat_token = graphene.String(chat_id=graphene.String(), sig=graphene.String())
+    game_stats = graphene.Field(GameStatsType)
     settings = graphene.Field(SettingsType)
 
     @classmethod
@@ -117,4 +119,21 @@ class Query(graphene.ObjectType):
     def resolve_settings(cls, root, info):
         return {
             'chest_sale_active': config.CHEST_SALE_ACTIVE,
+        }
+
+    @classmethod
+    def resolve_game_stats(cls, root, info):
+        return {
+            'junior': {
+                'waiting': GamePlayer.objects.filter(game__league=0, game__started=False).count(),
+                'in_game': GamePlayer.objects.filter(game__league=0, game__started=True, game__finished=False).count(),
+            },
+            'senior': {
+                'waiting': GamePlayer.objects.filter(game__league=1, game__started=False).count(),
+                'in_game': GamePlayer.objects.filter(game__league=1, game__started=True, game__finished=False).count(),
+            },
+            'master': {
+                'waiting': GamePlayer.objects.filter(game__league=2, game__started=False).count(),
+                'in_game': GamePlayer.objects.filter(game__league=2, game__started=True, game__finished=False).count(),
+            },
         }

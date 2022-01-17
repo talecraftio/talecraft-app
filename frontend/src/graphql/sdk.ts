@@ -29,6 +29,17 @@ export type GameLeaderboardItemType = {
   wins?: Maybe<Scalars['Int']>;
 };
 
+export type GameStatsItemType = {
+  inGame?: Maybe<Scalars['Int']>;
+  waiting?: Maybe<Scalars['Int']>;
+};
+
+export type GameStatsType = {
+  junior?: Maybe<GameStatsItemType>;
+  master?: Maybe<GameStatsItemType>;
+  senior?: Maybe<GameStatsItemType>;
+};
+
 export type LeaderboardItemType = {
   address: Scalars['String'];
   maxTier: Scalars['Int'];
@@ -64,6 +75,7 @@ export type MarketplaceStatsType = {
 export type Query = {
   chatToken?: Maybe<Scalars['String']>;
   gameLeaderboard?: Maybe<Array<GameLeaderboardItemType>>;
+  gameStats?: Maybe<GameStatsType>;
   leaderboard?: Maybe<Array<LeaderboardItemType>>;
   listings?: Maybe<MarketplaceListingResponseType>;
   marketplaceStats?: Maybe<MarketplaceStatsType>;
@@ -174,6 +186,13 @@ export type SettingsVariables = Exact<{ [key: string]: never; }>;
 
 export type Settings = { settings?: Maybe<{ chestSaleActive?: Maybe<boolean> }> };
 
+export type GameStatsItem = { waiting?: Maybe<number>, inGame?: Maybe<number> };
+
+export type GameStatsVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GameStats = { gameStats?: Maybe<{ junior?: Maybe<{ waiting?: Maybe<number>, inGame?: Maybe<number> }>, senior?: Maybe<{ waiting?: Maybe<number>, inGame?: Maybe<number> }>, master?: Maybe<{ waiting?: Maybe<number>, inGame?: Maybe<number> }> }> };
+
 export const Resource = gql`
     fragment resource on ResourceType {
   tokenId
@@ -218,6 +237,12 @@ export const GameLeaderboardItem = gql`
 export const MarketplaceStats = gql`
     fragment marketplaceStats on MarketplaceStatsType {
   minElementPrice
+}
+    `;
+export const GameStatsItem = gql`
+    fragment gameStatsItem on GameStatsItemType {
+  waiting
+  inGame
 }
     `;
 export const GetListingsDocument = gql`
@@ -293,6 +318,21 @@ export const SettingsDocument = gql`
   }
 }
     `;
+export const GameStatsDocument = gql`
+    query gameStats {
+  gameStats {
+    junior {
+      ...gameStatsItem
+    }
+    senior {
+      ...gameStatsItem
+    }
+    master {
+      ...gameStatsItem
+    }
+  }
+}
+    ${GameStatsItem}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -324,6 +364,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     settings(variables?: SettingsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<Settings> {
       return withWrapper((wrappedRequestHeaders) => client.request<Settings>(SettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'settings');
+    },
+    gameStats(variables?: GameStatsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GameStats> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GameStats>(GameStatsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'gameStats');
     }
   };
 }

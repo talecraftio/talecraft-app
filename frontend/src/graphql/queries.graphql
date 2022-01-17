@@ -97,3 +97,22 @@ query settings {
     chestSaleActive
   }
 }
+
+fragment gameStatsItem on GameStatsItemType {
+  waiting
+  inGame
+}
+
+query gameStats {
+  gameStats {
+    junior {
+      ...gameStatsItem
+    }
+    senior {
+      ...gameStatsItem
+    }
+    master {
+      ...gameStatsItem
+    }
+  }
+}
