@@ -68,3 +68,17 @@ class GameChatMessage(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
     text = models.TextField()
 
+
+class GameInfo(models.Model):
+    league = models.PositiveSmallIntegerField()
+    game_id = models.PositiveIntegerField()
+    winner = models.CharField(max_length=64, null=True, blank=True)
+    started = models.BooleanField(default=False)
+    finished = models.BooleanField(default=False)
+
+
+class GamePlayer(models.Model):
+    game = models.ForeignKey(GameInfo, on_delete=models.CASCADE)
+    address = models.CharField(max_length=64, null=True, blank=True)
+
+
