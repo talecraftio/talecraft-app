@@ -35,7 +35,7 @@ const MarketIndexPage = ({}: IMarketPageProps) => {
     const api = useInjection(Api);
     const walletStore = useInjection(WalletStore);
 
-    const [ sort, setSort, sortRef ] = useStateRef<'price' | '-price'>('price');
+    const [ sort, setSort, sortRef ] = useStateRef<'per_item' | '-per_item'>('per_item');
     const [ tiers, setTiers, tiersRef ] = useStateRef<string[]>([]);
     const [ weights, setWeights, weightsRef ] = useStateRef<string[]>([]);
     const [ q, setQ, qRef ] = useStateRef<string>('')
