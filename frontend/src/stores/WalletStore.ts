@@ -75,7 +75,6 @@ class WalletStore {
 
     @action public triggerBlockChange = () => {
         this.lastBlock = Math.random();
-        цуи3ю
     }
 
     private initialize = async () => {
