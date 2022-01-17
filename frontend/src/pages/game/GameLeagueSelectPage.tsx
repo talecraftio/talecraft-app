@@ -59,6 +59,14 @@ const GameLeagueItem = observer(({ title, address, minWeight, maxWeight, link })
                         <span>Max weight</span> {maxWeight}
                     </p>
                 </div>
+                <div className="staking__row">
+                    <p className="staking__count">
+                        <span>Waiting</span> {minWeight}
+                    </p>
+                    <p className="staking__count">
+                        <span>In-game</span> {maxWeight}
+                    </p>
+                </div>
                 <div className="staking__btn" style={{ flexDirection: "column" }}>
                     {eligible ? (
                         <Link to={link} className="btn primary up">

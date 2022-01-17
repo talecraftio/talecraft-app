@@ -20,8 +20,8 @@ class Command(BaseCommand):
 
                     if io.games_last_block < to_block:
                         logging.warning('Last remembered block: {}, current last: {}'.format(io.games_last_block, to_block))
-                        if to_block - io.games_last_block > 1000:
-                            to_block = io.games_last_block + 1000
+                        if to_block - io.games_last_block > 10000:
+                            to_block = io.games_last_block + 10000
                         from_block = io.games_last_block + 1
                         logging.warning('  Checking blocks {} ~ {}'.format(from_block, to_block))
 
