@@ -77,7 +77,7 @@ class Query(graphene.ObjectType):
         qs = MarketplaceListing.objects.filter(closed=False)
         elements = [qs.filter(resource__token_id=i).annotate(per_item=F('price') / F('amount')).order_by('per_item').first() for i in range(1, 5)]
         return {
-            'min_element_price': Decimal(min([e.price for e in elements if e] or [0])),
+            'min_element_price': Decimal(min([e.per_item for e in elements if e] or [0])),
         }
 
     @classmethod
