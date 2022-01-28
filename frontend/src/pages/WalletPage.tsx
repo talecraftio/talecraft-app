@@ -85,7 +85,7 @@ const WalletPage = observer(({}: IWalletPageProps) => {
                                                     </div>
                                                     <div className="card__body">
                                                         <p className="card__text">{inv.balance}x #{inv.tokenId}</p>
-                                                        <p className="card__descr"><span>{inv.info.name}</span></p>
+                                                        <p className="card__descr"><span>{inv.info?.name}</span></p>
                                                     </div>
                                                 </div>
                                             </Link>
