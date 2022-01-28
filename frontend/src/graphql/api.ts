@@ -15,6 +15,11 @@ export class Api {
         return r.listings;
     }
 
+    async getBorrowListings(weights?: string[], tiers?: string[], q?: string, seller?: string, special?: string, order?: string, page?: number) {
+        const r = await this.sdk.getBorrowListings({ weights, tiers, order, seller, special, page, q });
+        return r.borrowListings;
+    }
+
     async getMarketplaceStats() {
         const r = await this.sdk.getMarketplaceStats();
         return r.marketplaceStats;

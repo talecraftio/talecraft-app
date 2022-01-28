@@ -61,8 +61,6 @@ export type ContractContext = Web3ContractContext<
 >;
 export type Game2Events =
   | 'AbortTimeoutUpdated'
-  | 'BoostPriceUpdated'
-  | 'BoostUsed'
   | 'EpochUpdated'
   | 'GameAborted'
   | 'GameFinished'
@@ -75,29 +73,13 @@ export type Game2Events =
   | 'PlayerEntered'
   | 'PlayerLeft'
   | 'PlayerPlacedCard'
+  | 'PowerPricesUpdated'
+  | 'PowerUsed'
   | 'Unpaused';
 export interface Game2EventsContext {
   AbortTimeoutUpdated(
     parameters: {
       filter?: {};
-      fromBlock?: number;
-      toBlock?: 'latest' | number;
-      topics?: string[];
-    },
-    callback?: (error: Error, event: EventData) => void
-  ): EventResponse;
-  BoostPriceUpdated(
-    parameters: {
-      filter?: {};
-      fromBlock?: number;
-      toBlock?: 'latest' | number;
-      topics?: string[];
-    },
-    callback?: (error: Error, event: EventData) => void
-  ): EventResponse;
-  BoostUsed(
-    parameters: {
-      filter?: { gameId?: string | string[]; player?: string | string[] };
       fromBlock?: number;
       toBlock?: 'latest' | number;
       topics?: string[];
@@ -215,6 +197,24 @@ export interface Game2EventsContext {
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
+  PowerPricesUpdated(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  PowerUsed(
+    parameters: {
+      filter?: { gameId?: string | string[]; player?: string | string[] };
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
   Unpaused(
     parameters: {
       filter?: {};
@@ -229,13 +229,13 @@ export type Game2MethodNames =
   | 'new'
   | 'abort'
   | 'abortTimeout'
-  | 'boost'
-  | 'boostPrice'
   | 'currentGames'
   | 'emergencyWithdraw'
   | 'epoch'
   | 'fee'
   | 'game'
+  | 'getRoundWinner'
+  | 'inGameCount'
   | 'joinGame'
   | 'joinPrice'
   | 'lastGameTimestamps'
@@ -249,25 +249,37 @@ export type Game2MethodNames =
   | 'owner'
   | 'ownerAbort'
   | 'paused'
+  | 'placeBorrowedCard'
   | 'placeCard'
   | 'playerGames'
+  | 'playerPlayed'
   | 'playerWins'
+  | 'powerPrices'
   | 'renounceOwnership'
   | 'supportsInterface'
   | 'togglePause'
   | 'transferOwnership'
   | 'updateAbortTimeout'
-  | 'updateBoostPrice'
   | 'updateEpoch'
+  | 'updateGameLending'
   | 'updateJoinPrice'
   | 'updateMaxWeight'
   | 'updateMinWeight'
+  | 'updatePowerPrices'
+  | 'usePower'
+  | 'waitingCount'
   | 'withdrawFee';
+export interface UsedPowersResponse {
+  used: boolean;
+  powerType: string;
+  value: string;
+}
 export interface PlayerResponse {
   addr: string;
   placedCards: [string, string, string, string];
-  boostValue: string;
-  boostUsedRound: string;
+  borrowedCards: [string, string, string, string];
+  usedPowers: UsedPowersResponse[];
+  lent: [boolean, boolean, boolean, boolean];
 }
 export interface GameinfoResponse {
   gameId: string;
@@ -292,6 +304,7 @@ export interface Game2 {
    * Type: constructor
    * @param resource Type: address, Indexed: false
    * @param phi Type: address, Indexed: false
+   * @param gameLending Type: address, Indexed: false
    * @param joinPrice_ Type: uint256, Indexed: false
    * @param minWeight_ Type: uint256, Indexed: false
    * @param maxWeight_ Type: uint256, Indexed: false
@@ -299,6 +312,7 @@ export interface Game2 {
   'new'(
     resource: string,
     phi: string,
+    gameLending: string,
     joinPrice_: string,
     minWeight_: string,
     maxWeight_: string
@@ -317,20 +331,6 @@ export interface Game2 {
    * Type: function
    */
   abortTimeout(): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   */
-  boost(): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  boostPrice(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -370,6 +370,25 @@ export interface Game2 {
    * @param gameId Type: uint256, Indexed: false
    */
   game(gameId: string): MethodConstantReturnContext<GameinfoResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param gameId Type: uint256, Indexed: false
+   * @param round Type: uint256, Indexed: false
+   */
+  getRoundWinner(
+    gameId: string,
+    round: string
+  ): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  inGameCount(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: false
@@ -495,6 +514,14 @@ export interface Game2 {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
+   * @param listingId Type: uint256, Indexed: false
+   */
+  placeBorrowedCard(listingId: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
    * @param tokenId Type: uint256, Indexed: false
    */
   placeCard(tokenId: string): MethodReturnContext;
@@ -513,7 +540,23 @@ export interface Game2 {
    * Type: function
    * @param player Type: address, Indexed: false
    */
+  playerPlayed(player: string): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param player Type: address, Indexed: false
+   */
   playerWins(player: string): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param parameter0 Type: uint256, Indexed: false
+   */
+  powerPrices(parameter0: string): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: false
@@ -561,15 +604,15 @@ export interface Game2 {
    * Type: function
    * @param newValue Type: uint256, Indexed: false
    */
-  updateBoostPrice(newValue: string): MethodReturnContext;
+  updateEpoch(newValue: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
-   * @param newValue Type: uint256, Indexed: false
+   * @param newAddress Type: address, Indexed: false
    */
-  updateEpoch(newValue: string): MethodReturnContext;
+  updateGameLending(newAddress: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -594,6 +637,37 @@ export interface Game2 {
    * @param newValue Type: uint256, Indexed: false
    */
   updateMinWeight(newValue: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param waterPrice Type: uint256, Indexed: false
+   * @param firePrice Type: uint256, Indexed: false
+   * @param airPrice Type: uint256, Indexed: false
+   * @param earthPrice Type: uint256, Indexed: false
+   */
+  updatePowerPrices(
+    waterPrice: string,
+    firePrice: string,
+    airPrice: string,
+    earthPrice: string
+  ): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param powerType Type: uint8, Indexed: false
+   */
+  usePower(powerType: string | number): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  waitingCount(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: false

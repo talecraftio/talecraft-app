@@ -34,6 +34,22 @@ type LeaderboardItemType {
     weight: Int!
 }
 
+type LendingListingResponseType {
+    items: [LendingListingType!]
+    totalItems: Int
+}
+
+type LendingListingType {
+    borrower: String
+    closed: Boolean!
+    duration: Int!
+    lender: String!
+    listingId: Int!
+    price: Decimal!
+    resource: ResourceType
+    started: DateTime
+}
+
 type MarketplaceListingResponseType {
     items: [MarketplaceListingType!]
     totalItems: Int
@@ -55,6 +71,7 @@ type MarketplaceStatsType {
 }
 
 type Query {
+    borrowListings(order: String, page: Int, q: String, seller: String, special: String, tiers: [String], weights: [String]): LendingListingResponseType
     chatToken(chatId: String, sig: String): String
     gameLeaderboard: [GameLeaderboardItemType!]
     gameStats: GameStatsType

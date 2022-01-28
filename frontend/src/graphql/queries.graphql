@@ -54,6 +54,24 @@ query getListings($tiers: [String], $weights: [String], $q: String, $seller: Str
   }
 }
 
+query getBorrowListings($tiers: [String], $weights: [String], $q: String, $seller: String, $special: String, $order: String, $page: Int) {
+  borrowListings(tiers: $tiers, weights: $weights, q: $q, seller: $seller, special: $special, order: $order, page: $page) {
+    totalItems
+    items {
+      listingId
+      resource {
+        ...resource
+      }
+      duration
+      price
+      lender
+      borrower
+      closed
+      started
+    }
+  }
+}
+
 fragment marketplaceStats on MarketplaceStatsType {
   minElementPrice
 }

@@ -29,6 +29,18 @@ class MarketplaceListing(models.Model):
     closed_at = models.DateTimeField(db_index=True, null=True, blank=True)
 
 
+class LendingListing(models.Model):
+    listing_id = models.PositiveBigIntegerField(db_index=True)
+    resource = models.ForeignKey(Resource, on_delete=models.SET_NULL, null=True, blank=True)
+    price = models.DecimalField(max_digits=128, decimal_places=18)
+    duration = models.DurationField()
+    lender = models.CharField(max_length=64)
+    borrower = models.CharField(max_length=64, null=True, blank=True)
+    started = models.DateTimeField(null=True, blank=True)
+    closed = models.BooleanField(default=False, db_index=True)
+    closed_at = models.DateTimeField(db_index=True, null=True, blank=True)
+
+
 class LeaderboardItem(models.Model):
     address = models.CharField(max_length=64)
     weight = models.PositiveIntegerField()

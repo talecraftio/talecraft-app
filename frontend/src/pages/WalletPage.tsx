@@ -59,7 +59,7 @@ const WalletPage = observer(({}: IWalletPageProps) => {
                                         <p className="staking__text">AVAX balance: <span>{fd(ethBalance)} AVAX</span></p>
                                     </div>
                                     <div className="staking__row">
-                                        <p className="staking__text">$CRAFT balance: <span>{fd(phiBalance)} $CRAFT</span></p>
+                                        <p className="staking__text">CRAFT balance: <span>{fd(phiBalance)} CRAFT</span></p>
                                     </div>
                                     <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
                                     <div className="staking__row">
@@ -81,7 +81,7 @@ const WalletPage = observer(({}: IWalletPageProps) => {
                                             <Link className="card card_market" to={`/card/${inv.tokenId}`} key={inv.tokenId}>
                                                 <div className="card__wrapper">
                                                     <div className="card__wrap">
-                                                        <div className="card__image"><img src={`${IMAGES_CDN}/${inv.info.ipfsHash}.webp`} alt="" /></div>
+                                                        <div className="card__image"><img src={`${IMAGES_CDN}/${inv.info?.ipfsHash}.webp`} alt="" /></div>
                                                     </div>
                                                     <div className="card__body">
                                                         <p className="card__text">{inv.balance}x #{inv.tokenId}</p>

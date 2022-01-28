@@ -6,7 +6,7 @@ from django.core.management import BaseCommand
 from django.db.models import F
 
 from app.models import internal_options as io, Resource, LeaderboardItem, GameLeaderboardItem
-from talecraft.crypto import addresses, resource, marketplace, games
+from talecraft.crypto import addresses, resource, marketplace, games, lending
 
 
 class Command(BaseCommand):
@@ -62,6 +62,16 @@ class Command(BaseCommand):
                     weight += resources[tid][0]
                     tier_weights[resources[tid][1]] += resources[tid][0]
                     max_tier = max(max_tier, resources[tid][1])
+                logging.warning('      Fetching lending...')
+                listing_ids = lending.functions.getLenderHeldListings(player).call()
+                listings = lending.functions.getListings(listing_ids).call()
+                for lid, dur, pr, tid, *_ in listings:
+                    if tid <= 4:
+                        continue
+                    weight += resources[tid][0]
+                    tier_weights[resources[tid][1]] += resources[tid][0]
+                    max_tier = max(max_tier, resources[tid][1])
+
                 logging.warning('      Saving...')
                 LeaderboardItem.objects.update_or_create(address=player,
                                                          defaults={'weight': weight, 'max_tier': max_tier,

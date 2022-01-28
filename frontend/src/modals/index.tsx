@@ -5,12 +5,12 @@ import { ScrollLock } from "../components/ScrollLock";
 import { observer } from "mobx-react";
 import TransferModal from "./TransferModal";
 import SellModal from "./SellModal";
+import LendModal from "./LendModal";
 
 const MODAL_REGISTRY = {
     [ModalsEnum.Transfer]: TransferModal,
     [ModalsEnum.Sell]: SellModal,
-    // [ModalsEnum.Loading]: LoadingModal,
-    // [ModalsEnum.Prompt]: PromptModal,
+    [ModalsEnum.Lend]: LendModal,
 }
 
 const ModalsContainer = observer(() => {

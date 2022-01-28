@@ -6,6 +6,7 @@ export enum ModalsEnum {
     _,
     Transfer,
     Sell,
+    Lend
 }
 
 export interface ModalEntry {

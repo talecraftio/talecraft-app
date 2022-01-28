@@ -133,9 +133,11 @@
     .table-action {
         position: absolute;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         bottom: -5%;
         left: 0;
+        z-index: 100;
         @media (min-width: 1200px) {
             bottom: 3%;
             left: 2%;
@@ -165,6 +167,25 @@
             }
             &.red {
                 color: darkred;
+            }
+            &[disabled] {
+                cursor: default;
+                opacity: .5;
+            }
+        }
+    }
+
+    .table-powers {
+        display: flex;
+        button {
+            position: relative;
+
+            img {
+                height: 40px;
+            }
+
+            &[disabled] {
+                opacity: .5;
             }
         }
     }

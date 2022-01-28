@@ -9,8 +9,6 @@ BATCH_SIZE = 30
 def main():
     deployer = accounts.load('deployer')
 
-    network.gas_price(100000000000)
-
     with open('items.csv') as f:
         csv_reader = csv.reader(f, delimiter=',')
         token_id = 0

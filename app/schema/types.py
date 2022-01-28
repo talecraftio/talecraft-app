@@ -3,7 +3,8 @@ from decimal import Decimal
 import graphene
 from graphene_django import DjangoObjectType, DjangoListField
 
-from app.models import Resource, MarketplaceListing, LeaderboardItem, GameChatMessage, GameLeaderboardItem
+from app.models import Resource, MarketplaceListing, LeaderboardItem, GameChatMessage, GameLeaderboardItem, \
+    LendingListing
 
 
 def paginated_type(name, cls):
@@ -66,6 +67,22 @@ class MarketplaceListingType(DjangoObjectType):
 
 
 MarketplaceListingResponseType = paginated_type('MarketplaceListingResponseType', MarketplaceListingType)
+
+
+class LendingListingType(DjangoObjectType):
+    resource = graphene.Field(ResourceType)
+    duration = graphene.Int()
+
+    @staticmethod
+    def resolve_duration(listing: LendingListing, info):
+        return int(listing.duration.total_seconds())
+
+    class Meta:
+        model = LendingListing
+        fields = 'listing_id', 'resource', 'duration', 'price', 'lender', 'borrower', 'closed', 'started',
+
+
+LendingListingResponseType = paginated_type('LendingListingResponseType', LendingListingType)
 
 
 class MarketplaceStatsType(graphene.ObjectType):

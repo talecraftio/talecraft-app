@@ -7,7 +7,7 @@ import Timeout from "await-timeout";
 import {
     chestContract,
     game2Contract,
-    gameContract,
+    gameContract, gameLendingContract,
     marketplaceContract,
     phiContract,
     resourceContract,
@@ -200,6 +200,10 @@ class WalletStore {
         return timelockContract(this.web3, address);
     }
 
+    get gameLendingContract() {
+        return gameLendingContract(this.web3);
+    }
+
     sendTransaction = async (tx: MethodReturnContext, options?: Partial<SendOptions>) => {
         let gas;
         try {
@@ -216,17 +220,17 @@ class WalletStore {
         return tx.send({ from: this.address, gas, ...(options || {}) });
     }
 
-    getInventory = async (): Promise<InventoryItem[]> => {
+    getInventory = async () => {
         if (!this.address)
             return [];
         const contract = this.resourceContract;
         const ownedTokens = await contract.methods.ownedTokens(this.address).call();
         const balances = await contract.methods.balanceOfBatch(_.range(ownedTokens.length).map(_ => this.address), ownedTokens).call();
-        const resourceInfos = await contract.methods.getResourceTypes(ownedTokens).call();
         return ownedTokens.map((tokenId, i) => ({
-            info: resourceInfos[i],
+            info: this.resourceTypes[parseInt(tokenId)],
             tokenId,
             balance: parseInt(balances[i]),
+            lendingId: undefined,
         })).filter(({ balance }) => balance > 0);
     }
 

@@ -47,6 +47,7 @@ const Header = observer(({}: IHeaderProps) => {
                                     <li className="nav__items"><a className="nav__link" target="_blank" href="https://docs.talecraft.io/crafting-guideline" onClick={() => setBurger(false)}>Guideline</a></li>
                                 </ul>
                             </li>
+                            {walletStore.connected && <li className="nav__items"><NavLink className="nav__link" to="/lending" onClick={() => setBurger(false)}>Lending</NavLink></li>}
                         </ul>
                     </div>
                     <div className="nav__wrap">

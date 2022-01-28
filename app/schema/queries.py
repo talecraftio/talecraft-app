@@ -1,3 +1,4 @@
+from datetime import timedelta
 from decimal import Decimal
 from uuid import uuid4
 
@@ -6,15 +7,16 @@ from constance import config
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q, F
+from django.utils import timezone
 from eth_account.messages import encode_defunct
 from graphene_django import DjangoListField
 from graphql import GraphQLError
 from web3 import Web3, HTTPProvider
 
 from app.models import MarketplaceListing, Resource, LeaderboardItem, GameChat, GameLeaderboardItem, GameInfo, \
-    GamePlayer
+    GamePlayer, LendingListing
 from app.schema.types import MarketplaceListingResponseType, MarketplaceStatsType, ResourceType, LeaderboardItemType, \
-    GameLeaderboardItemType, SettingsType, GameStatsType
+    GameLeaderboardItemType, SettingsType, GameStatsType, LendingListingResponseType
 from talecraft.crypto import web3, games
 
 
@@ -26,6 +28,14 @@ class Query(graphene.ObjectType):
                               seller=graphene.String(required=False),
                               order=graphene.String(required=False),
                               page=graphene.Int())
+    borrow_listings = graphene.Field(LendingListingResponseType,
+                                     tiers=graphene.List(graphene.String, required=False),
+                                     weights=graphene.List(graphene.String, required=False),
+                                     q=graphene.String(required=False),
+                                     seller=graphene.String(required=False),
+                                     special=graphene.String(required=False),
+                                     order=graphene.String(required=False),
+                                     page=graphene.Int())
     marketplace_stats = graphene.Field(MarketplaceStatsType)
     resources = DjangoListField(ResourceType)
     resource = graphene.Field(ResourceType, token_id=graphene.ID())
@@ -65,6 +75,52 @@ class Query(graphene.ObjectType):
             qs = qs.filter(resource__name__icontains=q)
         if seller:
             qs = qs.filter(seller__iexact=seller)
+        qs = qs.order_by(order)
+
+        return {
+            'items': qs[page*16:(page+1)*16],
+            'total_items': qs.count(),
+        }
+
+    @classmethod
+    def resolve_borrow_listings(cls, root, info, tiers=None, weights=None, q='', seller='', special=None, order='price', page=0):
+        weights_q = Q()
+        weights_cnt = 0
+        tiers_q = Q()
+        tiers_cnt = 0
+        if weights:
+            for weight in weights:
+                if weight == '0-49':
+                    weights_q |= Q(resource__weight__lt=50)
+                elif weight == '50-99':
+                    weights_q |= Q(resource__weight__gte=50, resource__weight__lt=100)
+                elif weight == '100-199':
+                    weights_q |= Q(resource__weight__gte=100, resource__weight__lt=200)
+                elif weight == '200-399':
+                    weights_q |= Q(resource__weight__gte=200, resource__weight__lt=400)
+                weights_cnt += 1
+        if tiers:
+            for tier in tiers:
+                tiers_q |= Q(resource__tier=tier)
+                tiers_cnt += 1
+        qs = LendingListing.objects.all()
+        if special:
+            if special == 'listed':
+                qs = qs.filter(lender=seller, closed=False)
+            elif special == 'retrievable':
+                qs = qs.filter(lender=seller, started__lte=timezone.now() - F('duration'), closed=False)
+            elif special == 'borrowed':
+                qs = qs.filter(borrower=seller, started__gte=timezone.now() - F('duration'))
+            else:
+                qs = qs.filter(closed=False, started__isnull=True)
+        else:
+            qs = qs.filter(closed=False, started__isnull=True)
+        if weights_cnt:
+            qs = qs.filter(weights_q)
+        if tiers_cnt:
+            qs = qs.filter(tiers_q)
+        if q:
+            qs = qs.filter(resource__name__icontains=q)
         qs = qs.order_by(order)
 
         return {

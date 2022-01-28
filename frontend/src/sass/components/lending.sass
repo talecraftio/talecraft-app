@@ -1,0 +1,63 @@
+.lending-wrap
+  margin-right: -10px
+  margin-bottom: 20px
+  display: flex
+  flex-wrap: wrap
+
+.lending__item
+  display: flex
+  height: 100px
+  width: calc(50% - 10px)
+  background: #292F36
+  padding: 1.5rem 1rem
+  border: 2px solid #99763E
+  margin-right: 10px
+  margin-bottom: 10px
+
+  &__img
+    margin-right: 10px
+
+  &__info
+    display: flex
+    flex-direction: column
+    justify-content: space-between
+    flex-grow: 1
+
+    &__row
+      display: flex
+      align-items: center
+
+      span
+        display: flex
+        align-items: center
+        position: relative
+
+        .tooltip
+          display: none
+
+        &:hover .tooltip
+          display: block
+          position: absolute
+          top: 45px
+          left: 0
+          padding: 1rem
+          width: 300px
+          background: white
+          color: black
+          font-size: 20px
+
+        &:not(:last-child)
+          margin-right: 1rem
+
+        img
+          height: 30px
+          margin-right: 1rem
+
+  &__price
+    font-size: 24px
+    display: flex
+    flex-direction: column
+    justify-content: space-between
+
+    .btn
+      font-size: 20px

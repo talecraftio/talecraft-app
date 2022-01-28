@@ -19,8 +19,16 @@ import Timeout from "await-timeout";
 import { RouteComponentProps } from "react-router";
 import classNames from "classnames";
 import ChatWidget from "../../components/ChatWidget";
+import ClickAwayListener from "react-click-away-listener";
 
 interface IGamePageProps extends RouteComponentProps {
+}
+
+enum PowerType {
+    Water = '0',
+    Fire = '1',
+    Air = '2',
+    Earth = '3',
 }
 
 const GreenLight = () => {
@@ -168,22 +176,67 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         onComplete={() => { setShowWinAnim(false) }}
     />, []);
 
-    const boostAnimOptions = {
-        animationData: require('../../animations/boost.json'),
-        assetsPath: 'https://app.talecraft.io/uploads/boost/images/',
+    const boostAirAnimOptions = {
+        animationData: require('../../animations/frameAir.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/boost/air/images/',
         loop: true,
         autoplay: true,
     };
-    const boostAnimApi = useRef<LottieRefCurrentProps>();
-    const boostAnim = useMemo(() => <Lottie
+    const boostAirAnimApi = useRef<LottieRefCurrentProps>();
+    const boostAirAnim = useMemo(() => <Lottie
         className='boost-anim'
         renderer='canvas'
-        {...boostAnimOptions}
-        lottieRef={boostAnimApi}
+        {...boostAirAnimOptions}
+        lottieRef={boostAirAnimApi}
         style={{ width: 600, height: 840 }}
     />, []);
 
-    const getLight = (round: number) => {
+    const boostEarthAnimOptions = {
+        animationData: require('../../animations/frameEarth.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/boost/earth/images/',
+        loop: true,
+        autoplay: true,
+    };
+    const boostEarthAnimApi = useRef<LottieRefCurrentProps>();
+    const boostEarthAnim = useMemo(() => <Lottie
+        className='boost-anim'
+        renderer='canvas'
+        {...boostEarthAnimOptions}
+        lottieRef={boostEarthAnimApi}
+        style={{ width: 600, height: 840 }}
+    />, []);
+
+    const boostFireAnimOptions = {
+        animationData: require('../../animations/frameFire.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/boost/fire/images/',
+        loop: true,
+        autoplay: true,
+    };
+    const boostFireAnimApi = useRef<LottieRefCurrentProps>();
+    const boostFireAnim = useMemo(() => <Lottie
+        className='boost-anim'
+        renderer='canvas'
+        {...boostFireAnimOptions}
+        lottieRef={boostFireAnimApi}
+        style={{ width: 600, height: 840 }}
+    />, []);
+
+    const boostWaterAnimOptions = {
+        animationData: require('../../animations/frameWater.json'),
+        assetsPath: 'https://app.talecraft.io/uploads/boost/water/images/',
+        loop: true,
+        autoplay: true,
+    };
+    const boostWaterAnimApi = useRef<LottieRefCurrentProps>();
+    const boostWaterAnim = useMemo(() => <Lottie
+        className='boost-anim'
+        renderer='canvas'
+        {...boostWaterAnimOptions}
+        lottieRef={boostWaterAnimApi}
+        style={{ width: 600, height: 840 }}
+    />, []);
+
+    const getLight = async (round: number) => {
         if (!activeGame || activeGame.player[0].placedCards[round] == '0' || activeGame.player[1].placedCards[round] == '0')
             // return (<YellowLight />);
             return (
@@ -191,29 +244,24 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                     <img src={require('url:../../images/empty_bulb.png')} style={{ width: '100%', height: '100%' }} />
                 </div>
             );
-        let p0w = parseInt(walletStore.resourceTypes[activeGame.player[0].placedCards[round]].weight);
-        if (activeGame.player[0].boostUsedRound == round.toString())
-            p0w *= parseInt(activeGame.player[0].boostValue);
-        let p1w = parseInt(walletStore.resourceTypes[activeGame.player[1].placedCards[round]].weight);
-        if (activeGame.player[1].boostUsedRound == round.toString())
-            p1w *= parseInt(activeGame.player[1].boostValue);
-        if (p0w > p1w)
+        const balance = parseInt(await gameContract.methods.getRoundWinner(activeGame.gameId, round.toString()).call());
+        if (balance > 0)
             return isPlayer0 ? <GreenLight /> : <RedLight />;
-        else if (p1w > p0w)
+        else if (balance < 0)
             return isPlayer0 ? <RedLight /> : <GreenLight />;
         else
             return <YellowLight />;
     }
 
-    const light0 = useMemo(
+    const light0 = useAsyncMemo(
         () => getLight(0),
         [activeGame?.player[0].placedCards[0], activeGame?.player[1].placedCards[0]]
     );
-    const light1 = useMemo(
+    const light1 = useAsyncMemo(
         () => getLight(1),
         [activeGame?.player[0].placedCards[1], activeGame?.player[1].placedCards[1]]
     );
-    const light2 = useMemo(
+    const light2 = useAsyncMemo(
         () => getLight(2),
         [activeGame?.player[0].placedCards[2], activeGame?.player[1].placedCards[2]]
     );
@@ -259,8 +307,17 @@ const GamePage = observer(({ location }: IGamePageProps) => {
     }, []);
 
 
-    const filteredInventory = useMemo(() => inventory?.
-        filter(item => parseInt(item.tokenId) > 4 && (q ? new RegExp(`.*${q}.*`, 'i').test(item.info.name) : true)), [inventory]);
+    const filteredInventory = useAsyncMemo(async () => {
+        if (!inventory) return [];
+        const borrowed = walletStore.address ? (await walletStore.gameLendingContract.methods.getBorrowedListings(walletStore.address).call()).filter(l => !selfInfo?.borrowedCards.includes(l.id)).map(l => ({
+            info: walletStore.resourceTypes[parseInt(l.tokenId)],
+            balance: 1,
+            tokenId: l.tokenId,
+            lendingId: l.id,
+        })) : [];
+        return borrowed.concat(inventory).
+            filter(item => parseInt(item.tokenId) > 4 && (q ? new RegExp(`.*${q}.*`, 'i').test(item.info.name) : true))
+    }, [inventory, walletStore.lastBlock]);
 
     if (!walletStore.connected) {
         return (
@@ -282,7 +339,8 @@ const GamePage = observer(({ location }: IGamePageProps) => {
 
         try {
             const phiAllowance = toBN(await phiContract.methods.allowance(walletStore.address, gameAddress).call());
-            if (phiAllowance.lt(toBN(await gameContract.methods.boostPrice().call()).plus(await gameContract.methods.joinPrice().call()))) {
+            const powersPrices = await Promise.all([0, 1, 2, 3].map(i => gameContract.methods.powerPrices(i.toString()).call()));
+            if (phiAllowance.lt(toBN(Math.max(...powersPrices.map(i => parseInt(i))) * 3).plus(await gameContract.methods.joinPrice().call()))) {
                 const tx = await walletStore.sendTransaction(phiContract.methods.approve(gameAddress, MAX_UINT256));
                 toast.success(
                     <>
@@ -333,6 +391,12 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         walletStore.triggerBlockChange();
     }
 
+    const onPlaceBorrowed = async (listingId: string) => {
+        await walletStore.sendTransaction(gameContract.methods.placeBorrowedCard(listingId));
+        toast.success('Placed');
+        walletStore.triggerBlockChange();
+    }
+
     const onAbort = async () => {
         setLoading(true);
         try {
@@ -344,11 +408,11 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         }
     }
 
-    const onBoost = async () => {
+    const onUsePower = async (powerType: number) => {
         setLoading(true);
         try {
-            const tx = await walletStore.sendTransaction(gameContract.methods.boost());
-            toast.success('Boost applied');
+            const tx = await walletStore.sendTransaction(gameContract.methods.usePower(powerType));
+            toast.success('Power used');
             walletStore.triggerBlockChange();
         } finally {
             setLoading(false);
@@ -473,10 +537,17 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                                     <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item1RivalSlot}>
-                                                        {rivalInfo?.placedCards[0] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[0])].ipfsHash}.webp`} />}
-                                                        {rivalInfo?.boostUsedRound === '0' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
+                                                        {rivalInfo?.placedCards[0] !== '0' && <img src={selfInfo.usedPowers[0].powerType === PowerType.Air || parseInt(activeGame.round) > 0 ? `${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[0])].ipfsHash}.webp` : require('url:../../images/card_back.webp')} />}
+                                                        <div className="card__img-multiplier-wrapper">
+                                                            {rivalInfo?.usedPowers[0].powerType === PowerType.Fire && <div className='card__img-multiplier'>{rivalInfo.usedPowers[0].value}x</div>}
+                                                            {rivalInfo?.usedPowers[0].powerType === PowerType.Earth && <div className='card__img-multiplier'>+5</div>}
+                                                            {selfInfo?.usedPowers[0].used && selfInfo.usedPowers[0].powerType == PowerType.Water && <div className='card__img-multiplier'>-25%</div>}
+                                                        </div>
                                                     </div>
-                                                    {rivalInfo?.boostUsedRound === '0' && boostAnim}
+                                                    {rivalInfo?.usedPowers[0].powerType === PowerType.Air && boostAirAnim}
+                                                    {rivalInfo?.usedPowers[0].powerType === PowerType.Earth && boostEarthAnim}
+                                                    {rivalInfo?.usedPowers[0].powerType === PowerType.Fire && boostFireAnim}
+                                                    {rivalInfo?.usedPowers[0].used && rivalInfo?.usedPowers[0].powerType === PowerType.Water && boostWaterAnim}
                                                 </div>
                                             </div>
                                         </div>
@@ -486,10 +557,17 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                                     <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item2RivalSlot}>
-                                                        {rivalInfo?.placedCards[1] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[1])].ipfsHash}.webp`} />}
-                                                        {rivalInfo?.boostUsedRound === '1' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
+                                                        {rivalInfo?.placedCards[1] !== '0' && <img src={selfInfo.usedPowers[1].powerType === PowerType.Air || parseInt(activeGame.round) > 1 ? `${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[1])].ipfsHash}.webp` : require('url:../../images/card_back.webp')} />}
+                                                        <div className="card__img-multiplier-wrapper">
+                                                            {rivalInfo?.usedPowers[1].powerType === PowerType.Fire && <div className='card__img-multiplier'>{rivalInfo.usedPowers[1].value}x</div>}
+                                                            {rivalInfo?.usedPowers[1].powerType === PowerType.Earth && <div className='card__img-multiplier'>+5</div>}
+                                                            {selfInfo?.usedPowers[1].used && selfInfo.usedPowers[1].powerType == PowerType.Water && <div className='card__img-multiplier'>-25%</div>}
+                                                        </div>
                                                     </div>
-                                                    {rivalInfo?.boostUsedRound === '1' && boostAnim}
+                                                    {rivalInfo?.usedPowers[1].powerType === PowerType.Air && boostAirAnim}
+                                                    {rivalInfo?.usedPowers[1].powerType === PowerType.Earth && boostEarthAnim}
+                                                    {rivalInfo?.usedPowers[1].powerType === PowerType.Fire && boostFireAnim}
+                                                    {rivalInfo?.usedPowers[1].used && rivalInfo?.usedPowers[1].powerType === PowerType.Water && boostWaterAnim}
                                                 </div>
                                             </div>
                                         </div>
@@ -499,10 +577,17 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                                     <img src='data:image/svg+xml;utf8,<svg version="1.1" width="259" height="349" xmlns="http://www.w3.org/2000/svg"></svg>' />
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item3RivalSlot}>
-                                                        {rivalInfo?.placedCards[2] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[2])].ipfsHash}.webp`} />}
-                                                        {rivalInfo?.boostUsedRound === '2' && <div className='card__img-multiplier'>{rivalInfo.boostValue}x</div>}
+                                                        {rivalInfo?.placedCards[2] !== '0' && <img src={selfInfo.usedPowers[2].powerType === PowerType.Air || parseInt(activeGame.round) > 2 ? `${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(rivalInfo?.placedCards[2])].ipfsHash}.webp` : require('url:../../images/card_back.webp')} />}
+                                                        <div className="card__img-multiplier-wrapper">
+                                                            {rivalInfo?.usedPowers[2].powerType === PowerType.Fire && <div className='card__img-multiplier'>{rivalInfo.usedPowers[2].value}x</div>}
+                                                            {rivalInfo?.usedPowers[2].powerType === PowerType.Earth && <div className='card__img-multiplier'>+5</div>}
+                                                            {selfInfo?.usedPowers[2].used && selfInfo.usedPowers[2].powerType == PowerType.Water && <div className='card__img-multiplier'>-25%</div>}
+                                                        </div>
                                                     </div>
-                                                    {rivalInfo?.boostUsedRound === '2' && boostAnim}
+                                                    {rivalInfo?.usedPowers[2].powerType === PowerType.Air && boostAirAnim}
+                                                    {rivalInfo?.usedPowers[2].powerType === PowerType.Earth && boostEarthAnim}
+                                                    {rivalInfo?.usedPowers[2].powerType === PowerType.Fire && boostFireAnim}
+                                                    {rivalInfo?.usedPowers[2].used && rivalInfo?.usedPowers[2].powerType === PowerType.Water && boostWaterAnim}
                                                 </div>
                                             </div>
                                         </div>
@@ -521,9 +606,16 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item1SelfSlot}>
                                                         {selfInfo?.placedCards[0] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[0]) ].ipfsHash}.webp`} />}
-                                                        {selfInfo?.boostUsedRound === '0' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
+                                                        <div className="card__img-multiplier-wrapper">
+                                                            {selfInfo?.usedPowers[0].powerType === PowerType.Fire && <div className='card__img-multiplier'>{selfInfo.usedPowers[0].value}x</div>}
+                                                            {selfInfo?.usedPowers[0].powerType === PowerType.Earth && <div className='card__img-multiplier'>+5</div>}
+                                                            {rivalInfo?.usedPowers[0].used && rivalInfo.usedPowers[0].powerType == PowerType.Water && <div className='card__img-multiplier'>-25%</div>}
+                                                        </div>
                                                     </div>
-                                                    {selfInfo?.boostUsedRound === '0' && boostAnim}
+                                                    {selfInfo?.usedPowers[0].powerType === PowerType.Air && boostAirAnim}
+                                                    {selfInfo?.usedPowers[0].powerType === PowerType.Earth && boostEarthAnim}
+                                                    {selfInfo?.usedPowers[0].powerType === PowerType.Fire && boostFireAnim}
+                                                    {selfInfo?.usedPowers[0].used && selfInfo?.usedPowers[0].powerType === PowerType.Water && boostWaterAnim}
                                                 </div>
                                             </div>
                                         </div>
@@ -534,9 +626,16 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item2SelfSlot}>
                                                         {selfInfo?.placedCards[1] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[1])].ipfsHash}.webp`} />}
-                                                        {selfInfo?.boostUsedRound === '1' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
+                                                        <div className="card__img-multiplier-wrapper">
+                                                            {selfInfo?.usedPowers[1].powerType === PowerType.Fire && <div className='card__img-multiplier'>{selfInfo.usedPowers[1].value}x</div>}
+                                                            {selfInfo?.usedPowers[1].powerType === PowerType.Earth && <div className='card__img-multiplier'>+5</div>}
+                                                            {rivalInfo?.usedPowers[1].used && rivalInfo.usedPowers[1].powerType == PowerType.Water && <div className='card__img-multiplier'>-25%</div>}
+                                                        </div>
                                                     </div>
-                                                    {selfInfo?.boostUsedRound === '1' && boostAnim}
+                                                    {selfInfo?.usedPowers[1].powerType === PowerType.Air && boostAirAnim}
+                                                    {selfInfo?.usedPowers[1].powerType === PowerType.Earth && boostEarthAnim}
+                                                    {selfInfo?.usedPowers[1].powerType === PowerType.Fire && boostFireAnim}
+                                                    {selfInfo?.usedPowers[1].used && selfInfo?.usedPowers[1].powerType === PowerType.Water && boostWaterAnim}
                                                 </div>
                                             </div>
                                         </div>
@@ -547,9 +646,16 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                                     <img src={require('../../images/board.jpg')} alt=""/>
                                                     <div className="card__img-inner" ref={item3SelfSlot}>
                                                         {selfInfo?.placedCards[2] !== '0' && <img src={`${IMAGES_CDN}/${walletStore.resourceTypes[parseInt(selfInfo?.placedCards[2])].ipfsHash}.webp`} />}
-                                                        {selfInfo?.boostUsedRound === '2' && <div className='card__img-multiplier'>{selfInfo.boostValue}x</div>}
+                                                        <div className="card__img-multiplier-wrapper">
+                                                            {selfInfo?.usedPowers[2].powerType === PowerType.Fire && <div className='card__img-multiplier'>{selfInfo.usedPowers[2].value}x</div>}
+                                                            {selfInfo?.usedPowers[2].powerType === PowerType.Earth && <div className='card__img-multiplier'>+5</div>}
+                                                            {rivalInfo?.usedPowers[2].used && rivalInfo.usedPowers[2].powerType == PowerType.Water && <div className='card__img-multiplier'>-25%</div>}
+                                                        </div>
                                                     </div>
-                                                    {selfInfo?.boostUsedRound === '2' && boostAnim}
+                                                    {selfInfo?.usedPowers[2].powerType === PowerType.Air && boostAirAnim}
+                                                    {selfInfo?.usedPowers[2].powerType === PowerType.Earth && boostEarthAnim}
+                                                    {selfInfo?.usedPowers[2].powerType === PowerType.Fire && boostFireAnim}
+                                                    {selfInfo?.usedPowers[2].used && selfInfo?.usedPowers[2].powerType === PowerType.Water && boostWaterAnim}
                                                 </div>
                                             </div>
                                         </div>
@@ -566,8 +672,13 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                                     <button className='btn red' onClick={onAbort} disabled={loading}>Abort</button>
                                                 )
                                             ) : (
-                                                (isPlayer0 && parseInt(activeGame.player[0].boostUsedRound) === 0xFF || !isPlayer0 && parseInt(activeGame.player[1].boostUsedRound) === 0xFF) && (
-                                                    <button className='btn' onClick={onBoost} disabled={loading}>Boost</button>
+                                                (!activeGame.player[isPlayer0 ? 0 : 1].usedPowers[parseInt(activeGame.round)].used) && (
+                                                    <div className='table-powers'>
+                                                        <button disabled={loading || _.some(selfInfo.usedPowers.map(p => p.used && p.powerType === PowerType.Air))} onClick={() => onUsePower(2)}><img src={require('../../images/powers/Air.png.webp')} /><span className='tooltip'>Power of Air: Can see opponent's card</span></button>
+                                                        <button disabled={loading || _.some(selfInfo.usedPowers.map(p => p.used && p.powerType === PowerType.Earth))} onClick={() => onUsePower(3)}><img src={require('../../images/powers/Earth.png.webp')} /><span className='tooltip'>Power of Earth: +5 weight for your next placed card</span></button>
+                                                        <button disabled={loading || _.some(selfInfo.usedPowers.map(p => p.used && p.powerType === PowerType.Fire))} onClick={() => onUsePower(1)}><img src={require('../../images/powers/Fire.png.webp')} /><span className='tooltip'>Power of Fire: Multiples your next placed card's weight by random amount</span></button>
+                                                        <button disabled={loading || _.some(selfInfo.usedPowers.map(p => p.used && p.powerType === PowerType.Water))} onClick={() => onUsePower(0)}><img src={require('../../images/powers/Water.png.webp')} /><span className='tooltip'>Power of Water: %25 decrease for opponent’s card weight in current round</span></button>
+                                                    </div>
                                                 )
                                             )}
                                         </div>
@@ -609,7 +720,11 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                                     className="card__wrap"
                                                     key={`${item.tokenId}-${i}`}
                                                     onClick={async () => {
-                                                        await onPlace(item.tokenId);
+                                                        if (item.lendingId)
+                                                            await onPlaceBorrowed(item.lendingId);
+                                                        else
+                                                            await onPlace(item.tokenId);
+
                                                     }}
                                                 >
                                                     <div className="card__image">

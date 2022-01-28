@@ -29,10 +29,18 @@
         margin-bottom: 3.2rem;
     }
 
+    &-top {
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+        .form__checkbox-label {
+            font-size: 24px;
+        }
+    }
+
     .select-wrap {
         width: 100%;
         margin-bottom: 2rem;
-        margin-right: 20px;
+        //margin-right: 20px;
         @media (min-width: 690px) {
             margin-bottom: 0;
         }

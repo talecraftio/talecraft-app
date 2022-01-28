@@ -97,6 +97,8 @@ export type FactoryMethodNames =
   | 'defaultOwner'
   | 'deployDefaultVestingContract'
   | 'deployDefaultVestingContractAndDepositTokens'
+  | 'deployDiffAmountsMultipleTimelockContractAndDepositTokens'
+  | 'deployDiffAmountsMultipleVestingContractAndDepositTokens'
   | 'deployMultipleTimelockContractAndDepositTokens'
   | 'deployMultipleVestingContractAndDepositTokens'
   | 'deployTimelockContract'
@@ -180,7 +182,51 @@ export interface Factory {
    * @param _releaseTime Type: uint256, Indexed: false
    * @param _revocable Type: bool, Indexed: false
    * @param _token Type: address, Indexed: false
-   * @param amount Type: uint256, Indexed: false
+   * @param amounts Type: uint256[], Indexed: false
+   */
+  deployDiffAmountsMultipleTimelockContractAndDepositTokens(
+    _beneficiaries: string[],
+    _owner: string,
+    _releaseTime: string,
+    _revocable: boolean,
+    _token: string,
+    amounts: string[]
+  ): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param _owner Type: address, Indexed: false
+   * @param _beneficiaries Type: address[], Indexed: false
+   * @param _start Type: uint256, Indexed: false
+   * @param _cliff Type: uint256, Indexed: false
+   * @param _duration Type: uint256, Indexed: false
+   * @param _revocable Type: bool, Indexed: false
+   * @param _token Type: address, Indexed: false
+   * @param amounts Type: uint256[], Indexed: false
+   */
+  deployDiffAmountsMultipleVestingContractAndDepositTokens(
+    _owner: string,
+    _beneficiaries: string[],
+    _start: string,
+    _cliff: string,
+    _duration: string,
+    _revocable: boolean,
+    _token: string,
+    amounts: string[]
+  ): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param _beneficiaries Type: address[], Indexed: false
+   * @param _owner Type: address, Indexed: false
+   * @param _releaseTime Type: uint256, Indexed: false
+   * @param _revocable Type: bool, Indexed: false
+   * @param _token Type: address, Indexed: false
+   * @param amountEach Type: uint256, Indexed: false
    */
   deployMultipleTimelockContractAndDepositTokens(
     _beneficiaries: string[],
@@ -188,7 +234,7 @@ export interface Factory {
     _releaseTime: string,
     _revocable: boolean,
     _token: string,
-    amount: string
+    amountEach: string
   ): MethodReturnContext;
   /**
    * Payable: false

@@ -52,6 +52,22 @@ export type LeaderboardItemType = {
   weight: Scalars['Int'];
 };
 
+export type LendingListingResponseType = {
+  items?: Maybe<Array<LendingListingType>>;
+  totalItems?: Maybe<Scalars['Int']>;
+};
+
+export type LendingListingType = {
+  borrower?: Maybe<Scalars['String']>;
+  closed: Scalars['Boolean'];
+  duration: Scalars['Int'];
+  lender: Scalars['String'];
+  listingId: Scalars['Int'];
+  price: Scalars['Decimal'];
+  resource?: Maybe<ResourceType>;
+  started?: Maybe<Scalars['DateTime']>;
+};
+
 export type MarketplaceListingResponseType = {
   items?: Maybe<Array<MarketplaceListingType>>;
   totalItems?: Maybe<Scalars['Int']>;
@@ -73,6 +89,7 @@ export type MarketplaceStatsType = {
 };
 
 export type Query = {
+  borrowListings?: Maybe<LendingListingResponseType>;
   chatToken?: Maybe<Scalars['String']>;
   gameLeaderboard?: Maybe<Array<GameLeaderboardItemType>>;
   gameStats?: Maybe<GameStatsType>;
@@ -82,6 +99,17 @@ export type Query = {
   resource?: Maybe<ResourceType>;
   resources?: Maybe<Array<ResourceType>>;
   settings?: Maybe<SettingsType>;
+};
+
+
+export type Query_BorrowListingsArgs = {
+  order?: Maybe<Scalars['String']>;
+  page?: Maybe<Scalars['Int']>;
+  q?: Maybe<Scalars['String']>;
+  seller?: Maybe<Scalars['String']>;
+  special?: Maybe<Scalars['String']>;
+  tiers?: Maybe<Array<Maybe<Scalars['String']>>>;
+  weights?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 
@@ -143,6 +171,19 @@ export type GetListingsVariables = Exact<{
 
 
 export type GetListings = { listings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, amount: number, price: any, seller: string, buyer?: Maybe<string>, closed: boolean, perItem?: Maybe<any>, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, ingredients?: Maybe<Array<Maybe<number>>>, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
+
+export type GetBorrowListingsVariables = Exact<{
+  tiers?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
+  weights?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
+  q?: Maybe<Scalars['String']>;
+  seller?: Maybe<Scalars['String']>;
+  special?: Maybe<Scalars['String']>;
+  order?: Maybe<Scalars['String']>;
+  page?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type GetBorrowListings = { borrowListings?: Maybe<{ totalItems?: Maybe<number>, items?: Maybe<Array<{ listingId: number, duration: number, price: any, lender: string, borrower?: Maybe<string>, closed: boolean, started?: Maybe<any>, resource?: Maybe<{ tokenId: number, name: string, tier: number, ipfsHash: string, weight: number, ingredients?: Maybe<Array<Maybe<number>>>, sales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>>, currentSales?: Maybe<Array<Maybe<{ datetime?: Maybe<any>, amount?: Maybe<number>, price?: Maybe<any> }>>> }> }>> }> };
 
 export type MarketplaceStats = { minElementPrice?: Maybe<any> };
 
@@ -271,6 +312,33 @@ export const GetListingsDocument = gql`
   }
 }
     ${Resource}`;
+export const GetBorrowListingsDocument = gql`
+    query getBorrowListings($tiers: [String], $weights: [String], $q: String, $seller: String, $special: String, $order: String, $page: Int) {
+  borrowListings(
+    tiers: $tiers
+    weights: $weights
+    q: $q
+    seller: $seller
+    special: $special
+    order: $order
+    page: $page
+  ) {
+    totalItems
+    items {
+      listingId
+      resource {
+        ...resource
+      }
+      duration
+      price
+      lender
+      borrower
+      closed
+      started
+    }
+  }
+}
+    ${Resource}`;
 export const GetMarketplaceStatsDocument = gql`
     query getMarketplaceStats {
   marketplaceStats {
@@ -343,6 +411,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     getListings(variables?: GetListingsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetListings> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetListings>(GetListingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getListings');
+    },
+    getBorrowListings(variables?: GetBorrowListingsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetBorrowListings> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetBorrowListings>(GetBorrowListingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBorrowListings');
     },
     getMarketplaceStats(variables?: GetMarketplaceStatsVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetMarketplaceStats> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetMarketplaceStats>(GetMarketplaceStatsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getMarketplaceStats');
