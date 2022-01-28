@@ -80,7 +80,7 @@ const CardPage = observer(({ match: { params: { tokenId } } }: ICardPageProps) =
                                         <div className="card-footer">
                                             <button className="btn primary" type="button" onClick={() => modalStore.showModal(ModalsEnum.Sell, { tokenId, balance })}>Put on Marketplace</button>
                                             <button className="btn primary" type="button" onClick={() => modalStore.showModal(ModalsEnum.Transfer, { balance, tokenId })}>Transfer</button>
-                                            <button className="btn primary" type="button" onClick={() => modalStore.showModal(ModalsEnum.Lend, { tokenId })}>Lend</button>
+                                            {/*<button className="btn primary" type="button" onClick={() => modalStore.showModal(ModalsEnum.Lend, { tokenId })}>Lend</button>*/}
                                         </div>
                                     )}
                                 </div>

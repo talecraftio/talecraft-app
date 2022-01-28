@@ -10,7 +10,7 @@ import LendModal from "./LendModal";
 const MODAL_REGISTRY = {
     [ModalsEnum.Transfer]: TransferModal,
     [ModalsEnum.Sell]: SellModal,
-    [ModalsEnum.Lend]: LendModal,
+    // [ModalsEnum.Lend]: LendModal,
 }
 
 const ModalsContainer = observer(() => {

@@ -26,6 +26,7 @@ import GameLeagueSelectPage from "./pages/game/GameLeagueSelectPage";
 import GameLeaderboardPage from "./pages/game/GameLeaderboardPage";
 import ChatTestPage from "./pages/tools/ChatTestPage";
 import LendingPage from "./pages/LendingPage";
+import MaintenancePage from "./pages/MaintenancePage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -47,7 +48,8 @@ const App = observer(() => {
                     <Route exact path='/game' component={GameLeagueSelectPage} />
                     <Route exact path={['/game/junior', '/game/senior', '/game/master']} component={GamePage} />
                     <Route exact path={['/game/junior/leaderboard', '/game/senior/leaderboard', '/game/master/leaderboard']} component={GameLeaderboardPage} />
-                    {/*<Route path='/lending' component={LendingPage} />*/}
+                    <Route path='/______lending' component={LendingPage} />
+                    <Route path='/lending' component={MaintenancePage} />
                     <Route path='/_vesting' component={VestingPage} />
                     <Route exact path='/codex' component={CodexIndexPage} />
                     <Route exact path='/codex/:tokenId' component={CodexCardPage} />
