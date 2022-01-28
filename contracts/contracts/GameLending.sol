@@ -4,6 +4,7 @@ pragma solidity 0.8.5;
 
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/access/Ownable.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/utils/Counters.sol";
+import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/security/Pausable.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/token/ERC20/utils/SafeERC20.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/utils/structs/EnumerableSet.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/token/ERC1155/utils/ERC1155Holder.sol";
@@ -11,7 +12,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/token/ERC1155/IERC11
 import "./Resource.sol";
 import "./CustomEnumerableMap.sol";
 
-contract GameLending is Ownable, ERC1155Holder {
+contract GameLending is Ownable, ERC1155Holder, Pausable {
     using Counters for Counters.Counter;
     using EnumerableSet for EnumerableSet.UintSet;
     using CustomEnumerableMap for CustomEnumerableMap.UintToUintMap;
@@ -55,7 +56,7 @@ contract GameLending is Ownable, ERC1155Holder {
         emit FeeUpdated(feePercentage);
     }
 
-    function list(uint256 tokenId, uint256 duration, uint256 price) external {
+    function list(uint256 tokenId, uint256 duration, uint256 price) external whenNotPaused {
         require(price > 0, "price cannot be zero");
         require(duration > 0, "duration cannot be zero");
         require(tokenId > 0, "tokenId cannot be zero");
@@ -78,18 +79,19 @@ contract GameLending is Ownable, ERC1155Holder {
         emit NewListing(msg.sender, listingId);
     }
 
-    function cancelList(uint256 listingId) external {
+    function cancelList(uint256 listingId) external whenNotPaused {
         LendListing storage listing = _listings[listingId];
-        require(listing.lender == msg.sender, "you did not create this listing");
+        require(listing.lender == msg.sender || msg.sender == owner(), "you did not create this listing");
+        require(!listing.finished, "this listing is already cancelled");
         require(
             listing.started == 0 ||
-            block.timestamp - listing.started > listing.duration && !listing.finished,
-                "this listing is lent currently"
+            block.timestamp - listing.started > listing.duration,
+                "this listing is rented currently"
         );
 
         listing.finished = true;
-        _resource.safeTransferFrom(address(this), msg.sender, listing.tokenId, 1, "");
-        _heldListingsByLender[msg.sender].remove(listingId);
+        _resource.safeTransferFrom(address(this), listing.lender, listing.tokenId, 1, "");
+        _heldListingsByLender[listing.lender].remove(listingId);
         _activeListings.remove(listingId);
         _activeListingsByLender[listing.lender].remove(listingId);
         _activeListingsByBorrower[listing.borrower].remove(listingId);
@@ -97,7 +99,7 @@ contract GameLending is Ownable, ERC1155Holder {
         emit ListingCancelled(listingId);
     }
 
-    function borrowListing(uint256 listingId) external {
+    function borrowListing(uint256 listingId) external whenNotPaused {
         LendListing storage listing = _listings[listingId];
         require(listing.started == 0, "this listing is already used");
 
@@ -124,6 +126,10 @@ contract GameLending is Ownable, ERC1155Holder {
             result[i] = _listings[listingIds[i]];
         }
         return result;
+    }
+
+    function getActiveListingIds() external view returns (uint256[] memory) {
+        return _activeListings.values();
     }
 
     function getListingTokenId(uint256 listingId) public view returns (uint256) {
@@ -188,6 +194,13 @@ contract GameLending is Ownable, ERC1155Holder {
     function isListingAvailable(address borrower, uint256 listingId) public view returns (bool) {
         LendListing memory listing = _listings[listingId];
         return listing.borrower == borrower && block.timestamp - listing.started < listing.duration;
+    }
+
+    function togglePause() external onlyOwner {
+        if (paused())
+            _unpause();
+        else
+            _pause();
     }
 
     function emergencyWithdraw(uint256[] memory tokenId, uint256[] memory amount) external onlyOwner {
