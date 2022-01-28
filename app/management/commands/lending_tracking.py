@@ -12,7 +12,6 @@ from app.models import internal_options as io, Resource, LendingListing
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        io.lending_last_block = 5287474
         while True:
             try:
                 with transaction.atomic():
