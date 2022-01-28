@@ -102,7 +102,7 @@ const ListItem = observer(({ item }: { item: LendingListingType }) => {
                 </div>
             </div>
             <div className="lending__item__price">
-                <span>{toBN(item.price).toFixed(6)} CRAFT</span>
+                <span>{toBN(item.price).toFixed(2)} CRAFT</span>
                 {item.lender === walletStore.address ? (
                     item.started ? (
                         +new Date() - (+new Date(item.started) + item.duration * 1000) > 0 ? (
