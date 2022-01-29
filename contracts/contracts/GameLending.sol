@@ -79,7 +79,10 @@ contract GameLending is Ownable, ERC1155Holder, Pausable {
         emit NewListing(msg.sender, listingId);
     }
 
-    function cancelList(uint256 listingId) external whenNotPaused {
+    function cancelList(uint256 listingId) external {
+        if (msg.sender != owner())
+            require(!paused(), "Pausable: paused");
+
         LendListing storage listing = _listings[listingId];
         require(listing.lender == msg.sender || msg.sender == owner(), "you did not create this listing");
         require(!listing.finished, "this listing is already cancelled");
