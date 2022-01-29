@@ -387,7 +387,8 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
             for (uint8 p=0; p < 2; p++) {
                 uint256 tokenId = game_.player[p].placedCards[r];
                 if (tokenId != 0) {
-                    _resource.safeTransferFrom(address(this), game_.player[p].addr, tokenId, 1, "");
+                    if (game_.player[p].borrowedCards[r] == 0)
+                        _resource.safeTransferFrom(address(this), game_.player[p].addr, tokenId, 1, "");
                 }
             }
         }
@@ -396,6 +397,8 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         currentGames[game_.player[1].addr] = 0;
 
         emit GameAborted(game_.gameId, winner);
+
+        inGameCount -= 2;
     }
 
     function updateJoinPrice(uint256 newValue) external onlyOwner {

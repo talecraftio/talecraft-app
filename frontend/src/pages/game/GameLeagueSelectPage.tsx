@@ -13,7 +13,7 @@ import { Api } from "../../graphql/api";
 interface IGameLeagueSelectPageProps {
 }
 
-const GameLeagueItem = observer(({ title, address, minWeight, maxWeight, link, gameStats }) => {
+const GameLeagueItem = observer(({ title, address, minWeight, maxWeight, link }) => {
     const walletStore = useInjection(WalletStore);
     const contract = walletStore.getGame2Contract(address);
     const lending = walletStore.gameLendingContract;
@@ -76,7 +76,7 @@ const GameLeagueItem = observer(({ title, address, minWeight, maxWeight, link, g
                         <span>Waiting</span> {waitingPlayers}
                     </p>
                     <p className="staking__count">
-                        <span>In-game</span> {gameStats?.inGame}
+                        <span>In-game</span> {inGamePlayers}
                     </p>
                 </div>
                 <div className="staking__btn" style={{ flexDirection: "column" }}>
@@ -102,10 +102,6 @@ const GameLeagueSelectPage = observer(({}: IGameLeagueSelectPageProps) => {
     const walletStore = useInjection(WalletStore);
     const api = useInjection(Api);
 
-    const gameStats = useAsyncMemo(async () => {
-        return await api.getGameStats();
-    }, [walletStore.lastBlock]);
-
     if (!walletStore.connected) {
         return (
             <main className="main leaderboards" style={{ color: 'white' }}>
@@ -123,9 +119,9 @@ const GameLeagueSelectPage = observer(({}: IGameLeagueSelectPageProps) => {
                     <h1 className='section-title text-center'>Select game league</h1>
 
                     <div className="staking-wrap">
-                        <GameLeagueItem title='Junior' minWeight={6} maxWeight={50} address={ADDRESSES.games['0']} link='/game/junior' gameStats={gameStats?.junior} />
-                        <GameLeagueItem title='Senior' minWeight={51} maxWeight={150} address={ADDRESSES.games['1']} link='/game/senior' gameStats={gameStats?.senior} />
-                        <GameLeagueItem title='Master' minWeight={151} maxWeight={1000} address={ADDRESSES.games['2']} link='/game/master' gameStats={gameStats?.master} />
+                        <GameLeagueItem title='Junior' minWeight={6} maxWeight={50} address={ADDRESSES.games['0']} link='/game/junior' />
+                        <GameLeagueItem title='Senior' minWeight={51} maxWeight={150} address={ADDRESSES.games['1']} link='/game/senior' />
+                        <GameLeagueItem title='Master' minWeight={151} maxWeight={1000} address={ADDRESSES.games['2']} link='/game/master' />
                     </div>
                 </div>
             </section>

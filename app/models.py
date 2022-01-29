@@ -58,8 +58,8 @@ class GameLeaderboardItem(models.Model):
     address = models.CharField(max_length=64)
     _played = models.PositiveIntegerField()
     _wins = models.PositiveIntegerField()
-    _played_offset = models.PositiveIntegerField(default=0)
-    _wins_offset = models.PositiveIntegerField(default=0)
+    _played_offset = models.IntegerField(default=0)
+    _wins_offset = models.IntegerField(default=0)
 
     @property
     def played(self):
