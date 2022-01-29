@@ -104,6 +104,7 @@ contract GameLending is Ownable, ERC1155Holder, Pausable {
 
     function borrowListing(uint256 listingId) external whenNotPaused {
         LendListing storage listing = _listings[listingId];
+        require(!listing.finished, "this listing is already cancelled");
         require(listing.started == 0, "this listing is already used");
 
         listing.borrower = msg.sender;

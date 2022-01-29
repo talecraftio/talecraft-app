@@ -13,5 +13,5 @@ export default {
         "1": "0x9dA3a743F9b3258200979fe46CE40a09BBd19856",
         "2": "0x3FF5708Ed00ee00e54f651D583D47d84F9DA5734"
     },
-    "lending": "0xcc6C3660d7d9e59136834b66a64220400F9a82e5"
+    "lending": "0xf4C4b6FdBa5EDF00EB3ce1541168573325531bb1"
 }
