@@ -65,7 +65,7 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
     uint256 public joinPrice;
     uint256 public minWeight;
     uint256 public maxWeight;
-    uint256 public epoch = 30 * 60;
+    uint256 public epoch = 60;
     uint256 public fee = 50000;  // 1e6
     uint256 public inGameCount;
     CustomEnumerableMap.AddressToUintMap _playerPlayed;
@@ -101,7 +101,7 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         joinPrice = joinPrice_;
         minWeight = minWeight_;
         maxWeight = maxWeight_;
-        powerPrices[0] = powerPrices[1] = powerPrices[2] = powerPrices[3] = 1 ether;
+        powerPrices[0] = powerPrices[1] = powerPrices[2] = powerPrices[3] = 0 ether;
         _createGame();
 
         emit JoinPriceUpdated(joinPrice_);
