@@ -18,6 +18,9 @@ with open(settings.BASE_DIR / 'frontend/src/utils/contracts/game2.abi.json') as 
 with open(settings.BASE_DIR / 'frontend/src/utils/contracts/gameLending.abi.json') as f:
     lending_abi = json.load(f)
 
+with open(settings.BASE_DIR / 'frontend/src/utils/contracts/chest.abi.json') as f:
+    chest_abi = json.load(f)
+
 ETH_RPC = 'https://api.avax-test.network/ext/bc/C/rpc' if settings.TESTNET else 'https://api.avax.network/ext/bc/C/rpc'
 web3 = Web3(HTTPProvider(ETH_RPC))
 
@@ -29,3 +32,4 @@ games = {
     'master': web3.eth.contract(address=addresses['games']['2'], abi=game_abi),
 }
 lending = web3.eth.contract(address=addresses['lending'], abi=lending_abi)
+chest = web3.eth.contract(address=addresses['chest'], abi=chest_abi)

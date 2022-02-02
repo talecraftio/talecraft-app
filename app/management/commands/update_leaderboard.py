@@ -22,7 +22,10 @@ class Command(BaseCommand):
             '0x23BBba252DA45fEac8A22F0497bD2954D67b3cD0',
             addresses['chest'],
             addresses['marketplace'],
-            addresses['game'],
+            addresses['games']['1'],
+            addresses['games']['2'],
+            addresses['games']['3'],
+            addresses['lending'],
         ]
 
         while True:
@@ -81,6 +84,7 @@ class Command(BaseCommand):
                                                                    'tier3': tier_weights[3],
                                                                    'tier4': tier_weights[4],
                                                                    'tier5': tier_weights[5]})
+            LeaderboardItem.objects.filter(address__in=exclude_addresses).delete()
             logging.warning('Global leaderboards updated')
 
             now = datetime.utcnow()
