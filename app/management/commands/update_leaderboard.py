@@ -22,9 +22,9 @@ class Command(BaseCommand):
             '0x23BBba252DA45fEac8A22F0497bD2954D67b3cD0',
             addresses['chest'],
             addresses['marketplace'],
+            addresses['games']['0'],
             addresses['games']['1'],
             addresses['games']['2'],
-            addresses['games']['3'],
             addresses['lending'],
         ]
 
