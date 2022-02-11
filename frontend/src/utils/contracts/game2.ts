@@ -230,10 +230,10 @@ export type Game2MethodNames =
   | 'abort'
   | 'abortTimeout'
   | 'currentGames'
-  | 'emergencyWithdraw'
   | 'epoch'
   | 'fee'
   | 'game'
+  | 'getPlayerInventory'
   | 'getRoundWinner'
   | 'inGameCount'
   | 'joinGame'
@@ -244,19 +244,15 @@ export type Game2MethodNames =
   | 'leaveGame'
   | 'maxWeight'
   | 'minWeight'
-  | 'onERC1155BatchReceived'
-  | 'onERC1155Received'
   | 'owner'
   | 'ownerAbort'
   | 'paused'
-  | 'placeBorrowedCard'
   | 'placeCard'
   | 'playerGames'
   | 'playerPlayed'
   | 'playerWins'
   | 'powerPrices'
   | 'renounceOwnership'
-  | 'supportsInterface'
   | 'togglePause'
   | 'transferOwnership'
   | 'updateAbortTimeout'
@@ -277,7 +273,6 @@ export interface UsedPowersResponse {
 export interface PlayerResponse {
   addr: string;
   placedCards: [string, string, string, string];
-  borrowedCards: [string, string, string, string];
   usedPowers: UsedPowersResponse[];
   lent: [boolean, boolean, boolean, boolean];
 }
@@ -291,6 +286,10 @@ export interface GameinfoResponse {
   round: string;
   lastAction: string;
   bank: string;
+}
+export interface InventoryitemResponse {
+  tokenId: string;
+  balance: string;
 }
 export interface LeaderboarditemResponse {
   player: string;
@@ -341,15 +340,6 @@ export interface Game2 {
   currentGames(parameter0: string): MethodConstantReturnContext<string>;
   /**
    * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param tokenId Type: uint256[], Indexed: false
-   * @param amount Type: uint256[], Indexed: false
-   */
-  emergencyWithdraw(tokenId: string[], amount: string[]): MethodReturnContext;
-  /**
-   * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
@@ -370,6 +360,18 @@ export interface Game2 {
    * @param gameId Type: uint256, Indexed: false
    */
   game(gameId: string): MethodConstantReturnContext<GameinfoResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param gameId Type: uint256, Indexed: false
+   * @param player Type: address, Indexed: false
+   */
+  getPlayerInventory(
+    gameId: string,
+    player: string
+  ): MethodConstantReturnContext<InventoryitemResponse[]>;
   /**
    * Payable: false
    * Constant: true
@@ -453,42 +455,6 @@ export interface Game2 {
   minWeight(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param parameter0 Type: address, Indexed: false
-   * @param parameter1 Type: address, Indexed: false
-   * @param parameter2 Type: uint256[], Indexed: false
-   * @param parameter3 Type: uint256[], Indexed: false
-   * @param parameter4 Type: bytes, Indexed: false
-   */
-  onERC1155BatchReceived(
-    parameter0: string,
-    parameter1: string,
-    parameter2: string[],
-    parameter3: string[],
-    parameter4: string | number[]
-  ): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param parameter0 Type: address, Indexed: false
-   * @param parameter1 Type: address, Indexed: false
-   * @param parameter2 Type: uint256, Indexed: false
-   * @param parameter3 Type: uint256, Indexed: false
-   * @param parameter4 Type: bytes, Indexed: false
-   */
-  onERC1155Received(
-    parameter0: string,
-    parameter1: string,
-    parameter2: string,
-    parameter3: string,
-    parameter4: string | number[]
-  ): MethodReturnContext;
-  /**
-   * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
@@ -509,14 +475,6 @@ export interface Game2 {
    * Type: function
    */
   paused(): MethodConstantReturnContext<boolean>;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param listingId Type: uint256, Indexed: false
-   */
-  placeBorrowedCard(listingId: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -564,16 +522,6 @@ export interface Game2 {
    * Type: function
    */
   renounceOwnership(): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param interfaceId Type: bytes4, Indexed: false
-   */
-  supportsInterface(
-    interfaceId: string | number[]
-  ): MethodConstantReturnContext<boolean>;
   /**
    * Payable: false
    * Constant: false

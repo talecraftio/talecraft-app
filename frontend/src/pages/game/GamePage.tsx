@@ -8,7 +8,7 @@ import { useAsyncMemo } from "use-async-memo";
 import { toast } from "react-toastify";
 import { ADDRESSES } from "../../utils/contracts";
 import { ZERO_ADDRESS } from "../../utils/address";
-import _, { forEach } from "lodash";
+import _, { forEach, parseInt } from "lodash";
 import { IMAGES_CDN, MAX_UINT256 } from "../../utils/const";
 import { toBN } from "../../utils/number";
 import { RouterStore } from "mobx-react-router";
@@ -126,7 +126,7 @@ const GamePage = observer(({ location }: IGamePageProps) => {
     const [ showWinAnim, setShowWinAnim ] = useState(false);
     const [ showLoseAnim, setShowLoseAnim ] = useState(false);
 
-    const inventory = useAsyncMemo(() => walletStore.getInventory(), [walletStore.lastBlock]);
+    const inventory = useAsyncMemo(() => activeGame ? gameContract.methods.getPlayerInventory(activeGame.gameId, walletStore.address).call() : undefined, [walletStore.lastBlock, activeGame]);
     const isPlayer0 = useMemo(() => activeGame?.player[0].addr === walletStore.address, [walletStore.lastBlock, activeGame, walletStore.address]);
     const isTurn = useMemo(() => activeGame?.turn === (isPlayer0 ? '0' : '1'), [isPlayer0, activeGame, walletStore.address]);
     const selfInfo = useMemo(() => isPlayer0 ? activeGame?.player[0] : activeGame?.player[1], [activeGame]);
@@ -309,15 +309,13 @@ const GamePage = observer(({ location }: IGamePageProps) => {
 
     const filteredInventory = useAsyncMemo(async () => {
         if (!inventory) return [];
-        const borrowed = walletStore.address ? (await walletStore.gameLendingContract.methods.getBorrowedListings(walletStore.address).call()).filter(l => !selfInfo?.borrowedCards.includes(l.id)).map(l => ({
-            info: walletStore.resourceTypes[parseInt(l.tokenId)],
-            balance: 1,
-            tokenId: l.tokenId,
-            lendingId: l.id,
-        })) : [];
-        return borrowed.concat(inventory).
-            filter(item => parseInt(item.tokenId) > 4 && (q ? new RegExp(`.*${q}.*`, 'i').test(item.info.name) : true))
-    }, [inventory, walletStore.lastBlock]);
+
+        return inventory.map(({ tokenId, balance }) => ({
+            info: walletStore.resourceTypes[parseInt(tokenId)],
+            tokenId,
+            balance: parseInt(balance),
+        })).filter(item => parseInt(item.tokenId) > 4 && (q ? new RegExp(`.*${q}.*`, 'i').test(item.info.name) : true))
+    }, [inventory, walletStore.lastBlock, q]);
 
     if (!walletStore.connected) {
         return (
@@ -350,16 +348,16 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                 );
             }
 
-            const resourceAllowance = await resourceContract.methods.isApprovedForAll(walletStore.address, gameAddress).call();
-            if (!resourceAllowance) {
-                const tx = await walletStore.sendTransaction(resourceContract.methods.setApprovalForAll(gameAddress, true));
-                toast.success(
-                    <>
-                        Resource approved successfully<br/>
-                        <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
-                    </>
-                );
-            }
+            // const resourceAllowance = await resourceContract.methods.isApprovedForAll(walletStore.address, gameAddress).call();
+            // if (!resourceAllowance) {
+            //     const tx = await walletStore.sendTransaction(resourceContract.methods.setApprovalForAll(gameAddress, true));
+            //     toast.success(
+            //         <>
+            //             Resource approved successfully<br/>
+            //             <a href={`${BLOCK_EXPLORER}/tx/${tx.transactionHash}`} target='_blank'>View in explorer</a>
+            //         </>
+            //     );
+            // }
 
             await walletStore.sendTransaction(gameContract.methods.joinGame());
             toast.success('Joined game');
@@ -381,18 +379,7 @@ const GamePage = observer(({ location }: IGamePageProps) => {
     }
 
     const onPlace = async (placeTokenId: string) => {
-        if ((await resourceContract.methods.balanceOf(walletStore.address, placeTokenId).call()) === '0') {
-            toast.error('You do not own tokens with this ID');
-            return;
-        }
-
         await walletStore.sendTransaction(gameContract.methods.placeCard(placeTokenId));
-        toast.success('Placed');
-        walletStore.triggerBlockChange();
-    }
-
-    const onPlaceBorrowed = async (listingId: string) => {
-        await walletStore.sendTransaction(gameContract.methods.placeBorrowedCard(listingId));
         toast.success('Placed');
         walletStore.triggerBlockChange();
     }
@@ -424,8 +411,6 @@ const GamePage = observer(({ location }: IGamePageProps) => {
         setActiveGame(await gameContract.methods.game(gameId).call());
         setLoading(false);
     }
-
-
 
     return (
         <main className='main'>
@@ -715,16 +700,12 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                 <div className='cards-wrap'>
                                     {_.flatten(filteredInventory?.map(item => (
                                         _.range(item.balance).map(i => (
-                                            <div className='card'>
+                                            <div className='card' key={`${item.tokenId}${i}`}>
                                                 <div
                                                     className="card__wrap"
                                                     key={`${item.tokenId}-${i}`}
                                                     onClick={async () => {
-                                                        if (item.lendingId)
-                                                            await onPlaceBorrowed(item.lendingId);
-                                                        else
-                                                            await onPlace(item.tokenId);
-
+                                                        await onPlace(item.tokenId);
                                                     }}
                                                 >
                                                     <div className="card__image">
@@ -735,7 +716,7 @@ const GamePage = observer(({ location }: IGamePageProps) => {
                                             </div>
                                         ))
                                     ))).concat(_.range(4).map(i => (
-                                        <div className='card'>
+                                        <div className='card' key={i}>
                                             <div className="card__wrap" key={`filler-${i}`}>
                                                 <div className="card__image">
                                                     <img src='data:image/svg+xml;utf8,<svg version="1.1" width="300" height="420" xmlns="http://www.w3.org/2000/svg"></svg>' />

@@ -64,7 +64,8 @@ def avascan_publish(c: Contract):
 
 
 SNOWTRACE_KEY = '8MSW7WG86KADW7CQDRAT9FM4422DFYB7GR'
-SNOWTRACE_TESTNET = False
+SNOWTRACE_TESTNET = Chain().id == 43113
+print(SNOWTRACE_TESTNET)
 SNOWTRACE_API_URL = 'https://api-testnet.snowtrace.io/api' if SNOWTRACE_TESTNET else 'https://api.snowtrace.io/api'
 
 

@@ -7,14 +7,13 @@ import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/utils/Counters.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/security/Pausable.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/token/ERC20/ERC20.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/token/ERC20/utils/SafeERC20.sol";
-import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/token/ERC1155/IERC1155.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.3.2/contracts/utils/structs/EnumerableSet.sol";
 import "./CustomEnumerableMap.sol";
 import "./Resource.sol";
 import "./GameLending.sol";
 
-contract Game2 is Ownable, ERC1155Holder, Pausable {
+contract Game2 is Ownable, Pausable {
     using Counters for Counters.Counter;
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.UintSet;
@@ -36,7 +35,7 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
     struct GamePlayer {
         address addr;
         uint256[3] placedCards;
-        uint256[3] borrowedCards;
+//        uint256[3] borrowedCards;
         PowerInfo[3] usedPowers;
         bool[3] lent;
     }
@@ -58,6 +57,11 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         uint256 wins;
     }
 
+    struct InventoryItem {
+        uint256 tokenId;
+        uint256 balance;
+    }
+
     Counters.Counter internal _gameIds;
     mapping (uint256 => GameInfo) _games;
     uint256[4] public powerPrices;
@@ -71,7 +75,9 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
     CustomEnumerableMap.AddressToUintMap _playerPlayed;
     CustomEnumerableMap.AddressToUintMap _playerWins;
     mapping (address => EnumerableSet.UintSet) internal _playerGames;
-    mapping (uint256 => mapping (address => mapping (uint256 => bool))) internal _playerOwnedTokens;
+    mapping (uint256 => mapping (address => mapping (uint256 => uint256))) internal _playerOwnedTokens;
+    mapping (uint256 => mapping (address => EnumerableSet.UintSet)) internal _playerOwnedTokensEnum;
+    mapping (uint256 => mapping (address => bool)) internal _playerJoins;
     mapping (address => uint256) public lastGameTimestamps;
     mapping (address => uint256) public currentGames;
 
@@ -140,20 +146,24 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         require(block.timestamp - lastGameTimestamps[msg.sender] >= epoch, "wait for join timeout");
         uint256 gameId = _gameIds.current();
         GameInfo storage game_ = _games[gameId];
+        require(!_playerJoins[gameId][msg.sender], "please wait for the next game");
 
         // check if total owned cards weight is in range
         uint256 accumulatedWeight = 0;
         uint256 cardsCount = 0;
         uint256[] memory ownedTokens = _resource.ownedTokens(msg.sender);
+        uint256[] memory ownedTokensBalances = new uint256[](ownedTokens.length);
         uint256[] memory borrowedTokens = _gameLending.getBorrowedTokenIds(msg.sender);
         for (uint256 i=0; i < ownedTokens.length; i++) {
+            uint256 balance = _resource.balanceOf(msg.sender, ownedTokens[i]);
             // skip element cards
             if (ownedTokens[i] > 4) {
-                uint256 balance = _resource.balanceOf(msg.sender, ownedTokens[i]);
                 accumulatedWeight += _resource.getResourceWeight(ownedTokens[i]) * balance;
                 cardsCount += balance;
                 require(accumulatedWeight <= maxWeight, "you have too much cards weight");
             }
+            ownedTokensBalances[i] += balance;
+            _playerOwnedTokensEnum[gameId][msg.sender].add(ownedTokens[i]);
         }
         for (uint256 i=0; i < borrowedTokens.length; i++) {
             // skip element cards
@@ -162,6 +172,7 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
                 cardsCount += 1;
                 require(accumulatedWeight <= maxWeight, "you have too much cards weight");
             }
+            _playerOwnedTokensEnum[gameId][msg.sender].add(borrowedTokens[i]);
         }
         require(accumulatedWeight >= minWeight, "you don't have enough cards weight");
         require(cardsCount >= 3, "you don't have 3 cards");
@@ -172,10 +183,10 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         }
 
         for (uint256 i=0; i < ownedTokens.length; i++)
-            _playerOwnedTokens[gameId][msg.sender][ownedTokens[i]] = true;
+            _playerOwnedTokens[gameId][msg.sender][ownedTokens[i]] += ownedTokensBalances[i];
         for (uint256 i=0; i < borrowedTokens.length; i++)
             if (borrowedTokens[i] != 0)
-                _playerOwnedTokens[gameId][msg.sender][borrowedTokens[i]] = true;
+                _playerOwnedTokens[gameId][msg.sender][borrowedTokens[i]]++;
 
         if (game_.player[0].addr == address(0)) {
             game_.player[0].addr = msg.sender;
@@ -191,10 +202,11 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         _playerGames[msg.sender].add(gameId);
         game_.lastAction = block.timestamp;
         currentGames[msg.sender] = gameId;
+        _playerJoins[gameId][msg.sender] = true;
         lastGameTimestamps[msg.sender] = block.timestamp;
     }
 
-    function leaveGame() external {
+     function leaveGame() external {
         uint256 gameId = currentGames[msg.sender];
         require(gameId != 0, "you are not in a game");
         GameInfo storage game_ = _games[gameId];
@@ -214,13 +226,14 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         require(game_.started, "game has not started");
         bool turn0 = game_.turn == 0;
         require(turn0 && game_.player[0].addr == msg.sender || !turn0 && game_.player[1].addr == msg.sender, "not your turn");
-        require(_playerOwnedTokens[gameId][msg.sender][tokenId], "you cannot use this token");
-        _resource.safeTransferFrom(msg.sender, address(this), tokenId, 1, "");
+        require(_playerOwnedTokens[gameId][msg.sender][tokenId] > 0, "insufficient virtual balance");
+        _playerOwnedTokens[gameId][msg.sender][tokenId]--;
+//        _resource.safeTransferFrom(msg.sender, address(this), tokenId, 1, "");
         game_.player[game_.turn].placedCards[game_.round] = tokenId;
         _afterPlace(game_, tokenId);
     }
 
-    function placeBorrowedCard(uint256 listingId) external {
+    /* function placeBorrowedCard(uint256 listingId) external {
         uint256 gameId = currentGames[msg.sender];
         require(gameId != 0, "you are not playing a game");
         GameInfo storage game_ = _games[gameId];
@@ -235,18 +248,28 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         game_.player[playerIdx].placedCards[game_.round] = tokenId;
         game_.player[playerIdx].borrowedCards[game_.round] = listingId;
         _afterPlace(game_, tokenId);
-    }
+    } */
 
     function _afterPlace(GameInfo storage game_, uint256 tokenId) private {
         bool turn0 = game_.turn == 0;
-        if (game_.round == 1 && turn0 || game_.round != 1 && !turn0)
+        if (game_.round == 1 && turn0 || (game_.round == 0 || game_.round == 2) && !turn0)
             game_.round++;
         else
             game_.turn = turn0 ? 1 : 0;
-        emit PlayerPlacedCard(game_.gameId, msg.sender, tokenId);
+//        emit PlayerPlacedCard(game_.gameId, msg.sender, tokenId);
         game_.lastAction = block.timestamp;
-        if (game_.round == 3 || game_.round == 2 && _roundWinner(game_, 0) == _roundWinner(game_, 1))
+        int8 winner0 = _roundWinner(game_, 0);
+        if (game_.round == 3 || game_.round == 2 && winner0 == _roundWinner(game_, 1) && winner0 != 0)
             _finishGame(game_);
+    }
+
+    function getPlayerInventory(uint256 gameId, address player) external view returns (InventoryItem[] memory) {
+        uint256[] memory tokenIds = _playerOwnedTokensEnum[gameId][player].values();
+        InventoryItem[] memory result = new InventoryItem[](tokenIds.length);
+        for (uint256 i=0; i < tokenIds.length; i++) {
+            result[i] = InventoryItem({ tokenId: tokenIds[i], balance: _playerOwnedTokens[gameId][player][tokenIds[i]] });
+        }
+        return result;
     }
 
     function _roundWinner(GameInfo storage game_, uint256 round) private view returns (int8) {
@@ -284,10 +307,10 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         int8 balance = 0;
         for (uint8 r=0; r < game_.round; r++) {
             balance += _roundWinner(game_, r);
-            if (game_.player[0].borrowedCards[r] == 0)
-                _resource.safeTransferFrom(address(this), game_.player[0].addr, game_.player[0].placedCards[r], 1, "");
-            if (game_.player[1].borrowedCards[r] == 0)
-                _resource.safeTransferFrom(address(this), game_.player[1].addr, game_.player[1].placedCards[r], 1, "");
+//            if (game_.player[0].borrowedCards[r] == 0)
+//                _resource.safeTransferFrom(address(this), game_.player[0].addr, game_.player[0].placedCards[r], 1, "");
+//            if (game_.player[1].borrowedCards[r] == 0)
+//                _resource.safeTransferFrom(address(this), game_.player[1].addr, game_.player[1].placedCards[r], 1, "");
         }
         if (balance > 0)
             game_.winner = game_.player[0].addr;
@@ -383,15 +406,15 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
             _playerWins.set(winner, prevWins + 1);
         }
 
-        for (uint8 r=0; r < 3; r++) {
-            for (uint8 p=0; p < 2; p++) {
-                uint256 tokenId = game_.player[p].placedCards[r];
-                if (tokenId != 0) {
-                    if (game_.player[p].borrowedCards[r] == 0)
-                        _resource.safeTransferFrom(address(this), game_.player[p].addr, tokenId, 1, "");
-                }
-            }
-        }
+//        for (uint8 r=0; r < 3; r++) {
+//            for (uint8 p=0; p < 2; p++) {
+//                uint256 tokenId = game_.player[p].placedCards[r];
+//                if (tokenId != 0) {
+//                    if (game_.player[p].borrowedCards[r] == 0)
+//                        _resource.safeTransferFrom(address(this), game_.player[p].addr, tokenId, 1, "");
+//                }
+//            }
+//        }
 
         currentGames[game_.player[0].addr] = 0;
         currentGames[game_.player[1].addr] = 0;
@@ -485,7 +508,7 @@ contract Game2 is Ownable, ERC1155Holder, Pausable {
         _gameLending = newAddress;
     }
 
-    function emergencyWithdraw(uint256[] memory tokenId, uint256[] memory amount) external onlyOwner {
-        _resource.safeBatchTransferFrom(address(this), msg.sender, tokenId, amount, "");
-    }
+//    function emergencyWithdraw(uint256[] memory tokenId, uint256[] memory amount) external onlyOwner {
+//        _resource.safeBatchTransferFrom(address(this), msg.sender, tokenId, amount, "");
+//    }
 }

@@ -1,6 +1,6 @@
 import json
 
-from brownie import accounts, Contract, Game2, GameLending
+from brownie import accounts, Contract, Game2, GameLending, network
 
 from scripts._utils import snowtrace_publish
 
@@ -12,6 +12,8 @@ def main():
     except:
         addresses = {}
 
+    network.gas_price(40000000000)
+
     deployer = accounts.load('talecraft-deployer')
 
     games = addresses.get('games', {})
@@ -21,18 +23,19 @@ def main():
     # snowtrace_publish(lending)
     # lending.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
-    game1 = Game2.deploy(addresses['resource'], addresses['phi'], addresses['lending'], 0, 6, 50, {'from': deployer})
-    games['0'] = game1.address
-    snowtrace_publish(game1)
-    game1.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
-
-    game2 = Game2.deploy(addresses['resource'], addresses['phi'], addresses['lending'], 0, 51, 150, {'from': deployer})
-    games['1'] = game2.address
-    game2.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
-
-    game3 = Game2.deploy(addresses['resource'], addresses['phi'], addresses['lending'], 0, 151, 1000, {'from': deployer})
-    games['2'] = game3.address
-    game3.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    # game1 = Game2.deploy(addresses['resource'], addresses['phi'], addresses['lending'], 0, 6, 50, {'from': deployer})
+    # games['0'] = game1.address
+    # # snowtrace_publish(game1)
+    # game1.transferOwnership('0xd7d99E93804EBCdCbA544E4D7b7E543b73561454', {'from': deployer})
+    #
+    # game2 = Game2.deploy(addresses['resource'], addresses['phi'], addresses['lending'], 0, 51, 150, {'from': deployer})
+    # games['1'] = game2.address
+    # game2.transferOwnership('0xd7d99E93804EBCdCbA544E4D7b7E543b73561454', {'from': deployer})
+    #
+    # game3 = Game2.deploy(addresses['resource'], addresses['phi'], addresses['lending'], 0, 151, 1000, {'from': deployer})
+    # games['2'] = game3.address
+    game3 = Game2.at(games['2'])
+    game3.transferOwnership('0xd7d99E93804EBCdCbA544E4D7b7E543b73561454', {'from': deployer})
 
     addresses['games'] = games
 

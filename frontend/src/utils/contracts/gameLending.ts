@@ -64,7 +64,9 @@ export type GameLendingEvents =
   | 'FeeUpdated'
   | 'ListingCancelled'
   | 'NewListing'
-  | 'OwnershipTransferred';
+  | 'OwnershipTransferred'
+  | 'Paused'
+  | 'Unpaused';
 export interface GameLendingEventsContext {
   Borrow(
     parameters: {
@@ -118,24 +120,48 @@ export interface GameLendingEventsContext {
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
+  Paused(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+  Unpaused(
+    parameters: {
+      filter?: {};
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
 }
 export type GameLendingMethodNames =
   | 'new'
   | 'borrowListing'
   | 'cancelList'
   | 'emergencyWithdraw'
+  | 'getActiveListingIds'
   | 'getBorrowedListings'
   | 'getBorrowedTokenIds'
   | 'getBorrowedTotalWeight'
+  | 'getLenderHeldListings'
+  | 'getLenderListings'
   | 'getListing'
   | 'getListingTokenId'
+  | 'getListings'
   | 'isListingAvailable'
   | 'list'
   | 'onERC1155BatchReceived'
   | 'onERC1155Received'
   | 'owner'
+  | 'paused'
   | 'renounceOwnership'
   | 'supportsInterface'
+  | 'togglePause'
   | 'transferOwnership'
   | 'updateFee'
   | 'withdrawFee';
@@ -189,6 +215,13 @@ export interface GameLending {
    * Constant: true
    * StateMutability: view
    * Type: function
+   */
+  getActiveListingIds(): MethodConstantReturnContext<string[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
    * @param borrower Type: address, Indexed: false
    */
   getBorrowedListings(
@@ -215,6 +248,22 @@ export interface GameLending {
    * Constant: true
    * StateMutability: view
    * Type: function
+   * @param lender Type: address, Indexed: false
+   */
+  getLenderHeldListings(lender: string): MethodConstantReturnContext<string[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param lender Type: address, Indexed: false
+   */
+  getLenderListings(lender: string): MethodConstantReturnContext<string[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
    * @param listingId Type: uint256, Indexed: false
    */
   getListing(
@@ -228,6 +277,16 @@ export interface GameLending {
    * @param listingId Type: uint256, Indexed: false
    */
   getListingTokenId(listingId: string): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param listingIds Type: uint256[], Indexed: false
+   */
+  getListings(
+    listingIds: string[]
+  ): MethodConstantReturnContext<LendlistingResponse[]>;
   /**
    * Payable: false
    * Constant: true
@@ -295,6 +354,13 @@ export interface GameLending {
   owner(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  paused(): MethodConstantReturnContext<boolean>;
+  /**
+   * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
@@ -310,6 +376,13 @@ export interface GameLending {
   supportsInterface(
     interfaceId: string | number[]
   ): MethodConstantReturnContext<boolean>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   */
+  togglePause(): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false

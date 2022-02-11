@@ -187,6 +187,22 @@
             &[disabled] {
                 opacity: .5;
             }
+
+            .tooltip {
+                display: none;
+            }
+
+            &:hover .tooltip {
+                display: block;
+                position: absolute;
+                top: 45px;
+                left: 0;
+                padding: 1rem;
+                width: 300px;
+                background: white;
+                color: black;
+                font-size: 20px;
+            }
         }
     }
 
