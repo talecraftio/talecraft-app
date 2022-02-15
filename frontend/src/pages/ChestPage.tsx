@@ -28,11 +28,12 @@ const ChestPage = observer(({}: IChestPageProps) => {
         const contract = walletStore.chestContract;
 
         const weekTotal = parseInt(await contract.methods.CHESTS_PER_WEEK().call());
-        const chestsLeft = parseInt(await contract.methods.chestsLeft().call());
+        const chestPrice = parseInt(await contract.methods.chestPriceEth().call());
+        const chestsSold = parseInt(await walletStore.web3.eth.getBalance(ADDRESSES.chest)) / chestPrice;
 
         setTotalChests(weekTotal);
-        setSoldChests(weekTotal - chestsLeft);
-        setSaleProgress(1 - chestsLeft / weekTotal);
+        setSoldChests(chestsSold);
+        setSaleProgress(1 - (weekTotal - chestsSold) / weekTotal);
     };
 
     useAsyncEffect(updateInfo, [walletStore.lastBlock]);
