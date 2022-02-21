@@ -32,7 +32,7 @@ const CreateVestingPage = ({}: ICreateVestingPageProps) => {
             '18268500000000000000000',
             '91345350000000000000000',
         ];
-        let promises = _.chunk(beneficiaries, 5).map(chunk => factory.methods.deployDiffAmountsMultipleVestingContractAndDepositTokens(owner, chunk, start, cliff, duration, revocable, token, amounts));
+        let promises = [factory.methods.deployDiffAmountsMultipleVestingContractAndDepositTokens(owner, beneficiaries, start, cliff, duration, revocable, token, amounts)];
         toast.info('Waiting for txs to execute');
         await Promise.all(promises);
         duration = '131487150';
@@ -1786,7 +1786,16 @@ const CreateVestingPage = ({}: ICreateVestingPageProps) => {
             '70.3',
             '27.55',
         ]
-        promises = _.chunk(beneficiaries, 5).map(chunk => factory.methods.deployDiffAmountsMultipleVestingContractAndDepositTokens(owner, chunk, start, cliff, duration, revocable, token, amounts.map(a => toBN(a).times('1e18').toFixed(0))));
+        promises = _.chunk(_.range(beneficiaries.length), 5).map(chunk => factory.methods.deployDiffAmountsMultipleVestingContractAndDepositTokens(
+            owner,
+            chunk.map(i => beneficiaries[i]),
+            start,
+            cliff,
+            duration,
+            revocable,
+            token,
+            chunk.map(i => amounts[i]).map(a => toBN(a).times('1e18').toFixed(0))
+        ));
         toast.info('Waiting for txs to execute');
         await Promise.all(promises);
         toast.success('Done');
