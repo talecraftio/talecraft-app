@@ -1,7 +1,7 @@
 import React from 'react';
 import { useInjection } from "inversify-react";
 import WalletStore from "../../stores/WalletStore";
-import { vestingFactoryContract } from "../../utils/contracts";
+import { vestingFactory2Contract } from "../../utils/contracts";
 import _ from "lodash";
 import { toast } from "react-toastify";
 import { toBN } from "../../utils/number";
@@ -13,7 +13,7 @@ const CreateVestingPage = ({}: ICreateVestingPageProps) => {
     const walletStore = useInjection(WalletStore);
 
     const create = async () => {
-        const factory = vestingFactoryContract(walletStore.web3);
+        const factory = vestingFactory2Contract(walletStore.web3);
         const owner = '0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14';
         let beneficiaries = [
             '0x8B81D6180D609cD44509daaDF8cA0D22E97326B0',
