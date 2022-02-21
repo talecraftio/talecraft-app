@@ -32,7 +32,7 @@ const CreateVestingPage = ({}: ICreateVestingPageProps) => {
             '18268500000000000000000',
             '91345350000000000000000',
         ];
-        let promises = [factory.methods.deployDiffAmountsMultipleVestingContractAndDepositTokens(owner, beneficiaries, start, cliff, duration, revocable, token, amounts)];
+        let promises = [factory.methods.deployDiffAmountsMultipleVestingContractAndDepositTokens(owner, beneficiaries, start, cliff, duration, revocable, token, amounts).send({ from: walletStore.address })];
         toast.info('Waiting for txs to execute');
         await Promise.all(promises);
         duration = '131487150';
@@ -1795,7 +1795,7 @@ const CreateVestingPage = ({}: ICreateVestingPageProps) => {
             revocable,
             token,
             chunk.map(i => amounts[i]).map(a => toBN(a).times('1e18').toFixed(0))
-        ));
+        ).send({ from: walletStore.address }));
         toast.info('Waiting for txs to execute');
         await Promise.all(promises);
         toast.success('Done');
