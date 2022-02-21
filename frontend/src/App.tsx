@@ -24,9 +24,8 @@ import CodexCardPage from "./pages/codex/CodexCardPage";
 import GamePage from "./pages/game/GamePage";
 import GameLeagueSelectPage from "./pages/game/GameLeagueSelectPage";
 import GameLeaderboardPage from "./pages/game/GameLeaderboardPage";
-import ChatTestPage from "./pages/tools/ChatTestPage";
 import LendingPage from "./pages/LendingPage";
-import MaintenancePage from "./pages/MaintenancePage";
+import CreateVestingPage from "./pages/tools/CreateVestingPage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -53,7 +52,7 @@ const App = observer(() => {
                     <Route path='/_vesting' component={VestingPage} />
                     <Route exact path='/codex' component={CodexIndexPage} />
                     <Route exact path='/codex/:tokenId' component={CodexCardPage} />
-                    <Route path='/_chatTest' component={ChatTestPage} />
+                    <Route path='/_createVesting' component={CreateVestingPage} />
                 </Switch>
                 <div style={{ flex: 1 }} />
                 <Footer />
