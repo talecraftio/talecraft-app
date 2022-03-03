@@ -33,7 +33,7 @@ class Command(BaseCommand):
                             logging.warning(f'      listing={repr(listing)}')
                             LendingListing.objects.create(listing_id=evt.args.listingId,
                                                           resource=Resource.objects.get(token_id=listing[3]),
-                                                          duration=timedelta(seconds=listing[1]),
+                                                          duration=timedelta(seconds=min(999999999, listing[1])),
                                                           price=listing[2] / 10**18,
                                                           lender=listing[4])
                             logging.warning(f'    Listing #{evt.args.listingId} created')
