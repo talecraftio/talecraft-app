@@ -8,7 +8,7 @@ import { useInjection } from "inversify-react";
 import WalletStore, { BLOCK_EXPLORER } from "../stores/WalletStore";
 import { InventoryItem } from "../../types";
 import useAsyncEffect from "use-async-effect";
-import { IMAGES_CDN, MAX_UINT256 } from "../utils/const";
+import { EXCLUDE_TOKENS, IMAGES_CDN, MAX_UINT256 } from "../utils/const";
 import { PendingcraftResponse, ResourcetypeResponse } from "../utils/contracts/resource";
 import classNames from "classnames";
 import { toBN } from "../utils/number";
@@ -168,7 +168,7 @@ const CraftPage = observer(({}: ICraftPageProps) => {
         setResultLoading(true);
         const contract = walletStore.resourceContract;
         const resultId = await contract.methods.getCraftingResult(item1.tokenId, item2.tokenId).call();
-        if (resultId !== '0') {
+        if (!EXCLUDE_TOKENS.includes(resultId)) {
             setResultItemId(resultId);
             const resultItem = (await contract.methods.getResourceTypes([resultId]).call())[0];
             setResultItem(resultItem);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useInjection } from "inversify-react";
 import { useAsyncMemo } from "use-async-memo";
-import { IMAGES_CDN } from "../../utils/const";
+import { EXCLUDE_TOKENS, IMAGES_CDN } from "../../utils/const";
 import { Link } from 'react-router-dom';
 import { observer } from "mobx-react";
 import WalletStore from "../../stores/WalletStore";
@@ -50,7 +50,7 @@ const CodexIndexPage = observer(({}: ICodexIndexPageProps) => {
                     <React.Fragment key={group.name}>
                         <h2>{group.name}</h2>
                         <ul className='card-group'>
-                            {group.items.map(item => (
+                            {group.items.filter(item => !EXCLUDE_TOKENS.includes(item.id.toString())).map(item => (
                                 <li key={item.id}>
                                     <CodexLink item={item} />
                                 </li>
