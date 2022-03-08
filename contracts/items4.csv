@@ -2,7 +2,7 @@ blue fire,fire,fire,2,stone tier,QmabEBKsk4HUe5vvuW8i1hd1mSmQEhUh4wW5sC6fogbE3h
 ruby,blue fire,blue fire,4,stone tier,QmYFbeWMdFzKECmu43FRhsQ9m8WwaSvTjNh4Wqyi4kWtgY
 green ruby,ruby,ruby,8,stone tier,QmPtV5WqxjP8PoCKYZAbYTiQUEbasWYGhCa3oEDwjaBJzX
 solar,green ruby,green ruby,16,iron tier,QmVDP89Ysq2RadHPPSkL4ozujgxzSm43VQNn8aWsTdNMCv
-swipe,solar,cz,229,gold tier,QmXiaegrPB8QCSmQwk3517ZsCci7riA7umwidKhXY9LYYM
+DO NOT USE,solar,cz,229,phi stone tier,QmbwVahb74im2APPGQfVz3h5hhPPNufEvUZKEJqSdkyEVV
 magma,blue fire,lava,4,stone tier,QmWC4pn2CTdUkixVQcDXnPEQFG8nPtUqYeM1HSSArTfoL7
 volcano,magma,metal,8,stone tier,QmRGAW3R2oQtW1A33LViQKUDJvHq6XB9badBpgHKQ7QqLS
 el salvador,volcano,blockchain,122,gold tier,QmQjVtgqkBo4nXLfqqLaQcLfgTvEpzkZf1JgEuVY6YewUw
@@ -13,3 +13,4 @@ gas,natural gas,ethereum,306,phi stone tier,QmWhvuJ4e7vUGjHLUfe5jMisgUQK4C9jQrKB
 theta,computer,electricity,41,silver tier,QmPCqVDFVw1Kbd8gdKHKnqAwDbqVcRA38FMU3KKYaGq63W
 node,gas,theta,347,phi stone tier,QmbcPfS3ec7jRLhKKpiT3kmQTyuTqqgWwY1iwyaGyNj6Hx
 volcano miner,node,el salvador,469,phi stone tier,QmTnrNmbieidsWP9U5JBeCgzhKXEVRB5WEPkWRvgVB3PGW
+swipe,solar,cz,229,phi stone tier,QmbwVahb74im2APPGQfVz3h5hhPPNufEvUZKEJqSdkyEVV
