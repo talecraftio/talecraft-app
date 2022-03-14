@@ -73,4 +73,4 @@ class Command(BaseCommand):
                 logging.exception(e)
                 time.sleep(5)
 
-            time.sleep(.3)
+            time.sleep(5)
