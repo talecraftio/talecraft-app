@@ -23,6 +23,7 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
     const [ allowance, setAllowance ] = useState<BN>(toBN(0));
     const [ earned, setEarned ] = useState<BN>(toBN(0));
     const [ apr, setApr ] = useState<BN>(toBN(0));
+    const [ startTimestamp, setStartTimestamp ] = useState(0);
     const [ endTimestamp, setEndTimestamp ] = useState(0);
     const [ totalStakedAmount, setTotalStakedAmount ] = useState<BN>(toBN(0));
 
@@ -40,6 +41,7 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
         const totalStakedAmount = toBN(poolInfo.supply).div('1e18');
         setTotalStakedAmount(totalStakedAmount);
         setEndTimestamp(parseInt(await contract.methods.endTimestamp().call()));
+        setStartTimestamp(parseInt(await contract.methods.startTimestamp().call()));
 
         const apr = toBN(aprBase).div(totalStakedAmount).times(100);
         setApr(apr);
@@ -169,7 +171,7 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
                     <button type='button' className='btn primary' style={{ fontSize: 16, minHeight: 0, minWidth: 0 }} onClick={() => setAmount(balance.toString())} disabled={loading || disabled}>MAX</button>
                 </div>
                 <div className="staking__btn">
-                    <button className="btn primary up" type="submit" disabled={loading || toBN(amount).gt(balance) || toBN(amount).isZero() || disabled}>
+                    <button className="btn primary up" type="submit" disabled={loading || toBN(amount).gt(balance) || toBN(amount).isZero() || disabled || timelock && (+new Date() / 1000 < startTimestamp)}>
                         {allowance.lt(amount) ? 'approve' : 'stake'}
                     </button>
                 </div>
