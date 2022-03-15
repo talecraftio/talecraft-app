@@ -240,7 +240,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                             contract={walletStore.stakingLockContract}
                             craftPrice={craftPrice}
                             avaxPrice={avaxPrice}
-                            address={ADDRESSES.staking_x7}
+                            address={ADDRESSES.staking_lock}
                             title='Earn Alchemy Power'
                             earnedVisible={false}
                             timelock
