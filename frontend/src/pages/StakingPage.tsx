@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 interface IStakingPageProps {
 }
 
-const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPrice, title = 'Earn CRAFT', disabled }: { contract: StakingContract, address: string, aprBase: string, craftPrice: BN, avaxPrice: BN, title?: string, disabled?: boolean }) => {
+const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPrice, title = 'Earn CRAFT', subtitle = 'Stake CRAFT', info, earnedVisible = true, disabled, timelock = false }: { contract: StakingContract, address: string, aprBase: string, craftPrice: BN, avaxPrice: BN, title?: string, subtitle?: React.ReactChild, info?: React.ReactChild, earnedVisible?: boolean, disabled?: boolean, timelock?: boolean }) => {
     const walletStore = useInjection(WalletStore);
 
     const [ amount, setAmount ] = useState('');
@@ -23,6 +23,7 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
     const [ allowance, setAllowance ] = useState<BN>(toBN(0));
     const [ earned, setEarned ] = useState<BN>(toBN(0));
     const [ apr, setApr ] = useState<BN>(toBN(0));
+    const [ endTimestamp, setEndTimestamp ] = useState(0);
     const [ totalStakedAmount, setTotalStakedAmount ] = useState<BN>(toBN(0));
 
     useAsyncEffect(async () => {
@@ -38,6 +39,7 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
         const poolInfo = await contract.methods.poolInfo('0').call();
         const totalStakedAmount = toBN(poolInfo.supply).div('1e18');
         setTotalStakedAmount(totalStakedAmount);
+        setEndTimestamp(parseInt(await contract.methods.endTimestamp().call()));
 
         const apr = toBN(aprBase).div(totalStakedAmount).times(100);
         setApr(apr);
@@ -120,7 +122,7 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
             <form className="staking__wrap" onSubmit={onSubmit}>
                 <h2 className="section-title text-center">{title}</h2>
                 <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
-                <h4 className="section-subtitle">Stake CRAFT</h4>
+                <h4 className="section-subtitle">{subtitle}</h4>
                 <div className="staking__row">
                     <p className="staking__category">APR:</p>
                     <p className="staking__count">{apr?.toFixed(2) || '0.00'}%</p>
@@ -130,15 +132,15 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
                         <span>CRAFT staked</span>
                         {staked.toFixed(6)} CRAFT
                     </p>
-                    <button className="btn up" type="button" disabled={loading || staked.isZero()} onClick={onWithdraw}>WITHDRAW</button>
+                    <button className="btn up" type="button" disabled={loading || staked.isZero() || timelock && (+new Date() / 1000 < endTimestamp)} onClick={onWithdraw}>WITHDRAW</button>
                 </div>
-                <div className="staking__row">
+                {earnedVisible && <div className="staking__row">
                     <p className="staking__count">
                         <span>CRAFT earned</span>
                         {earned.toFixed(6)} CRAFT
                     </p>
                     <button className="btn up" type="button" disabled={loading || earned.isZero()} onClick={onHarvest}>HARVEST</button>
-                </div>
+                </div>}
                 <div className="staking__row">
                     <p className="staking__count">
                         <span>Total staked</span>
@@ -150,6 +152,7 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
                     </p>
                 </div>
                 <div className="title-img"><img src={require('url:../images/border.png')} alt="alt" /></div>
+                {info}
                 <div className="form__field">
                     <input
                         className="form__input"
@@ -213,8 +216,36 @@ const StakingPage = observer(({}: IStakingPageProps) => {
             <section className="staking-section">
                 <div className="container">
                     <div className="staking-wrap">
-                        <StakingBlock aprBase='47414' contract={walletStore.stakingContract} craftPrice={craftPrice} avaxPrice={avaxPrice} address={ADDRESSES.staking} title='FINISHED' />
-                        <StakingBlock aprBase='311040' contract={walletStore.stakingContractX7} craftPrice={craftPrice} avaxPrice={avaxPrice} address={ADDRESSES.staking_x7} title='Earn CRAFT x7' />
+                        <StakingBlock
+                            aprBase='47414'
+                            contract={walletStore.stakingContract}
+                            craftPrice={craftPrice}
+                            avaxPrice={avaxPrice}
+                            address={ADDRESSES.staking}
+                            title='FINISHED'
+                        />
+                        <StakingBlock
+                            aprBase='311040'
+                            contract={walletStore.stakingContractX7}
+                            craftPrice={craftPrice}
+                            avaxPrice={avaxPrice}
+                            address={ADDRESSES.staking_x7}
+                            title='Earn CRAFT x7'
+                        />
+                        <StakingBlock
+                            aprBase='600000'
+                            contract={walletStore.stakingLockContract}
+                            craftPrice={craftPrice}
+                            avaxPrice={avaxPrice}
+                            address={ADDRESSES.staking_x7}
+                            title='Earn Alchemy Power'
+                            earnedVisible={false}
+                            timelock
+                            info={<h5 className='section-info'>
+                                CRAFTs will be locked until April 15th.<br/>
+                                5000 AP will be airdropped depends on weights.
+                            </h5>}
+                        />
                     </div>
                 </div>
             </section>
