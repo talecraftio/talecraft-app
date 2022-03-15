@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 interface IStakingPageProps {
 }
 
-const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPrice, title = 'Earn CRAFT' }: { contract: StakingContract, address: string, aprBase: string, craftPrice: BN, avaxPrice: BN, title?: string }) => {
+const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPrice, title = 'Earn CRAFT', disabled }: { contract: StakingContract, address: string, aprBase: string, craftPrice: BN, avaxPrice: BN, title?: string, disabled?: boolean }) => {
     const walletStore = useInjection(WalletStore);
 
     const [ amount, setAmount ] = useState('');
@@ -159,14 +159,14 @@ const StakingBlock = observer(({ contract, address, aprBase, craftPrice, avaxPri
                         max={balance.toString()}
                         step='1e-18'
                         placeholder="Amount"
-                        disabled={loading}
+                        disabled={loading || disabled}
                         value={amount}
                         onChange={e => setAmount(e.target.value)}
                     />
-                    <button type='button' className='btn primary' style={{ fontSize: 16, minHeight: 0, minWidth: 0 }} onClick={() => setAmount(balance.toString())} disabled={loading}>MAX</button>
+                    <button type='button' className='btn primary' style={{ fontSize: 16, minHeight: 0, minWidth: 0 }} onClick={() => setAmount(balance.toString())} disabled={loading || disabled}>MAX</button>
                 </div>
                 <div className="staking__btn">
-                    <button className="btn primary up" type="submit" disabled={loading || toBN(amount).gt(balance) || toBN(amount).isZero()}>
+                    <button className="btn primary up" type="submit" disabled={loading || toBN(amount).gt(balance) || toBN(amount).isZero() || disabled}>
                         {allowance.lt(amount) ? 'approve' : 'stake'}
                     </button>
                 </div>
@@ -213,7 +213,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
             <section className="staking-section">
                 <div className="container">
                     <div className="staking-wrap">
-                        <StakingBlock aprBase='47414' contract={walletStore.stakingContract} craftPrice={craftPrice} avaxPrice={avaxPrice} address={ADDRESSES.staking} />
+                        <StakingBlock aprBase='47414' contract={walletStore.stakingContract} craftPrice={craftPrice} avaxPrice={avaxPrice} address={ADDRESSES.staking} title='FINISHED' />
                         <StakingBlock aprBase='311040' contract={walletStore.stakingContractX7} craftPrice={craftPrice} avaxPrice={avaxPrice} address={ADDRESSES.staking_x7} title='Earn CRAFT x7' />
                     </div>
                 </div>

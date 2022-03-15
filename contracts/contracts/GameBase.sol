@@ -13,7 +13,7 @@ import "./CustomEnumerableMap.sol";
 import "./Resource.sol";
 import "./GameLending.sol";
 
-contract Game2 is Ownable, Pausable {
+abstract contract GameBase is Ownable, Pausable {
     using Counters for Counters.Counter;
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.UintSet;
@@ -141,21 +141,15 @@ contract Game2 is Ownable, Pausable {
         return _playerGames[player].values();
     }
 
-    function joinGame() external whenNotPaused {
-        require(currentGames[msg.sender] == 0, "you are playing already");
-        require(block.timestamp - lastGameTimestamps[msg.sender] >= epoch, "wait for join timeout");
-        uint256 gameId = _gameIds.current();
-        GameInfo storage game_ = _games[gameId];
-        require(!_playerJoins[gameId][msg.sender], "please wait for the next game");
-
+    function _saveVirtualBalances(address account, uint256 saveId) internal {
         // check if total owned cards weight is in range
         uint256 accumulatedWeight = 0;
         uint256 cardsCount = 0;
-        uint256[] memory ownedTokens = _resource.ownedTokens(msg.sender);
+        uint256[] memory ownedTokens = _resource.ownedTokens(account);
         uint256[] memory ownedTokensBalances = new uint256[](ownedTokens.length);
-        uint256[] memory borrowedTokens = _gameLending.getBorrowedTokenIds(msg.sender);
+        uint256[] memory borrowedTokens = _gameLending.getBorrowedTokenIds(account);
         for (uint256 i=0; i < ownedTokens.length; i++) {
-            uint256 balance = _resource.balanceOf(msg.sender, ownedTokens[i]);
+            uint256 balance = _resource.balanceOf(account, ownedTokens[i]);
             // skip element cards
             if (ownedTokens[i] > 4) {
                 accumulatedWeight += _resource.getResourceWeight(ownedTokens[i]) * balance;
@@ -163,7 +157,7 @@ contract Game2 is Ownable, Pausable {
                 require(accumulatedWeight <= maxWeight, "you have too much cards weight");
             }
             ownedTokensBalances[i] += balance;
-            _playerOwnedTokensEnum[gameId][msg.sender].add(ownedTokens[i]);
+            _playerOwnedTokensEnum[saveId][account].add(ownedTokens[i]);
         }
         for (uint256 i=0; i < borrowedTokens.length; i++) {
             // skip element cards
@@ -172,38 +166,49 @@ contract Game2 is Ownable, Pausable {
                 cardsCount += 1;
                 require(accumulatedWeight <= maxWeight, "you have too much cards weight");
             }
-            _playerOwnedTokensEnum[gameId][msg.sender].add(borrowedTokens[i]);
+            _playerOwnedTokensEnum[saveId][account].add(borrowedTokens[i]);
         }
         require(accumulatedWeight >= minWeight, "you don't have enough cards weight");
         require(cardsCount >= 3, "you don't have 3 cards");
 
+        for (uint256 i=0; i < ownedTokens.length; i++)
+            _playerOwnedTokens[saveId][account][ownedTokens[i]] += ownedTokensBalances[i];
+        for (uint256 i=0; i < borrowedTokens.length; i++)
+            if (borrowedTokens[i] != 0)
+                _playerOwnedTokens[saveId][account][borrowedTokens[i]]++;
+    }
+
+    function _joinGame(address account, bool saveBalances) internal {
+        require(currentGames[account] == 0, "you are playing already");
+        require(block.timestamp - lastGameTimestamps[account] >= epoch, "wait for join timeout");
+        uint256 gameId = _gameIds.current();
+        GameInfo storage game_ = _games[gameId];
+        require(!_playerJoins[gameId][account], "please wait for the next game");
+
+        if (saveBalances)
+            _saveVirtualBalances(account, gameId);
+
         if (joinPrice > 0) {
-            _phi.safeTransferFrom(msg.sender, address(this), joinPrice);
+            _phi.safeTransferFrom(account, address(this), joinPrice);
             game_.bank += joinPrice;
         }
 
-        for (uint256 i=0; i < ownedTokens.length; i++)
-            _playerOwnedTokens[gameId][msg.sender][ownedTokens[i]] += ownedTokensBalances[i];
-        for (uint256 i=0; i < borrowedTokens.length; i++)
-            if (borrowedTokens[i] != 0)
-                _playerOwnedTokens[gameId][msg.sender][borrowedTokens[i]]++;
-
         if (game_.player[0].addr == address(0)) {
-            game_.player[0].addr = msg.sender;
+            game_.player[0].addr = account;
         } else {
-            game_.player[1].addr = msg.sender;
+            game_.player[1].addr = account;
             game_.started = true;
             emit GameStarted(gameId);
             inGameCount += 2;
             _createGame();
         }
-        emit PlayerEntered(gameId, msg.sender);
+        emit PlayerEntered(gameId, account);
 
-        _playerGames[msg.sender].add(gameId);
+        _playerGames[account].add(gameId);
         game_.lastAction = block.timestamp;
-        currentGames[msg.sender] = gameId;
-        _playerJoins[gameId][msg.sender] = true;
-        lastGameTimestamps[msg.sender] = block.timestamp;
+        currentGames[account] = gameId;
+        _playerJoins[gameId][account] = true;
+        lastGameTimestamps[account] = block.timestamp;
     }
 
      function leaveGame() external {
@@ -303,14 +308,9 @@ contract Game2 is Ownable, Pausable {
     function _finishGame(GameInfo storage game_) private {
         game_.finished = true;
         uint256[2] memory weights;
-        uint256 multiplier = 1;
         int8 balance = 0;
         for (uint8 r=0; r < game_.round; r++) {
             balance += _roundWinner(game_, r);
-//            if (game_.player[0].borrowedCards[r] == 0)
-//                _resource.safeTransferFrom(address(this), game_.player[0].addr, game_.player[0].placedCards[r], 1, "");
-//            if (game_.player[1].borrowedCards[r] == 0)
-//                _resource.safeTransferFrom(address(this), game_.player[1].addr, game_.player[1].placedCards[r], 1, "");
         }
         if (balance > 0)
             game_.winner = game_.player[0].addr;
@@ -321,13 +321,6 @@ contract Game2 is Ownable, Pausable {
             if (_playerWins.contains(game_.winner))
                 prevWins = _playerWins.get(game_.winner);
             _playerWins.set(game_.winner, prevWins + 1);
-            if (game_.bank > 0)
-                _phi.safeTransfer(game_.winner, game_.bank * (1e6 - fee) / 1e6);
-        } else {
-            if (game_.bank > 0) {
-                _phi.safeTransfer(game_.player[0].addr, game_.bank / 2);
-                _phi.safeTransfer(game_.player[1].addr, game_.bank / 2);
-            }
         }
 
         uint256 prevPlayed = 0;
@@ -345,7 +338,11 @@ contract Game2 is Ownable, Pausable {
         emit GameFinished(game_.gameId, game_.winner);
 
         inGameCount -= 2;
+
+        _afterGameEnd(game_);
     }
+
+    function _afterGameEnd(GameInfo storage game_) internal virtual {}
 
     function usePower(PowerType powerType) external {
         uint256 gameId = currentGames[msg.sender];
