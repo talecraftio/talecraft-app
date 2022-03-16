@@ -234,6 +234,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                             avaxPrice={avaxPrice}
                             address={ADDRESSES.staking_x7}
                             title='Earn CRAFT x7'
+                            disabled
                         />
                         <StakingBlock
                             aprBase='600000'
