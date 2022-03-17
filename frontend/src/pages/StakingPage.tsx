@@ -249,6 +249,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                                 CRAFTs will be locked until April 15th.<br/>
                                 5000 AP will be airdropped depends on weights.
                             </h5>}
+                            disabled
                         />
                     </div>
                 </div>
