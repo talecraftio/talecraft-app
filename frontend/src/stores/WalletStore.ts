@@ -7,7 +7,7 @@ import Timeout from "await-timeout";
 import {
     chestContract,
     game2Contract,
-    gameContract, gameLendingContract,
+    gameContract, gameLendingContract, gameTournamentContract,
     marketplaceContract,
     phiContract,
     resourceContract,
@@ -186,6 +186,10 @@ class WalletStore {
 
     getGame2Contract(address: string) {
         return game2Contract(this.web3, address);
+    }
+
+    get gameTournamentContract() {
+        return gameTournamentContract(this.web3);
     }
 
     get vestingFactoryContract() {

@@ -30,6 +30,7 @@ contract GameTournament is GameBase {
     Counters.Counter private tournamentIds;
 
     mapping (address => uint256) public playersCurrentTournaments;
+    mapping (uint256 => bool) public diceRolled;
     uint256[5] public winAmounts = [5e18, 10e18, 20e18, 40e18, 80e18];
 
     event WinAmountsUpdated(uint256[5] values);
@@ -57,7 +58,7 @@ contract GameTournament is GameBase {
 
         tournamentPlayers[tournamentId].add(msg.sender);
         playersCurrentTournaments[msg.sender] = tournamentId;
-        _saveVirtualBalances(msg.sender, 2**128 + tournamentId);
+        _saveVirtualBalances(msg.sender, 10**10 + tournamentId);
         emit TournamentJoin(tournamentId, msg.sender);
 
         if (tournamentPlayers[tournamentId].length() == tournament.playersCount) {
@@ -91,11 +92,11 @@ contract GameTournament is GameBase {
                 address player1 = players[i];
                 address player2 = players[i + 1];
                 // start game
+                uint256 gameId = _gameIds.current();
                 _joinGame(player1, false);
                 _joinGame(player2, false);
-                uint256 gameId = _gameIds.current();
                 _copyVirtualBalances(tournamentId, gameId, player1, player2);
-                tournament.gameIds[0].push(_gameIds.current());
+                tournament.gameIds[0].push(gameId);
             }
             emit TournamentStart(tournamentId);
         }
@@ -124,6 +125,11 @@ contract GameTournament is GameBase {
 
     function _afterGameEnd(GameBase.GameInfo storage game_) internal override {
         address winner = game_.winner;
+        if (winner == address(0)) {
+            uint256 rand = uint256(keccak256(abi.encodePacked(block.timestamp, blockhash(block.number - 1), game_.gameId))) % 2;
+            winner = game_.winner = game_.player[rand].addr;
+            diceRolled[game_.gameId] = true;
+        }
         uint256 tournamentId = playersCurrentTournaments[winner];
         Tournament storage tournament = tournaments[tournamentId];
         tournament.currentWinners.push(winner);
@@ -132,7 +138,7 @@ contract GameTournament is GameBase {
             address addr0 = game_.player[0].addr;
             _phi.safeTransfer(addr0 == winner ? game_.player[1].addr : addr0, winAmounts[0]);
         }
-        _phi.safeTransfer(winner, tournament.tournamentRound + 1);
+        _phi.safeTransfer(winner, winAmounts[tournament.tournamentRound + 1]);
 
         uint256 winnersCount = tournament.currentWinners.length;
         if (winnersCount == tournament.gameIds[tournament.tournamentRound].length) {
@@ -151,9 +157,9 @@ contract GameTournament is GameBase {
                 for (uint256 i=0; i < winnersCount; i += 2) {
                     address player1 = winners[i];
                     address player2 = winners[i + 1];
+                    uint256 gameId = _gameIds.current();
                     _joinGame(player1, false);
                     _joinGame(player2, false);
-                    uint256 gameId = _gameIds.current();
                     _copyVirtualBalances(tournamentId, gameId, player1, player2);
                     tournament.gameIds[tournament.tournamentRound].push(gameId);
                 }
@@ -163,7 +169,7 @@ contract GameTournament is GameBase {
     }
 
     function _copyVirtualBalances(uint256 tournamentId, uint256 gameId, address player0, address player1) private {
-        uint256 balanceId = 2**128 + tournamentId;
+        uint256 balanceId = 10**10 + tournamentId;
         for (uint256 i=0; i < _playerOwnedTokensEnum[balanceId][player0].length(); i++) {
             uint256 tokenId = _playerOwnedTokensEnum[balanceId][player0].at(i);
             _playerOwnedTokensEnum[gameId][player0].add(tokenId);
@@ -188,6 +194,23 @@ contract GameTournament is GameBase {
         tournament.playersCount = playersCount;
         tournament.startTime = startTime;
         tournament.joinDeadline = joinDeadline;
+    }
+
+    function getTournaments(uint256[] memory ids) external view returns (Tournament[] memory) {
+        Tournament[] memory result = new Tournament[](ids.length);
+        for (uint256 i=0; i < ids.length; i++) {
+            result[i] = tournaments[ids[i]];
+            result[i].players = tournamentPlayers[ids[i]].values();
+        }
+        return result;
+    }
+
+    function getLastTournamentId() external view returns (uint256) {
+        return tournamentIds.current();
+    }
+
+    function getWinAmounts() external view returns (uint256[5] memory) {
+        return winAmounts;
     }
 
     function updateWinAmounts(uint256[5] memory amounts) external onlyOwner {

@@ -54,12 +54,12 @@ export interface MethodConstantReturnContext<TCallReturn> {
 export interface MethodReturnContext extends MethodPayableReturnContext {}
 
 export type ContractContext = Web3ContractContext<
-  Game2,
-  Game2MethodNames,
-  Game2EventsContext,
-  Game2Events
+  GameBase,
+  GameBaseMethodNames,
+  GameBaseEventsContext,
+  GameBaseEvents
 >;
-export type Game2Events =
+export type GameBaseEvents =
   | 'AbortTimeoutUpdated'
   | 'EpochUpdated'
   | 'GameAborted'
@@ -76,7 +76,7 @@ export type Game2Events =
   | 'PowerPricesUpdated'
   | 'PowerUsed'
   | 'Unpaused';
-export interface Game2EventsContext {
+export interface GameBaseEventsContext {
   AbortTimeoutUpdated(
     parameters: {
       filter?: {};
@@ -225,7 +225,7 @@ export interface Game2EventsContext {
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
 }
-export type Game2MethodNames =
+export type GameBaseMethodNames =
   | 'new'
   | 'abort'
   | 'abortTimeout'
@@ -236,7 +236,6 @@ export type Game2MethodNames =
   | 'getPlayerInventory'
   | 'getRoundWinner'
   | 'inGameCount'
-  | 'joinGame'
   | 'joinPrice'
   | 'lastGameTimestamps'
   | 'leaderboard'
@@ -295,7 +294,7 @@ export interface LeaderboarditemResponse {
   player: string;
   wins: string;
 }
-export interface Game2 {
+export interface GameBase {
   /**
    * Payable: false
    * Constant: false
@@ -391,13 +390,6 @@ export interface Game2 {
    * Type: function
    */
   inGameCount(): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   */
-  joinGame(): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

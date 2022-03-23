@@ -291,11 +291,15 @@ export type GameTournamentMethodNames =
   | 'abortTimeout'
   | 'addTournament'
   | 'currentGames'
+  | 'diceRolled'
   | 'epoch'
   | 'fee'
   | 'game'
+  | 'getLastTournamentId'
   | 'getPlayerInventory'
   | 'getRoundWinner'
+  | 'getTournaments'
+  | 'getWinAmounts'
   | 'inGameCount'
   | 'joinPrice'
   | 'joinTournament'
@@ -309,7 +313,7 @@ export type GameTournamentMethodNames =
   | 'owner'
   | 'ownerAbort'
   | 'paused'
-  | 'placeCard'
+  | 'placeCardMangledNameFoo'
   | 'playerGames'
   | 'playerPlayed'
   | 'playerWins'
@@ -355,6 +359,19 @@ export interface GameinfoResponse {
 export interface InventoryitemResponse {
   tokenId: string;
   balance: string;
+}
+export interface TournamentResponse {
+  tournamentId: string;
+  tournamentRound: string;
+  players: string[];
+  gameIds: string[][];
+  currentWinners: string[];
+  startTime: string;
+  joinDeadline: string;
+  playersCount: string;
+  started: boolean;
+  finished: boolean;
+  winner: string;
 }
 export interface LeaderboarditemResponse {
   player: string;
@@ -418,6 +435,14 @@ export interface GameTournament {
    * Constant: true
    * StateMutability: view
    * Type: function
+   * @param parameter0 Type: uint256, Indexed: false
+   */
+  diceRolled(parameter0: string): MethodConstantReturnContext<boolean>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
    */
   epoch(): MethodConstantReturnContext<string>;
   /**
@@ -435,6 +460,13 @@ export interface GameTournament {
    * @param gameId Type: uint256, Indexed: false
    */
   game(gameId: string): MethodConstantReturnContext<GameinfoResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  getLastTournamentId(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -459,6 +491,25 @@ export interface GameTournament {
     gameId: string,
     round: string
   ): MethodConstantReturnContext<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param ids Type: uint256[], Indexed: false
+   */
+  getTournaments(
+    ids: string[]
+  ): MethodConstantReturnContext<TournamentResponse[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  getWinAmounts(): MethodConstantReturnContext<
+    [string, string, string, string, string, string]
+  >;
   /**
    * Payable: false
    * Constant: true
@@ -566,7 +617,7 @@ export interface GameTournament {
    * Type: function
    * @param tokenId Type: uint256, Indexed: false
    */
-  placeCard(tokenId: string): MethodReturnContext;
+  placeCardMangledNameFoo(tokenId: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

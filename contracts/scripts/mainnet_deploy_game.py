@@ -1,6 +1,6 @@
 import json
 
-from brownie import accounts, Contract, Game2, GameLending, network
+from brownie import accounts, Contract, Game2, GameLending, network, GameTournament, Resource, PHI
 
 from scripts._utils import snowtrace_publish
 
@@ -34,10 +34,16 @@ def main():
     #
     # game3 = Game2.deploy(addresses['resource'], addresses['phi'], addresses['lending'], 0, 151, 1000, {'from': deployer})
     # games['2'] = game3.address
-    game3 = Game2.at(games['2'])
-    game3.transferOwnership('0xd7d99E93804EBCdCbA544E4D7b7E543b73561454', {'from': deployer})
+    # game3 = Game2.at(games['2'])
+    # game3.transferOwnership('0xd7d99E93804EBCdCbA544E4D7b7E543b73561454', {'from': deployer})
+    #
+    # addresses['games'] = games
 
-    addresses['games'] = games
+
+    tournament = GameTournament.deploy(Resource[-1].address, PHI[-1].address, addresses['lending'], 0, {'from': deployer})
+    # snowtrace_publish(tournament)
+    addresses['gameTournament'] = tournament.address
+    tournament.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:
         f.write('export default ' + json.dumps(addresses))

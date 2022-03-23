@@ -7,6 +7,7 @@ import STAKING_ABI from './staking.abi.json';
 import MARKETPLACE_ABI from './marketplace.abi.json';
 import GAME_ABI from './game.abi.json';
 import GAME2_ABI from './game2.abi.json';
+import GAME_TOURNAMENT_ABI from './gameTournament.abi.json';
 import VESTING_FACTORY_ABI from './vesting/factory.abi.json';
 import VESTING_ABI from './vesting/vesting.abi.json';
 import TIMELOCK_ABI from './vesting/timelock.abi.json';
@@ -19,6 +20,7 @@ import { ContractContext as StakingContract } from './staking';
 import { ContractContext as MarketplaceContract } from './marketplace';
 import { ContractContext as GameContract } from './game';
 import { ContractContext as Game2Contract } from './game2';
+import { ContractContext as GameTournamentContract } from './gameTournament';
 import { ContractContext as VestingFactoryContract } from './vesting/factory';
 import { ContractContext as VestingContract } from './vesting/vesting';
 import { ContractContext as TimelockContract } from './vesting/timelock';
@@ -63,6 +65,10 @@ export function gameContract(web3: Web3) {
 
 export function game2Contract(web3: Web3, address: string) {
     return new web3.eth.Contract(GAME2_ABI as any, address) as any as Game2Contract;
+}
+
+export function gameTournamentContract(web3: Web3) {
+    return new web3.eth.Contract(GAME_TOURNAMENT_ABI as any, ADDRESSES.gameTournament) as any as GameTournamentContract;
 }
 
 export function vestingFactoryContract(web3: Web3) {

@@ -1,0 +1,61 @@
+.tournament-info {
+  display: inline-flex;
+  flex-wrap: wrap;
+  background-color: #141719;
+  border: 2px solid #99763E;
+  box-shadow: 0 4px 25px rgb(0 0 0 / 50%), inset 4px 4px 15px rgb(0 0 0 / 25%);
+  padding: 2rem 1.5rem;
+  margin-bottom: 1em;
+
+  &__item {
+    margin-right: 1em;
+    .title {
+      font-size: 1.4rem;
+      color: #6D7E8A;
+    }
+  }
+}
+
+.games-list {
+  .round-name {
+    text-align: center;
+  }
+
+  .games-wrap {
+    display: flex;
+    flex-wrap: wrap;
+
+    .game-info {
+      background-color: #141719;
+      border: 2px solid #99763E;
+      box-shadow: 0 4px 25px rgb(0 0 0 / 50%), inset 4px 4px 15px rgb(0 0 0 / 25%);
+      padding: 2rem 1.5rem;
+      margin-bottom: 1em;
+      margin-right: 1em;
+
+      span.row {
+        display: block;
+      }
+    }
+  }
+}
+
+.tournaments-page {
+  h3 {
+    text-align: center;
+  }
+
+  .tournaments {
+    display: flex;
+    flex-wrap: wrap;
+
+    &__item {
+      background-color: #141719;
+      border: 2px solid #99763E;
+      box-shadow: 0 4px 25px rgb(0 0 0 / 50%), inset 4px 4px 15px rgb(0 0 0 / 25%);
+      padding: 2rem 1.5rem;
+      margin-bottom: 1em;
+      margin-right: 1em;
+    }
+  }
+}

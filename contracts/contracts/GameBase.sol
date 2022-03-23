@@ -13,7 +13,7 @@ import "./CustomEnumerableMap.sol";
 import "./Resource.sol";
 import "./GameLending.sol";
 
-abstract contract GameBase is Ownable, Pausable {
+contract GameBase is Ownable, Pausable {
     using Counters for Counters.Counter;
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.UintSet;
@@ -224,7 +224,7 @@ abstract contract GameBase is Ownable, Pausable {
         emit PlayerLeft(gameId, msg.sender);
     }
 
-    function placeCard(uint256 tokenId) external {
+    function placeCardMangledNameFoo(uint256 tokenId) external {
         uint256 gameId = currentGames[msg.sender];
         require(gameId != 0, "you are not playing a game");
         GameInfo storage game_ = _games[gameId];

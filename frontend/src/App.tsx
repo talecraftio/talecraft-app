@@ -21,11 +21,13 @@ import MarketItemPage from "./pages/marketplace/MarketItemPage";
 import VestingPage from "./pages/VestingPage";
 import CodexIndexPage from "./pages/codex/CodexIndexPage";
 import CodexCardPage from "./pages/codex/CodexCardPage";
-import GamePage from "./pages/game/GamePage";
-import GameLeagueSelectPage from "./pages/game/GameLeagueSelectPage";
-import GameLeaderboardPage from "./pages/game/GameLeaderboardPage";
+// import GamePage from "./pages/game/GamePage";
+// import GameLeagueSelectPage from "./pages/game/GameLeagueSelectPage";
+// import GameLeaderboardPage from "./pages/game/GameLeaderboardPage";
 import LendingPage from "./pages/LendingPage";
 import CreateVestingPage from "./pages/tools/CreateVestingPage";
+import TournamentsListPage from "./pages/tournaments/TournamentsListPage";
+import TournamentInfoPage from "./pages/tournaments/TournamentInfoPage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -44,9 +46,11 @@ const App = observer(() => {
                     <Route path='/wallet' component={WalletPage} />
                     <Route path='/craft' component={CraftPage} />
                     <Route path='/leaderboard' component={LeaderboardsPage} />
-                    <Route exact path='/game' component={GameLeagueSelectPage} />
-                    <Route exact path={['/game/junior', '/game/senior', '/game/master']} component={GamePage} />
-                    <Route exact path={['/game/junior/leaderboard', '/game/senior/leaderboard', '/game/master/leaderboard']} component={GameLeaderboardPage} />
+                    {/*<Route exact path='/game' component={GameLeagueSelectPage} />*/}
+                    {/*<Route exact path={['/game/junior', '/game/senior', '/game/master']} component={GamePage} />*/}
+                    {/*<Route exact path={['/game/junior/leaderboard', '/game/senior/leaderboard', '/game/master/leaderboard']} component={GameLeaderboardPage} />*/}
+                    <Route exact path='/tournaments' component={TournamentsListPage} />
+                    <Route path='/tournaments/:tournamentId' component={TournamentInfoPage} />
                     <Route path='/lending' component={LendingPage} />
                     {/*<Route path='/lending' component={MaintenancePage} />*/}
                     <Route path='/_vesting' component={VestingPage} />
