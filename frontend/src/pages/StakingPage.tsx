@@ -237,7 +237,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                             contract={walletStore.stakingNewContract}
                             craftPrice={craftPrice}
                             avaxPrice={avaxPrice}
-                            address={ADDRESSES.staking_lock}
+                            address={ADDRESSES.staking_new}
                             title='Earn CRAFT New'
                             info={<h5 className='section-info'>
                                 Withdraw same block 25% fee (prevent flashloans), before 30 days 20% fee, before 60 days 10% fee, after 60 days finished, no fee.<br/>
