@@ -219,6 +219,18 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                 <div className="container">
                     <div className="staking-wrap">
                         <StakingBlock
+                            aprBase='317952'
+                            contract={walletStore.stakingNewContract}
+                            craftPrice={craftPrice}
+                            avaxPrice={avaxPrice}
+                            address={ADDRESSES.staking_new}
+                            title='Earn CRAFT New'
+                            info={<h5 className='section-info'>
+                                Withdraw same block 25% fee (prevent flashloans), before 30 days 20% fee, before 60 days 10% fee, after 60 days finished, no fee.<br/>
+                                Rewards dist. until 26 June
+                            </h5>}
+                        />
+                        <StakingBlock
                             aprBase='600000'
                             contract={walletStore.stakingLockContract}
                             craftPrice={craftPrice}
@@ -231,18 +243,7 @@ const StakingPage = observer(({}: IStakingPageProps) => {
                                 CRAFTs will be locked until April 15th.<br/>
                                 5000 AP will be airdropped depends on weights.
                             </h5>}
-                        />
-                        <StakingBlock
-                            aprBase='317952'
-                            contract={walletStore.stakingNewContract}
-                            craftPrice={craftPrice}
-                            avaxPrice={avaxPrice}
-                            address={ADDRESSES.staking_new}
-                            title='Earn CRAFT New'
-                            info={<h5 className='section-info'>
-                                Withdraw same block 25% fee (prevent flashloans), before 30 days 20% fee, before 60 days 10% fee, after 60 days finished, no fee.<br/>
-                                Rewards dist. until 26 June
-                            </h5>}
+                            disabled
                         />
                         <StakingBlock
                             aprBase='47414'
