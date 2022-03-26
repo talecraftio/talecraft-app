@@ -25,7 +25,7 @@ const TournamentsListPage = ({}: IGameTournamentPageProps) => {
         setAllTournaments(allTournaments);
         const now = +new Date() / 1000;
         const futureTournaments = _.sortBy(tournaments.filter(t => parseInt(t.joinDeadline) > now && !t.started), t => parseInt(t.startTime));
-        setUpcomingTournaments(futureTournaments.filter(t => t.startTime == futureTournaments[0]?.startTime));
+        setUpcomingTournaments(futureTournaments.filter(t => Math.abs(parseInt(t.startTime) - parseInt(futureTournaments[0]?.startTime)) < 30));
         setCurrentTournaments(tournaments.filter(t => t.started && !t.finished));
     };
 
