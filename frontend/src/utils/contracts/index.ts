@@ -55,6 +55,10 @@ export function stakingLockContract(web3: Web3) {
     return new web3.eth.Contract(STAKING_ABI as any, ADDRESSES.staking_lock) as any as StakingContract;
 }
 
+export function stakingNewContract(web3: Web3) {
+    return new web3.eth.Contract(STAKING_ABI as any, ADDRESSES.staking_new) as any as StakingContract;
+}
+
 export function marketplaceContract(web3: Web3) {
     return new web3.eth.Contract(MARKETPLACE_ABI as any, ADDRESSES.marketplace) as any as MarketplaceContract;
 }

@@ -12,7 +12,7 @@ import {
     phiContract,
     resourceContract,
     stakingContract,
-    stakingContractX7, stakingLockContract,
+    stakingContractX7, stakingLockContract, stakingNewContract,
     timelockContract,
     vestingContract,
     vestingFactory2Contract,
@@ -174,6 +174,10 @@ class WalletStore {
 
     get stakingLockContract() {
         return stakingLockContract(this.web3);
+    }
+
+    get stakingNewContract() {
+        return stakingNewContract(this.web3);
     }
 
     get marketplaceContract() {
