@@ -40,10 +40,10 @@ def main():
     tournament = GameTournament.deploy(Resource[-1].address, PHI[-1].address, addresses['lending'], 0, {'from': deployer})
     # snowtrace_publish(tournament)
     addresses['gameTournament'] = tournament.address
-    tournament.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
-    # now = int(time())
-    # GameTournament[-1].addTournament(2, now + 30, now + 100000, {'from': deployer})
-    # GameTournament[-1].addTournament(2, now + 30, now + 100000, {'from': deployer})
+    # tournament.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
+    now = int(time())
+    GameTournament[-1].addTournament(2, now + 30, now + 100000, {'from': deployer})
+    GameTournament[-1].addTournament(2, now + 30, now + 100000, {'from': deployer})
     # now = int(time())
     # GameTournament[-1].addTournament(2, now + 101, now + 100001, {'from': deployer})
 

@@ -11,8 +11,7 @@ def main():
             addresses = json.loads(f.read()[14:])
     except:
         addresses = {}
-
-    network.gas_price(40000000000)
+    network.gas_price(100000000000)
 
     deployer = accounts.load('talecraft-deployer')
 
@@ -40,9 +39,10 @@ def main():
     # addresses['games'] = games
 
 
-    tournament = GameTournament.deploy(Resource[-1].address, PHI[-1].address, addresses['lending'], 0, {'from': deployer})
+    tournament = GameTournament[-1]  # .deploy(Resource[-1].address, PHI[-1].address, addresses['lending'], 0, {'from': deployer})
+    tournament.updateWinAmounts([10000000000000000000,20000000000000000000,40000000000000000000,80000000000000000000,160000000000000000000], {'from': deployer})
     # snowtrace_publish(tournament)
-    addresses['gameTournament'] = tournament.address
+    # addresses['gameTournament'] = tournament.address
     tournament.transferOwnership('0xd4AE6402155Ec508C6Ca7Dd833fd355c6eDd1c14', {'from': deployer})
 
     with open('../frontend/src/utils/contracts/addresses.ts', 'w') as f:

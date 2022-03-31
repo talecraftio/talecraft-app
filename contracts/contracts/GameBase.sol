@@ -178,8 +178,9 @@ contract GameBase is Ownable, Pausable {
                 _playerOwnedTokens[saveId][account][borrowedTokens[i]]++;
     }
 
-    function _joinGame(address account, bool saveBalances) internal {
-        require(currentGames[account] == 0, "you are playing already");
+    function _joinGame(address account, bool saveBalances, bool checkCurrentGames) internal {
+        if (checkCurrentGames)
+            require(currentGames[account] == 0, "you are playing already");
         require(block.timestamp - lastGameTimestamps[account] >= epoch, "wait for join timeout");
         uint256 gameId = _gameIds.current();
         GameInfo storage game_ = _games[gameId];
@@ -229,6 +230,8 @@ contract GameBase is Ownable, Pausable {
         require(gameId != 0, "you are not playing a game");
         GameInfo storage game_ = _games[gameId];
         require(game_.started, "game has not started");
+        _beforeGameAction(game_);
+
         bool turn0 = game_.turn == 0;
         require(turn0 && game_.player[0].addr == msg.sender || !turn0 && game_.player[1].addr == msg.sender, "not your turn");
         require(_playerOwnedTokens[gameId][msg.sender][tokenId] > 0, "insufficient virtual balance");
@@ -344,11 +347,15 @@ contract GameBase is Ownable, Pausable {
 
     function _afterGameEnd(GameInfo storage game_) internal virtual {}
 
+    function _beforeGameAction(GameInfo storage game_) internal virtual {}
+
     function usePower(PowerType powerType) external {
         uint256 gameId = currentGames[msg.sender];
         require(gameId != 0, "you are not playing a game");
         GameInfo storage game_ = _games[gameId];
         require(game_.started, "game is not running");
+        _beforeGameAction(game_);
+
         bool turn0 = game_.turn == 0;
         uint256 round = game_.round;
         require(turn0 && game_.player[0].addr == msg.sender || !turn0 && game_.player[1].addr == msg.sender, "not your turn");
@@ -375,6 +382,7 @@ contract GameBase is Ownable, Pausable {
         GameInfo storage game_ = _games[gameId];
         require(game_.started, "game is not running");
         require(block.timestamp - game_.lastAction >= abortTimeout, "timeout has not passed");
+
         bool turn0 = game_.turn == 0;
         require(turn0 && game_.player[1].addr == msg.sender || !turn0 && game_.player[0].addr == msg.sender, "now is your turn");
         _abort(game_, msg.sender);
@@ -387,6 +395,8 @@ contract GameBase is Ownable, Pausable {
     }
 
     function _abort(GameInfo storage game_, address winner) private {
+        _beforeGameAction(game_);
+
         game_.finished = true;
         game_.winner = winner;
         if (winner == address(0)) {
@@ -419,6 +429,8 @@ contract GameBase is Ownable, Pausable {
         emit GameAborted(game_.gameId, winner);
 
         inGameCount -= 2;
+
+        _afterGameEnd(game_);
     }
 
     function updateJoinPrice(uint256 newValue) external onlyOwner {

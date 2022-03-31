@@ -192,7 +192,7 @@ const TournamentInfoPage = observer(({ match: { params: { tournamentId } } }: IT
                     ) : 'Loading...'}
                 </div>
             </section>
-            <GameComponent activeGame={activeGame} gameContract={contract as any} debugName='tournament' />
+            {(t?.started || !!spectateId) && <GameComponent activeGame={activeGame} gameContract={contract as any} debugName='tournament' />}
         </main>
     )
 });

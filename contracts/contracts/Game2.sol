@@ -11,7 +11,7 @@ contract Game2 is GameBase {
             GameBase(resource, phi, gameLending, joinPrice_, minWeight_, maxWeight_) {}
 
     function joinGame() external whenNotPaused {
-        _joinGame(msg.sender, true);
+        _joinGame(msg.sender, true, true);
     }
 
     function _afterGameEnd(GameInfo storage game_) internal override {

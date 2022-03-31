@@ -14,10 +14,11 @@ import useAsyncEffect from "use-async-effect";
 import { usePrevious } from "react-use";
 import { toast } from "react-toastify";
 import { observer } from "mobx-react";
+import { ContractContext as GameTournamentContract } from "../utils/contracts/gameTournament";
 
 interface IGameComponentProps {
     activeGame: GameinfoResponse;
-    gameContract: GameBaseContract;
+    gameContract: GameTournamentContract;
     debugName: string;
 }
 
@@ -101,7 +102,29 @@ const GameComponent = observer(({ activeGame, gameContract, debugName }: IGameCo
     const item2RivalSlot = useRef<HTMLDivElement>();
     const item3RivalSlot = useRef<HTMLDivElement>();
 
-    const inventory = useAsyncMemo(() => activeGame ? gameContract.methods.getPlayerInventory(activeGame.gameId, walletStore.address).call() : undefined, [walletStore.lastBlock, activeGame]);
+    const inventory = useAsyncMemo(async () => {
+        if (!activeGame)
+            return undefined;
+        const resource = walletStore.resourceContract;
+        const tokenIds = await resource.methods.ownedTokens(walletStore.address).call();
+        const balances = await resource.methods.balanceOfBatch(_.range(tokenIds.length).map(() => walletStore.address), tokenIds).call();
+        const borrowedTokens = _.reduce(
+            await walletStore.gameLendingContract.methods.getBorrowedTokenIds(walletStore.address).call(),
+            (acc, tokenId) => ({ ...acc, [tokenId]: (acc[tokenId] || 0) + 1 }),
+            {}
+        );
+        const inventoryObj: { [tokenId: string]: number } = _.reduce(
+            _.zip(tokenIds, balances),
+            (acc, [tokenId, balance]) => ({ ...acc, [tokenId]: (acc[tokenId] || 0) + parseInt(balance) }),
+            borrowedTokens
+        );
+        const usedTokens = _.reduce(
+            await gameContract.methods.getPlayerUsedCards(activeGame.gameId, walletStore.address).call(),
+            (acc, { tokenId, balance }) => ({ ...acc, [tokenId]: parseInt(balance) }),
+            {}
+        );
+        return _.map(inventoryObj, (balance, tokenId) => ({ tokenId, balance: balance - (usedTokens[tokenId] || 0) }));
+    }, [walletStore.lastBlock, activeGame]);
     const isPlayer0 = useMemo(() => activeGame?.player[0].addr === walletStore.address, [walletStore.lastBlock, activeGame, walletStore.address]);
     const isTurn = useMemo(() => activeGame?.turn === (isPlayer0 ? '0' : '1'), [isPlayer0, activeGame, walletStore.address]);
     const selfInfo = useMemo(() => isPlayer0 ? activeGame?.player[0] : activeGame?.player[1], [activeGame]);
@@ -282,7 +305,7 @@ const GameComponent = observer(({ activeGame, gameContract, debugName }: IGameCo
         return inventory.map(({ tokenId, balance }) => ({
             info: walletStore.resourceTypes[parseInt(tokenId)],
             tokenId,
-            balance: parseInt(balance),
+            balance: balance,
         })).filter(item => parseInt(item.tokenId) > 4 && (q ? new RegExp(`.*${q}.*`, 'i').test(item.info.name) : true))
     }, [inventory, walletStore.lastBlock, walletStore.resourceTypes, q]);
 

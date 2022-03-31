@@ -61,13 +61,10 @@ export type ContractContext = Web3ContractContext<
 >;
 export type GameTournamentEvents =
   | 'AbortTimeoutUpdated'
-  | 'EpochUpdated'
   | 'GameAborted'
   | 'GameFinished'
   | 'GameStarted'
   | 'JoinPriceUpdated'
-  | 'MaxWeightUpdated'
-  | 'MinWeightUpdated'
   | 'OwnershipTransferred'
   | 'Paused'
   | 'PlayerEntered'
@@ -78,21 +75,11 @@ export type GameTournamentEvents =
   | 'TournamentCreated'
   | 'TournamentFinish'
   | 'TournamentJoin'
-  | 'TournamentLeave'
   | 'TournamentStart'
   | 'Unpaused'
   | 'WinAmountsUpdated';
 export interface GameTournamentEventsContext {
   AbortTimeoutUpdated(
-    parameters: {
-      filter?: {};
-      fromBlock?: number;
-      toBlock?: 'latest' | number;
-      topics?: string[];
-    },
-    callback?: (error: Error, event: EventData) => void
-  ): EventResponse;
-  EpochUpdated(
     parameters: {
       filter?: {};
       fromBlock?: number;
@@ -129,24 +116,6 @@ export interface GameTournamentEventsContext {
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
   JoinPriceUpdated(
-    parameters: {
-      filter?: {};
-      fromBlock?: number;
-      toBlock?: 'latest' | number;
-      topics?: string[];
-    },
-    callback?: (error: Error, event: EventData) => void
-  ): EventResponse;
-  MaxWeightUpdated(
-    parameters: {
-      filter?: {};
-      fromBlock?: number;
-      toBlock?: 'latest' | number;
-      topics?: string[];
-    },
-    callback?: (error: Error, event: EventData) => void
-  ): EventResponse;
-  MinWeightUpdated(
     parameters: {
       filter?: {};
       fromBlock?: number;
@@ -248,15 +217,6 @@ export interface GameTournamentEventsContext {
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
-  TournamentLeave(
-    parameters: {
-      filter?: { tournamentId?: string | string[] };
-      fromBlock?: number;
-      toBlock?: 'latest' | number;
-      topics?: string[];
-    },
-    callback?: (error: Error, event: EventData) => void
-  ): EventResponse;
   TournamentStart(
     parameters: {
       filter?: { tournamentId?: string | string[] };
@@ -292,24 +252,19 @@ export type GameTournamentMethodNames =
   | 'addTournament'
   | 'currentGames'
   | 'diceRolled'
-  | 'epoch'
   | 'fee'
   | 'game'
   | 'getLastTournamentId'
-  | 'getPlayerInventory'
+  | 'getPlayerUsedCards'
   | 'getRoundWinner'
   | 'getTournaments'
   | 'getWinAmounts'
   | 'inGameCount'
   | 'joinPrice'
   | 'joinTournament'
-  | 'lastGameTimestamps'
   | 'leaderboard'
   | 'leaderboardPaginated'
   | 'leaveGame'
-  | 'leaveTournament'
-  | 'maxWeight'
-  | 'minWeight'
   | 'owner'
   | 'ownerAbort'
   | 'paused'
@@ -323,15 +278,11 @@ export type GameTournamentMethodNames =
   | 'togglePause'
   | 'transferOwnership'
   | 'updateAbortTimeout'
-  | 'updateEpoch'
   | 'updateGameLending'
   | 'updateJoinPrice'
-  | 'updateMaxWeight'
-  | 'updateMinWeight'
   | 'updatePowerPrices'
   | 'updateWinAmounts'
   | 'usePower'
-  | 'waitingCount'
   | 'winAmounts'
   | 'withdrawFee';
 export interface UsedPowersResponse {
@@ -444,13 +395,6 @@ export interface GameTournament {
    * StateMutability: view
    * Type: function
    */
-  epoch(): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
   fee(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
@@ -475,7 +419,7 @@ export interface GameTournament {
    * @param gameId Type: uint256, Indexed: false
    * @param player Type: address, Indexed: false
    */
-  getPlayerInventory(
+  getPlayerUsedCards(
     gameId: string,
     player: string
   ): MethodConstantReturnContext<InventoryitemResponse[]>;
@@ -537,14 +481,6 @@ export interface GameTournament {
    * Constant: true
    * StateMutability: view
    * Type: function
-   * @param parameter0 Type: address, Indexed: false
-   */
-  lastGameTimestamps(parameter0: string): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
    */
   leaderboard(): MethodConstantReturnContext<LeaderboarditemResponse[]>;
   /**
@@ -566,28 +502,6 @@ export interface GameTournament {
    * Type: function
    */
   leaveGame(): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param tournamentId Type: uint256, Indexed: false
-   */
-  leaveTournament(tournamentId: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  maxWeight(): MethodConstantReturnContext<string>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  minWeight(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -695,14 +609,6 @@ export interface GameTournament {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
-   * @param newValue Type: uint256, Indexed: false
-   */
-  updateEpoch(newValue: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
    * @param newAddress Type: address, Indexed: false
    */
   updateGameLending(newAddress: string): MethodReturnContext;
@@ -714,22 +620,6 @@ export interface GameTournament {
    * @param newValue Type: uint256, Indexed: false
    */
   updateJoinPrice(newValue: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param newValue Type: uint256, Indexed: false
-   */
-  updateMaxWeight(newValue: string): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param newValue Type: uint256, Indexed: false
-   */
-  updateMinWeight(newValue: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -764,13 +654,6 @@ export interface GameTournament {
    * @param powerType Type: uint8, Indexed: false
    */
   usePower(powerType: string | number): MethodReturnContext;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  waitingCount(): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
