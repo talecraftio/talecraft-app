@@ -28,6 +28,7 @@ import LendingPage from "./pages/LendingPage";
 import CreateVestingPage from "./pages/tools/CreateVestingPage";
 import TournamentsListPage from "./pages/tournaments/TournamentsListPage";
 import TournamentInfoPage from "./pages/tournaments/TournamentInfoPage";
+import TournamentAbortPage from "./pages/tournaments/TournamentAbortPage";
 
 const App = observer(() => {
     const settingsStore = useInjection(SettingsStore);
@@ -50,6 +51,7 @@ const App = observer(() => {
                     {/*<Route exact path={['/game/junior', '/game/senior', '/game/master']} component={GamePage} />*/}
                     {/*<Route exact path={['/game/junior/leaderboard', '/game/senior/leaderboard', '/game/master/leaderboard']} component={GameLeaderboardPage} />*/}
                     <Route exact path='/tournaments' component={TournamentsListPage} />
+                    <Route exact path='/tournaments/abortGame' component={TournamentAbortPage} />
                     <Route path='/tournaments/:tournamentId' component={TournamentInfoPage} />
                     <Route path='/lending' component={LendingPage} />
                     {/*<Route path='/lending' component={MaintenancePage} />*/}

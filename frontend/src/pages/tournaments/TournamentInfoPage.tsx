@@ -123,11 +123,6 @@ const TournamentInfoPage = observer(({ match: { params: { tournamentId } } }: IT
         await loadTournamentInfo();
     }
 
-    const onLeave = async () => {
-        await walletStore.sendTransaction(contract.methods.leaveTournament(tournamentId));
-        await loadTournamentInfo();
-    }
-
     const totalPrize = useAsyncMemo(async () => {
         if (!t)
             return null;
@@ -180,7 +175,8 @@ const TournamentInfoPage = observer(({ match: { params: { tournamentId } } }: IT
                                 {!t.started && now > parseInt(t.startTime) && now < parseInt(t.joinDeadline) && (
                                     <div className="tournament-info__item">
                                         {t.players.includes(walletStore.address) ? (
-                                            <button className='btn' onClick={onLeave}>Leave</button>
+                                            <></>
+                                            // <button className='btn' onClick={onLeave}>Leave</button>
                                         ) : (
                                             <button className='btn' onClick={onJoin}>Join</button>
                                         )}
