@@ -82,7 +82,7 @@ contract GameTournament is Ownable, Pausable {
     Counters.Counter private tournamentIds;
     mapping (address => uint256) public playersCurrentTournaments;
     mapping (uint256 => bool) public diceRolled;
-    uint256[5] public winAmounts = [5e18, 10e18, 20e18, 40e18, 80e18];
+    uint256[5] public winAmounts = [10e18, 20e18, 40e18, 80e18, 160e18];
 
     Counters.Counter internal _gameIds;
     mapping (uint256 => GameInfo) _games;
@@ -97,6 +97,7 @@ contract GameTournament is Ownable, Pausable {
     mapping (uint256 => mapping (address => bool)) internal _playerJoins;
     mapping (uint256 => mapping (address => CustomEnumerableMap.UintToUintMap)) internal _usedCards;
     mapping (address => uint256) public currentGames;
+    mapping (uint256 => uint256) internal _gameTournaments;
 
     Resource internal immutable _resource;
     IERC20 internal immutable _phi;
@@ -215,9 +216,10 @@ contract GameTournament is Ownable, Pausable {
             address player2 = tournamentPlayers[tournamentId].at(newPlayersCount - 2);
             // start game
             uint256 gameId = _gameIds.current();
-            _joinGame(player1, false, false);
-            _joinGame(player2, false, false);
+            _joinGame(player1);
+            _joinGame(player2);
             tournament.gameIds[0].push(gameId);
+            _gameTournaments[gameId] = tournamentId;
         }
 
         if (newPlayersCount == tournament.playersCount) {
@@ -253,7 +255,7 @@ contract GameTournament is Ownable, Pausable {
         return result;
     }
 
-    function _joinGame(address account, bool saveBalances, bool checkCurrentGames) internal {
+    function _joinGame(address account) internal {
         uint256 gameId = _gameIds.current();
         GameInfo storage game_ = _games[gameId];
         require(!_playerJoins[gameId][account], "please wait for the next game");
@@ -298,7 +300,7 @@ contract GameTournament is Ownable, Pausable {
         require(gameId != 0, "you are not playing a game");
         GameInfo storage game_ = _games[gameId];
         require(game_.started, "game has not started");
-        require(tournaments[playersCurrentTournaments[msg.sender]].started, "tournament has not started yet");
+        require(tournaments[_gameTournaments[gameId]].started, "tournament has not started yet");
 
         bool turn0 = game_.turn == 0;
         require(turn0 && game_.player[0].addr == msg.sender || !turn0 && game_.player[1].addr == msg.sender, "not your turn");
@@ -444,9 +446,10 @@ contract GameTournament is Ownable, Pausable {
                     address player1 = winners[i];
                     address player2 = winners[i + 1];
                     uint256 gameId = _gameIds.current();
-                    _joinGame(player1, false, false);
-                    _joinGame(player2, false, false);
+                    _joinGame(player1);
+                    _joinGame(player2);
                     tournament.gameIds[tournament.tournamentRound].push(gameId);
+                    _gameTournaments[gameId] = tournamentId;
                 }
                 delete tournament.currentWinners;
             }
@@ -458,7 +461,7 @@ contract GameTournament is Ownable, Pausable {
         require(gameId != 0, "you are not playing a game");
         GameInfo storage game_ = _games[gameId];
         require(game_.started, "game is not running");
-        require(tournaments[playersCurrentTournaments[msg.sender]].started, "tournament has not started yet");
+        require(tournaments[_gameTournaments[gameId]].started, "tournament has not started yet");
 
         bool turn0 = game_.turn == 0;
         uint256 round = game_.round;
@@ -499,7 +502,7 @@ contract GameTournament is Ownable, Pausable {
     }
 
     function _abort(GameInfo storage game_, address winner) private {
-        require(tournaments[playersCurrentTournaments[msg.sender]].started, "tournament has not started yet");
+        require(tournaments[_gameTournaments[game_.gameId]].started, "tournament has not started yet");
 
         game_.finished = true;
         game_.winner = winner;
